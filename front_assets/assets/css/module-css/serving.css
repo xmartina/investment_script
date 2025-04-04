@@ -1,0 +1,141 @@
+/*--------------------------------------------------------------
+# Serving One
+--------------------------------------------------------------*/
+.serving-one {
+    position: relative;
+    display: block;
+    padding: 120px 0 0px;
+    z-index: 1;
+}
+
+.serving-one ul.row {
+    --bs-gutter-x: 0px;
+}
+
+.serving-one ul li {
+    position: relative;
+    border-right: 1px solid var(--finris-bdr-color);
+    border-bottom: 1px solid var(--finris-bdr-color);
+}
+
+.serving-one ul li:nth-child(6) {
+    border-right: 0;
+}
+
+.serving-one ul li:nth-child(12) {
+    border-right: 0;
+}
+
+.serving-one__single {
+    position: relative;
+    display: block;
+    text-align: center;
+    padding: 60px 0 52px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.serving-one__single:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--finris-base);
+    opacity: 0;
+    transform: translateY(50px);
+    transition: background-color 0.7s ease;
+    transition: all 0.7s ease;
+    z-index: -1;
+}
+
+.serving-one__single:hover:before {
+    opacity: 1;
+    transform: translateY(0px);
+}
+
+.serving-one__icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 80px;
+    margin: 0 auto 0;
+    background-color: rgba(var(--finris-base-rgb), .05);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.serving-one__icon::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: var(--finris-white);
+    opacity: 0;
+    transform: perspective(400px) scaleX(0);
+    transform-origin: center;
+    transition: all 500ms ease;
+}
+
+.serving-one__single:hover .serving-one__icon::before {
+    opacity: 1;
+    transform: perspective(400px) scaleX(1.0);
+    transition-delay: 200ms;
+}
+
+.serving-one__icon span {
+    position: relative;
+    display: inline-block;
+    font-size: 40px;
+    color: var(--finris-base);
+    transition: all 500ms linear;
+    transition-delay: 0.1s;
+    transform: scale(1);
+}
+
+.serving-one__single:hover .serving-one__icon span {
+    color: var(--finris-black);
+    transform: scale(.9);
+}
+
+.serving-one__title {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 30px;
+    text-transform: uppercase;
+    margin-top: 25px;
+    -webkit-transition: all 500ms ease;
+    transition: all 500ms ease;
+}
+
+.serving-one__single:hover .serving-one__title {
+    color: var(--finris-white);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*--------------------------------------------------------------
+# End
+--------------------------------------------------------------*/

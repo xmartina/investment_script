@@ -1,0 +1,122 @@
+/*--------------------------------------------------------------
+# Counter One
+--------------------------------------------------------------*/
+.counter-one {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background-color: var(--finris-base);
+    padding: 50px 0 50px;
+    z-index: 1;
+}
+
+.counter-one__shape-1 {
+    position: absolute;
+    top: 0;
+    right: -30px;
+    bottom: 0;
+    width: 61.4%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    z-index: -1;
+}
+
+.counter-one__list {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.counter-one__list li {
+    position: relative;
+    display: block;
+}
+
+.counter-one__list li:before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: -95px;
+    height: 7px;
+    width: 7px;
+    background-color: var(--finris-white);
+    border-radius: 50%;
+}
+
+.counter-one__list li:after {
+    content: "";
+    position: absolute;
+    bottom: 16px;
+    left: -95px;
+    height: 7px;
+    width: 7px;
+    background-color: var(--finris-white);
+    border-radius: 50%;
+}
+
+.counter-one__list li:first-child:before,
+.counter-one__list li:first-child:after {
+    display: none;
+}
+
+.counter-one__single {
+    position: relative;
+    display: block;
+    text-align: center;
+}
+
+.counter-one__single:before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    bottom: 16px;
+    left: -92px;
+    width: 1px;
+    background-color: var(--finris-white);
+}
+
+.counter-one__list li:first-child .counter-one__single:before {
+    display: none;
+}
+
+.counter-one__count {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.counter-one__count p {
+    font-size: 60px;
+    color: var(--finris-white);
+    line-height: 60px;
+    font-weight: 700;
+}
+
+.counter-one__count-plus {
+    font-size: 60px;
+    color: var(--finris-white);
+    line-height: 60px;
+    font-weight: 700;
+}
+
+.counter-one__text {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--finris-white);
+}
+
+
+
+
+
+
+
+/*--------------------------------------------------------------
+# End
+--------------------------------------------------------------*/

@@ -1,0 +1,239 @@
+/*--------------------------------------------------------------
+# Awards One
+--------------------------------------------------------------*/
+.awards-one {
+    position: relative;
+    display: block;
+    padding: 120px 0 67px;
+    z-index: 1;
+}
+
+.awards-one__left {
+    position: relative;
+    display: block;
+}
+
+.awards-one__left .section-title-two {
+    margin-bottom: 57px;
+}
+
+.awards-one__img-box {
+    position: relative;
+    display: block;
+    margin-right: 216px;
+}
+
+.awards-one__img {
+    position: relative;
+    display: block;
+}
+
+.awards-one__img img {
+    width: 100%;
+}
+
+.awards-one__img-2 {
+    position: absolute;
+    right: -136px;
+    bottom: -43px;
+    border: 4px solid var(--finris-white);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.awards-one__img-2 img {
+    width: auto;
+    border-radius: 16px;
+}
+
+.awards-one__experience-box {
+    position: absolute;
+    bottom: 24px;
+    left: 25px;
+    z-index: 2;
+}
+
+.awards-one__count {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.awards-one__count h3 {
+    font-size: 60px;
+    font-weight: 700;
+    line-height: 60px;
+    font-family: var(--finris-font);
+    color: var(--finris-white);
+}
+
+.awards-one__count span {
+    font-size: 60px;
+    font-weight: 700;
+    line-height: 60px;
+    font-family: var(--finris-font);
+    color: var(--finris-white);
+}
+
+.awards-one__count-text {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--finris-white);
+    margin-top: 2px;
+}
+
+.awards-one__shape-1 {
+    position: absolute;
+    bottom: -100px;
+    left: -34px;
+    width: 279px;
+    height: 279px;
+    background-color: rgba(10, 87, 239, 0.69);
+    border-radius: 50%;
+}
+
+.awards-one__shape-2 {
+    position: absolute;
+    bottom: -80px;
+    left: -15px;
+    width: 236px;
+    height: 236px;
+    background-color: rgba(10, 87, 239, 0.69);
+    border-radius: 50%;
+}
+
+.awards-one__right {
+    position: relative;
+    display: block;
+    margin-top: 200px;
+}
+
+.awards-one__awards-list {
+    position: relative;
+    display: block;
+}
+
+.awards-one__awards-list::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 29px;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--finris-bdr-color);
+}
+
+.awards-one__awards-list li {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+}
+
+.awards-one__awards-list li+li {
+    margin-top: 38px;
+}
+
+.awards-one__awards-list li .icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 60px;
+    width: 100%;
+    height: 60px;
+    background-color: var(--finris-base);
+    border-radius: 50%;
+}
+
+.awards-one__awards-list li .icon span {
+    position: relative;
+    display: inline-block;
+    font-size: 24px;
+    color: var(--finris-white);
+}
+
+.awards-one__awards-list li .content {
+    position: relative;
+    display: block;
+}
+
+.awards-one__awards-list li .content h3 {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 34px;
+}
+
+.awards-one__awards-list li .content p {
+    margin-top: 10px;
+    margin-bottom: 11px;
+}
+
+.awards-one__tag-and-date {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.awards-one__tag {
+    position: relative;
+    display: block;
+}
+
+.awards-one__tag>p {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #FEB72B;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--finris-black);
+    padding: 2px 12px 2px;
+    border-radius: 15px;
+}
+
+.awards-one__tag>p>span {
+    font-size: 16px;
+}
+
+.awards-one__date {
+    position: relative;
+    display: block;
+}
+
+.awards-one__date>p {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--finris-gray);
+    padding: 1px 11px 1px;
+    border-radius: 15px;
+    border: 1px solid var(--finris-bdr-color);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*--------------------------------------------------------------
+# End
+--------------------------------------------------------------*/

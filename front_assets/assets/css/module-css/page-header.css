@@ -1,0 +1,116 @@
+/*--------------------------------------------------------------
+# Page Header
+--------------------------------------------------------------*/
+.page-header {
+    position: relative;
+    display: block;
+    background-color: #120340;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.page-header__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    z-index: -1;
+}
+
+.page-header__shape-1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: topBottom 3s ease-in-out infinite;
+    z-index: -1;
+}
+
+.page-header__shape-1 img {
+    width: 100%;
+    opacity: 0.01;
+}
+
+.page-header__inner {
+    position: relative;
+    display: block;
+    padding: 290px 0 150px;
+    text-align: center;
+    z-index: 1;
+}
+
+.page-header__inner h2 {
+    font-size: 56px;
+    color: var(--finris-white);
+    line-height: 66px;
+    font-weight: 500;
+    font-family: var(--finris-font);
+    text-transform: capitalize;
+}
+
+.page-header__inner h2 span {
+    color: var(--finris-primary);
+}
+
+.thm-breadcrumb__inner {
+    position: relative;
+    display: block;
+}
+
+.thm-breadcrumb {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    padding: 6px 21px 6px;
+    border-radius: 20px;
+    margin-top: 26px;
+}
+
+.thm-breadcrumb li {
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    -webkit-transition: all 500ms ease;
+    transition: all 500ms ease;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--finris-white);
+}
+
+.thm-breadcrumb li i {
+    position: relative;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.thm-breadcrumb li a {
+    color: var(--finris-white);
+}
+
+.thm-breadcrumb li a:hover {
+    color: var(--finris-primary);
+}
+
+.thm-breadcrumb li span {
+    position: relative;
+    display: block;
+    width: 5px;
+    height: 5px;
+    background-color: var(--finris-base);
+    border-radius: 50%;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+
+
+
+
+
+/*--------------------------------------------------------------
+# End
+--------------------------------------------------------------*/

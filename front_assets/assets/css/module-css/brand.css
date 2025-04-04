@@ -1,0 +1,78 @@
+/*--------------------------------------------------------------
+# Brand One
+--------------------------------------------------------------*/
+.brand-one {
+    position: relative;
+    display: block;
+    background-color: #FFFDFC;
+    border-top: 1px solid #ECD8E7;
+    border-bottom: 1px dashed #ECD8E7;
+    padding: 39px 0 39px;
+    z-index: 1;
+}
+
+.brand-one.border-top-none {
+    border-top: none;
+}
+
+.brand-one__left {
+    position: relative;
+    display: block;
+}
+
+.brand-one__text {
+    font-size: 20px;
+    color: var(--finris-black);
+    font-weight: 500;
+    line-height: 1.5em;
+}
+
+.brand-one__text span {
+    color: var(--finris-base);
+    font-weight: 700;
+}
+
+.brand-one__right {
+    position: relative;
+    display: block;
+}
+
+.brand-one__carousel {
+    position: relative;
+    display: block;
+}
+
+.brand-one__single {
+    position: relative;
+    display: block;
+}
+
+.brand-one__img {
+    position: relative;
+    display: block;
+}
+
+.brand-one__img img {
+    width: auto !important;
+    margin: 0 auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*--------------------------------------------------------------
+# End
+--------------------------------------------------------------*/

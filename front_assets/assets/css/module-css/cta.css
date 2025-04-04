@@ -1,0 +1,376 @@
+/*--------------------------------------------------------------
+# CTA One
+--------------------------------------------------------------*/
+.cta-one {
+    position: relative;
+    display: block;
+    padding: 195px 0 0;
+    z-index: 1;
+}
+
+.cta-one__inner {
+    position: relative;
+    display: block;
+    z-index: 1;
+}
+
+.cta-one__img {
+    position: absolute;
+    bottom: 0;
+    right: 70px;
+    animation: leftRight 4s ease-in-out infinite;
+    z-index: 2;
+}
+
+.cta-one__img img {
+    width: auto;
+}
+
+.cta-one__inner-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 100px;
+    background: linear-gradient(90deg, #003496 0%, #0057FC 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 57px 65px 55px;
+    z-index: 1;
+}
+
+.cta-one__shape-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    z-index: -1;
+}
+
+.cta-one__title {
+    font-size: 40px;
+    color: var(--finris-white);
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 1.3em;
+}
+
+.cta-one__btn {
+    position: relative;
+    display: block;
+}
+
+.cta-one__btn a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--finris-white);
+    font-size: 16px;
+    font-weight: 500;
+    border: 2px solid var(--finris-white);
+    padding: 20px 40px 20px;
+    border-radius: 35px;
+    overflow: hidden;
+    transition: all 200ms linear;
+    transition-delay: 0.1s;
+    z-index: 1;
+}
+
+.cta-one__btn a:hover {
+    color: var(--finris-black);
+    border-color: transparent;
+}
+
+.cta-one__btn a::after {
+    position: absolute;
+    background-color: var(--finris-white);
+    bottom: 0;
+    right: 0;
+    content: "";
+    width: 50%;
+    height: 0;
+    visibility: hidden;
+    opacity: 0;
+    z-index: -1;
+    transition: all 0.4s ease-in-out;
+}
+
+.cta-one__btn a:hover:after {
+    width: 100%;
+    height: 100%;
+    visibility: visible;
+    opacity: 1;
+}
+
+
+.cta-one__btn a:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    width: 50%;
+    height: 0;
+    visibility: hidden;
+    background-color: var(--finris-white);
+    opacity: 0;
+    z-index: -1;
+    transition: all 0.4s ease-in-out;
+}
+
+.cta-one__btn a:hover::before {
+    width: 100%;
+    height: 100%;
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/*--------------------------------------------------------------
+# CTA Two
+--------------------------------------------------------------*/
+.cta-two {
+    padding: 175px 0 120px;
+}
+
+/*--------------------------------------------------------------
+# CTA Three
+--------------------------------------------------------------*/
+.cta-three {
+    position: relative;
+    display: block;
+    background-color: #EEFFFC;
+    padding: 100px 0 100px;
+    z-index: 1;
+}
+
+.cta-three__left {
+    position: relative;
+    display: block;
+    margin-top: 0px;
+    margin-right: -25px;
+}
+
+.cta-three__left-content {
+    position: relative;
+    display: block;
+    padding: 45px 40px 55px;
+    border-radius: 16px;
+    z-index: 1;
+}
+
+.cta-three__left-content:before {
+    content: "";
+    position: absolute;
+    top: 45px;
+    bottom: 45px;
+    right: 0;
+    width: 80px;
+    border: 1px dashed var(--finris-white);
+    border-right: 0;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.cta-three__left-content-shape-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 16px;
+    z-index: -1;
+}
+
+.cta-three__title-box {
+    position: relative;
+    display: block;
+    margin-bottom: 19px;
+}
+
+.cta-three__title-tagline-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 26px;
+}
+
+.cta-three__title-tagline-icon-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cta-three__title-tagline-icon-1 {
+    position: relative;
+    display: block;
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--finris-gray);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.cta-three__title-tagline-icon-2 {
+    position: relative;
+    display: block;
+    width: 14px;
+    height: 14px;
+    background-color: var(--finris-primary);
+    border-radius: 50%;
+    margin-left: -9px;
+    z-index: 1;
+}
+
+.cta-three__title-tagline {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--finris-white);
+    line-height: 20px;
+}
+
+.cta-three__title {
+    font-size: 40px;
+    color: var(--finris-white);
+    text-transform: uppercase;
+    line-height: 1.2em;
+    font-weight: 400;
+}
+
+.cta-three__text {
+    color: var(--finris-white);
+}
+
+.cta-three__user {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.cta-three__user-img {
+    position: relative;
+    display: block;
+    width: 60px;
+    border-radius: 50%;
+}
+
+.cta-three__user-img img {
+    width: 100%;
+    border-radius: 50%;
+}
+
+.cta-three__user-content {
+    position: relative;
+    display: block;
+}
+
+.cta-three__user-name {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--finris-primary);
+    line-height: 25px;
+}
+
+.cta-three__user-sub-title {
+    font-size: 14px;
+    color: var(--finris-white);
+    line-height: 14px;
+}
+
+.cta-three__right {
+    position: relative;
+    display: block;
+    margin-left: 55px;
+    margin-right: 170px;
+}
+
+.cta-three__form {
+    position: relative;
+    display: block;
+}
+
+.cta-three__form .row {
+    --bs-gutter-x: 20px;
+}
+
+.cta-three__input-box {
+    position: relative;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.cta-three__input-box input[type="text"],
+.cta-three__input-box input[type="email"] {
+    height: 52px;
+    width: 100%;
+    background-color: var(--finris-white);
+    border: 1px solid var(--finris-bdr-color);
+    padding-left: 20px;
+    padding-right: 20px;
+    outline: none;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--finris-gray);
+    display: block;
+    border-radius: 12px;
+}
+
+.cta-three__input-box textarea {
+    font-size: 16px;
+    color: var(--finris-gray);
+    height: 160px;
+    width: 100%;
+    background-color: var(--finris-white);
+    border: 1px solid var(--finris-bdr-color);
+    padding: 15px 20px 30px;
+    border-radius: 20px;
+    outline: none;
+    font-weight: 400;
+    position: relative;
+    display: block;
+}
+
+.cta-three__input-box.text-message-box {
+    height: 160px;
+}
+
+.cta-three__btn-box {
+    position: relative;
+    display: block;
+    margin-top: 29px;
+}
+
+/*--------------------------------------------------------------
+# CTA Four
+--------------------------------------------------------------*/
+.cta-four {
+    margin-bottom: 120px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*--------------------------------------------------------------
+# End
+--------------------------------------------------------------*/

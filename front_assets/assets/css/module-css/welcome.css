@@ -1,0 +1,151 @@
+/*--------------------------------------------------------------
+# Welcome One
+--------------------------------------------------------------*/
+.welcome-one {
+    position: relative;
+    display: block;
+    padding: 120px 0px 90px;
+    z-index: 1;
+}
+
+.welcome-one__single {
+    position: relative;
+    display: block;
+    margin-bottom: 30px;
+}
+
+.welcome-one__img {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 10px;
+    z-index: 1;
+}
+
+.welcome-one__img::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--finris-black);
+    opacity: 0;
+    transition: background-color 0.5s ease;
+    transition: all 0.5s ease;
+    z-index: 1;
+}
+
+.welcome-one__single:hover .welcome-one__img::before {
+    opacity: .50;
+}
+
+.welcome-one__img img {
+    width: 100%;
+    border-radius: 10px;
+    transform: scale3d(1, 1, 1);
+    transition: transform 1s ease-in-out;
+}
+
+.welcome-one__single:hover .welcome-one__img img {
+    transform: scale(1.05) rotate(0deg);
+}
+
+.welcome-one__content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    background-color: var(--finris-white);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.05);
+    padding: 20px 20px 20px;
+    border-radius: 10px;
+    margin-left: 18px;
+    margin-right: 18px;
+    margin-top: -40px;
+    z-index: 2;
+}
+
+.welcome-one__icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 50px;
+    background-color: var(--finris-base);
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.welcome-one__icon::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: var(--finris-black);
+    border-radius: 5px;
+    opacity: 0;
+    transform: perspective(400px) scaleX(0);
+    transform-origin: center;
+    transition: all 500ms ease;
+}
+
+.welcome-one__single:hover .welcome-one__icon::before {
+    opacity: 1;
+    transform: perspective(400px) scaleX(1.0);
+    transition-delay: 200ms;
+}
+
+.welcome-one__icon span {
+    position: relative;
+    display: inline-block;
+    font-size: 25px;
+    color: var(--finris-white);
+    transition: all 500ms linear;
+    transition-delay: 0.1s;
+    transform: scale(1);
+}
+
+.welcome-one__single:hover .welcome-one__icon span {
+    color: var(--finris-white);
+    transform: scale(.9);
+}
+
+.welcome-one__title {
+    font-size: 24px;
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 34px;
+}
+
+.welcome-one__title a {
+    color: var(--finris-black);
+}
+
+.welcome-one__title a:hover {
+    color: var(--finris-base);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*--------------------------------------------------------------
+# End
+--------------------------------------------------------------*/
