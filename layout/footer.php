@@ -2,7 +2,7 @@
 <!--Site Footer Start-->
 <footer class="site-footer">
     <div class="site-footer__shape-bg"
-         style="background-image: url(assets/images/shapes/site-footer-shape-bg.png);"></div>
+         style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/site-footer-shape-bg.png);"></div>
     <div class="site-footer__big-text">GET IN TOUCH</div>
     <div class="site-footer__top">
         <div class="site-footer__main-content">
@@ -12,7 +12,7 @@
                         <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="100ms">
                             <div class="footer-widget__about">
                                 <div class="footer-widget__about-logo">
-                                    <a href="index.html"><img src="assets/images/resources/logo-2.png"
+                                    <a href="index.html"><img src="<?=web_url?>front_assets/assets/images/resources/logo-2.png"
                                                               alt=""></a>
                                 </div>
                                 <p class="footer-widget__about-text">We are the leading global creative agency
@@ -152,7 +152,7 @@
     <div class="mobile-nav__content">
         <span class="mobile-nav__close mobile-nav__toggler"><i class="fa fa-times"></i></span>
         <div class="logo-box">
-            <a href="index.html" aria-label="logo image"><img src="assets/images/resources/logo-2.png" width="140"
+            <a href="index.html" aria-label="logo image"><img src="<?=web_url?>front_assets/assets/images/resources/logo-2.png" width="140"
                                                               alt="" /></a>
         </div>
         <!-- /.logo-box -->
@@ -206,39 +206,39 @@
 </a>
 
 
-<script src="assets/js/jquery-3.6.0.min.js"></script>
-<script src="assets/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/jarallax.min.js"></script>
-<script src="assets/js/jquery.ajaxchimp.min.js"></script>
-<script src="assets/js/jquery.appear.min.js"></script>
-<script src="assets/js/swiper.min.js"></script>
-<script src="assets/js/jquery.magnific-popup.min.js"></script>
-<script src="assets/js/jquery.validate.min.js"></script>
-<script src="assets/js/wNumb.min.js"></script>
-<script src="assets/js/wow.js"></script>
-<script src="assets/js/isotope.js"></script>
-<script src="assets/js/owl.carousel.min.js"></script>
-<script src="assets/js/jquery-ui.js"></script>
-<script src="assets/js/jquery.nice-select.min.js"></script>
-<script src="assets/js/marquee.min.js"></script>
-<script src="assets/js/countdown.min.js"></script>
-<script src="assets/js/jquery.circleType.js"></script>
-<script src="assets/js/jquery.fittext.js"></script>
-<script src="assets/js/jquery.lettering.min.js"></script>
-<script src="assets/js/jquery-sidebar-content.js"></script>
-<script src="assets/js/aos.js"></script>
-<script src="assets/js/typed-2.0.11.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery-3.6.0.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/bootstrap.bundle.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jarallax.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.ajaxchimp.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.appear.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/swiper.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.magnific-popup.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.validate.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/wNumb.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/wow.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/isotope.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/owl.carousel.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery-ui.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.nice-select.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/marquee.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/countdown.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.circleType.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.fittext.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery.lettering.min.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/jquery-sidebar-content.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/aos.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/typed-2.0.11.js"></script>
 
 
-<script src="assets/js/gsap/gsap.js"></script>
-<script src="assets/js/gsap/ScrollTrigger.js"></script>
-<script src="assets/js/gsap/SplitText.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/gsap/gsap.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/gsap/ScrollTrigger.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/gsap/SplitText.js"></script>
 
 
 
 
 <!-- template js -->
-<script src="assets/js/script.js"></script>
+<script src="<?=web_url?>front_assets/assets/js/script.js"></script>
 </body>
 
 </html>
