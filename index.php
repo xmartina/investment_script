@@ -4,22 +4,22 @@ include_once 'layout/header.php'; ?>
     <!-- Banner One Start -->
     <section class="banner-one">
         <div class="banner-one__shape-bg"
-             style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/banner-one-shape-bg.jpg);"></div>
+             style="background-image: url(<?=link?>/front_assets/assets/images/shapes/banner-one-shape-bg.jpg);"></div>
         <div class="banner-one__shape-bg-2"
-             style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/banner-one-shape-bg-2.png);"></div>
+             style="background-image: url(<?=link?>/front_assets/assets/images/shapes/banner-one-shape-bg-2.png);"></div>
         <div class="banner-one__shape-bg-3 img-bounce"
-             style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/banner-one-shape-bg-3.png);"></div>
+             style="background-image: url(<?=link?>/front_assets/assets/images/shapes/banner-one-shape-bg-3.png);"></div>
         <div class="banner-one__shape-1 text-rotate-box">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/banner-one-shape-1.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/banner-one-shape-1.png" alt="">
         </div>
         <div class="banner-one__shape-2 rotate-me">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/banner-one-shape-2.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/banner-one-shape-2.png" alt="">
         </div>
         <div class="banner-one__shape-3 rotate-me">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/banner-one-shape-3.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/banner-one-shape-3.png" alt="">
         </div>
         <div class="banner-one__shape-4 float-bob-y">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/banner-one-shape-4.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/banner-one-shape-4.png" alt="">
         </div>
         <div class="container">
             <div class="banner-one__title-box">
@@ -50,19 +50,19 @@ include_once 'layout/header.php'; ?>
                                 <ul class="list-unstyled banner-one__satisfied-client-list">
                                     <li>
                                         <div class="banner-one__satisfied-client-img">
-                                            <img src="<?=web_url?>front_assets/assets/images/resources/banner-one-satisfied-client-1-1.jpg"
+                                            <img src="<?=link?>/front_assets/assets/images/resources/banner-one-satisfied-client-1-1.jpg"
                                                  alt="">
                                         </div>
                                     </li>
                                     <li>
                                         <div class="banner-one__satisfied-client-img">
-                                            <img src="<?=web_url?>front_assets/assets/images/resources/banner-one-satisfied-client-1-2.jpg"
+                                            <img src="<?=link?>/front_assets/assets/images/resources/banner-one-satisfied-client-1-2.jpg"
                                                  alt="">
                                         </div>
                                     </li>
                                     <li>
                                         <div class="banner-one__satisfied-client-img">
-                                            <img src="<?=web_url?>front_assets/assets/images/resources/banner-one-satisfied-client-1-3.jpg"
+                                            <img src="<?=link?>/front_assets/assets/images/resources/banner-one-satisfied-client-1-3.jpg"
                                                  alt="">
                                         </div>
                                     </li>
@@ -81,7 +81,7 @@ include_once 'layout/header.php'; ?>
                 <div class="col-xl-7 col-lg-6">
                     <div class="banner-one__right">
                         <div class="banner-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/resources/banner-one-img-1.png" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/resources/banner-one-img-1.png" alt="">
                         </div>
                     </div>
                 </div>
@@ -105,35 +105,35 @@ include_once 'layout/header.php'; ?>
                             <div class="item">
                                 <div class="brand-one__single">
                                     <div class="brand-one__img">
-                                        <img src="<?=web_url?>front_assets/assets/images/brand/brand-1-1.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/brand/brand-1-1.png" alt="">
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="brand-one__single">
                                     <div class="brand-one__img">
-                                        <img src="<?=web_url?>front_assets/assets/images/brand/brand-1-2.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/brand/brand-1-2.png" alt="">
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="brand-one__single">
                                     <div class="brand-one__img">
-                                        <img src="<?=web_url?>front_assets/assets/images/brand/brand-1-3.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/brand/brand-1-3.png" alt="">
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="brand-one__single">
                                     <div class="brand-one__img">
-                                        <img src="<?=web_url?>front_assets/assets/images/brand/brand-1-4.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/brand/brand-1-4.png" alt="">
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="brand-one__single">
                                     <div class="brand-one__img">
-                                        <img src="<?=web_url?>front_assets/assets/images/brand/brand-1-5.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/brand/brand-1-5.png" alt="">
                                     </div>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@ include_once 'layout/header.php'; ?>
                         <div class="services-one__count"></div>
                         <div class="services-one__content-box">
                             <div class="services-one__icon">
-                                <img src="<?=web_url?>front_assets/assets/images/icon/product-design.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/icon/product-design.png" alt="">
                             </div>
                             <h3 class="services-one__title"><a href="digital-marketing.html">Product Design <br> &
                                     Branding</a></h3>
@@ -188,7 +188,7 @@ include_once 'layout/header.php'; ?>
                         <div class="services-one__count"></div>
                         <div class="services-one__content-box">
                             <div class="services-one__icon">
-                                <img src="<?=web_url?>front_assets/assets/images/icon/digital-marketing.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/icon/digital-marketing.png" alt="">
                             </div>
                             <h3 class="services-one__title"><a href="digital-marketing.html">Digital Marketing &
                                     <br> ADS Camping</a>
@@ -207,7 +207,7 @@ include_once 'layout/header.php'; ?>
                         <div class="services-one__count"></div>
                         <div class="services-one__content-box">
                             <div class="services-one__icon">
-                                <img src="<?=web_url?>front_assets/assets/images/icon/user-reaserach.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/icon/user-reaserach.png" alt="">
                             </div>
                             <h3 class="services-one__title"><a href="web-design-development.html">Ui/UX Design &
                                     User <br> Reaserach</a></h3>
@@ -225,7 +225,7 @@ include_once 'layout/header.php'; ?>
                         <div class="services-one__count"></div>
                         <div class="services-one__content-box">
                             <div class="services-one__icon">
-                                <img src="<?=web_url?>front_assets/assets/images/icon/web-design.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/icon/web-design.png" alt="">
                             </div>
                             <h3 class="services-one__title"><a href="web-design-development.html">Website Design &
                                     <br> Development</a></h3>
@@ -244,9 +244,9 @@ include_once 'layout/header.php'; ?>
     <!--About One Start -->
     <section class="about-one">
         <div class="about-one__shape-bg"
-             style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/about-one-shape-bg-1.png);"></div>
+             style="background-image: url(<?=link?>/front_assets/assets/images/shapes/about-one-shape-bg-1.png);"></div>
         <div class="about-one__star rotate-me">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/about-one-star.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/about-one-star.png" alt="">
         </div>
         <div class="container">
             <div class="row">
@@ -256,10 +256,10 @@ include_once 'layout/header.php'; ?>
                             <div class="about-one__shape-1"></div>
                             <div class="about-one__shape-2"></div>
                             <div class="about-one__img">
-                                <img src="<?=web_url?>front_assets/assets/images/resources/about-one-img-1.jpg" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/resources/about-one-img-1.jpg" alt="">
                             </div>
                             <div class="about-one__img-two">
-                                <img src="<?=web_url?>front_assets/assets/images/resources/about-one-img-2.jpg" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/resources/about-one-img-2.jpg" alt="">
                             </div>
                         </div>
                     </div>
@@ -362,7 +362,7 @@ include_once 'layout/header.php'; ?>
     <!-- Why Choose One Start -->
     <section class="why-choose-one">
         <div class="why-choose-one__shape-bg"
-             style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/why-choose-one-shape-bg.png);"></div>
+             style="background-image: url(<?=link?>/front_assets/assets/images/shapes/why-choose-one-shape-bg.png);"></div>
         <div class="container">
             <div class="row">
                 <div class="col-xl-6">
@@ -384,7 +384,7 @@ include_once 'layout/header.php'; ?>
                         <ul class="list-unstyled why-choose-one__list">
                             <li>
                                 <div class="icon">
-                                    <img src="<?=web_url?>front_assets/assets/images/icon/why-choose-one-icon-1.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/icon/why-choose-one-icon-1.png" alt="">
                                 </div>
                                 <div class="content">
                                     <p><a href="about.html">Innovative Solutions</a></p>
@@ -393,7 +393,7 @@ include_once 'layout/header.php'; ?>
                             </li>
                             <li>
                                 <div class="icon">
-                                    <img src="<?=web_url?>front_assets/assets/images/icon/why-choose-one-icon-2.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/icon/why-choose-one-icon-2.png" alt="">
                                 </div>
                                 <div class="content">
                                     <p><a href="about.html">Creative Excellence</a></p>
@@ -403,7 +403,7 @@ include_once 'layout/header.php'; ?>
                             </li>
                             <li>
                                 <div class="icon">
-                                    <img src="<?=web_url?>front_assets/assets/images/icon/why-choose-one-icon-3.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/icon/why-choose-one-icon-3.png" alt="">
                                 </div>
                                 <div class="content">
                                     <p><a href="about.html">Custom Strategies</a></p>
@@ -421,7 +421,7 @@ include_once 'layout/header.php'; ?>
                             <div class="col-xl-6 col-lg-6 col-md-6">
                                 <div class="why-choose-one__content-one">
                                     <div class="why-choose-one__img-one">
-                                        <img src="<?=web_url?>front_assets/assets/images/resources/why-choose-one-img-1.jpg" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/resources/why-choose-one-img-1.jpg" alt="">
                                     </div>
                                     <div class="why-choose-one__round-text-box">
                                         <div class="why-choose-one__round-text-box-inner">
@@ -435,10 +435,10 @@ include_once 'layout/header.php'; ?>
                             <div class="col-xl-6 col-lg-6 col-md-6">
                                 <div class="why-choose-one__content-two">
                                     <div class="why-choose-one__icon">
-                                        <img src="<?=web_url?>front_assets/assets/images/icon/why-choose-one-icon-4.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/icon/why-choose-one-icon-4.png" alt="">
                                     </div>
                                     <div class="why-choose-one__img-two">
-                                        <img src="<?=web_url?>front_assets/assets/images/resources/why-choose-one-img-2.jpg" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/resources/why-choose-one-img-2.jpg" alt="">
                                     </div>
                                 </div>
                             </div>
@@ -457,7 +457,7 @@ include_once 'layout/header.php'; ?>
             <div class="container">
                 <div class="process-one__top-title-box">
                     <div class="process-one__top-icon">
-                        <img src="<?=web_url?>front_assets/assets/images/icon/process-one-top-icon-1.png" alt="">
+                        <img src="<?=link?>/front_assets/assets/images/icon/process-one-top-icon-1.png" alt="">
                     </div>
                     <div class="section-title text-left sec-title-animation animation-style2">
                         <div class="section-title__tagline-box">
@@ -471,7 +471,7 @@ include_once 'layout/header.php'; ?>
                                     Process.</span></h2>
                     </div>
                     <div class="process-one__star rotate-me">
-                        <img src="<?=web_url?>front_assets/assets/images/shapes/process-one-star.png" alt="">
+                        <img src="<?=link?>/front_assets/assets/images/shapes/process-one-star.png" alt="">
                     </div>
                 </div>
             </div>
@@ -507,7 +507,7 @@ include_once 'layout/header.php'; ?>
                         <div class="process-one__single process-one__single-1">
                             <div class="process-one__title-box">
                                 <div class="process-one__icon">
-                                    <img src="<?=web_url?>front_assets/assets/images/icon/process-one-icon-1.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/icon/process-one-icon-1.png" alt="">
                                 </div>
                                 <h3 class="process-one__title">Identify The <br> Problems</h3>
                             </div>
@@ -516,7 +516,7 @@ include_once 'layout/header.php'; ?>
                                 their business goals and challenges.</p>
                             <div class="process-one__count"></div>
                             <div class="process-one__arrow">
-                                <img src="<?=web_url?>front_assets/assets/images/shapes/process-one-arrow.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/shapes/process-one-arrow.png" alt="">
                             </div>
                         </div>
                     </li>
@@ -527,7 +527,7 @@ include_once 'layout/header.php'; ?>
                         <div class="process-one__single process-one__single-2">
                             <div class="process-one__title-box">
                                 <div class="process-one__icon">
-                                    <img src="<?=web_url?>front_assets/assets/images/icon/process-one-icon-2.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/icon/process-one-icon-2.png" alt="">
                                 </div>
                                 <h3 class="process-one__title">Client Needs <br> Assessment</h3>
                             </div>
@@ -536,7 +536,7 @@ include_once 'layout/header.php'; ?>
                                 their business goals and challenges.</p>
                             <div class="process-one__count"></div>
                             <div class="process-one__arrow">
-                                <img src="<?=web_url?>front_assets/assets/images/shapes/process-one-arrow.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/shapes/process-one-arrow.png" alt="">
                             </div>
                         </div>
                     </li>
@@ -547,7 +547,7 @@ include_once 'layout/header.php'; ?>
                         <div class="process-one__single process-one__single-3">
                             <div class="process-one__title-box">
                                 <div class="process-one__icon">
-                                    <img src="<?=web_url?>front_assets/assets/images/icon/process-one-icon-3.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/icon/process-one-icon-3.png" alt="">
                                 </div>
                                 <h3 class="process-one__title">Market Research <br> Analysis</h3>
                             </div>
@@ -556,7 +556,7 @@ include_once 'layout/header.php'; ?>
                                 their business goals and challenges.</p>
                             <div class="process-one__count"></div>
                             <div class="process-one__arrow">
-                                <img src="<?=web_url?>front_assets/assets/images/shapes/process-one-arrow.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/shapes/process-one-arrow.png" alt="">
                             </div>
                         </div>
                     </li>
@@ -567,7 +567,7 @@ include_once 'layout/header.php'; ?>
                         <div class="process-one__single process-one__single-4">
                             <div class="process-one__title-box">
                                 <div class="process-one__icon">
-                                    <img src="<?=web_url?>front_assets/assets/images/icon/process-one-icon-4.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/icon/process-one-icon-4.png" alt="">
                                 </div>
                                 <h3 class="process-one__title">Growth Plan <br> Execution</h3>
                             </div>
@@ -576,7 +576,7 @@ include_once 'layout/header.php'; ?>
                                 their business goals and challenges.</p>
                             <div class="process-one__count"></div>
                             <div class="process-one__arrow">
-                                <img src="<?=web_url?>front_assets/assets/images/shapes/process-one-arrow.png" alt="">
+                                <img src="<?=link?>/front_assets/assets/images/shapes/process-one-arrow.png" alt="">
                             </div>
                         </div>
                     </li>
@@ -590,9 +590,9 @@ include_once 'layout/header.php'; ?>
     <!-- Portfolio One Start -->
     <section class="portfolio-one">
         <div class="portfolio-one__shape-bg"
-             style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/portfolio-one-shape-bg.jpg);"></div>
+             style="background-image: url(<?=link?>/front_assets/assets/images/shapes/portfolio-one-shape-bg.jpg);"></div>
         <div class="portfolio-one__shape-bg-two"
-             style="background-image: url(<?=web_url?>front_assets/assets/images/shapes/portfolio-one-shape-bg-two.jpg);"></div>
+             style="background-image: url(<?=link?>/front_assets/assets/images/shapes/portfolio-one-shape-bg-two.jpg);"></div>
         <div class="section-title text-center sec-title-animation animation-style1">
             <div class="section-title__tagline-box justify-content-center">
                 <div class="section-title__tagline-icon-box">
@@ -610,7 +610,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-1.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-1.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -633,7 +633,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-2.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-2.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -656,7 +656,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-3.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-3.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -679,7 +679,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-4.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-4.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -702,7 +702,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-1.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-1.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -725,7 +725,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-2.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-2.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -748,7 +748,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-3.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-3.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -771,7 +771,7 @@ include_once 'layout/header.php'; ?>
                 <div class="portfolio-one__single">
                     <div class="portfolio-one__img-box">
                         <div class="portfolio-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/project/portfolio-one-1-4.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/project/portfolio-one-1-4.jpg" alt="">
                         </div>
                         <div class="portfolio-one__content">
                             <h3 class="portfolio-one__title"><a href="portfolio-details.html">Social Media Marketing
@@ -803,10 +803,10 @@ include_once 'layout/header.php'; ?>
     <!-- Testimonial One Start -->
     <section class="testimonial-one">
         <div class="testimonial-one__shape-1 img-bounce">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/testimonial-one-shape-1.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/testimonial-one-shape-1.png" alt="">
         </div>
         <div class="testimonial-one__star rotate-me">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/testimonial-one-star.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/testimonial-one-star.png" alt="">
         </div>
         <div class="container">
             <div class="section-title text-center sec-title-animation animation-style1">
@@ -827,7 +827,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-1.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-1.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -862,7 +862,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-2.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-2.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -898,7 +898,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-3.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-3.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -934,7 +934,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-1.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-1.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -969,7 +969,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-2.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-2.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -1005,7 +1005,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-3.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-3.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -1041,7 +1041,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-1.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-1.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -1076,7 +1076,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-2.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-2.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -1112,7 +1112,7 @@ include_once 'layout/header.php'; ?>
                         <div class="testimonial-one__client-info">
                             <div class="testimonial-one__client-img-box">
                                 <div class="testimonial-one__client-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/testimonial/testimonial-1-3.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/testimonial/testimonial-1-3.jpg" alt="">
                                 </div>
                                 <div class="testimonial-one__quote">
                                     <span class="icon-left"></span>
@@ -1150,10 +1150,10 @@ include_once 'layout/header.php'; ?>
     <!-- Pricing One Start -->
     <section class="pricing-one">
         <div class="pricing-one__shape-3 float-bob-y">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/pricing-one-shape-3.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/pricing-one-shape-3.png" alt="">
         </div>
         <div class="pricing-one__shape-4 float-bob-x">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/pricing-one-shape-4.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/pricing-one-shape-4.png" alt="">
         </div>
         <div class="container">
             <div class="section-title text-center sec-title-animation animation-style1">
@@ -1403,7 +1403,7 @@ include_once 'layout/header.php'; ?>
                             <div class="pricing-one__single-last">
                                 <div class="pricing-one__custom-pricing-box">
                                     <div class="pricing-one__custom-pricing-icon">
-                                        <img src="<?=web_url?>front_assets/assets/images/icon/pricing-one-custom-pricing-icon-1.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/icon/pricing-one-custom-pricing-icon-1.png" alt="">
                                     </div>
                                     <p class="pricing-one__custom-pricing-title">Need Custom?</p>
                                     <p class="pricing-one__custom-pricing-text">If you need any an custom packages
@@ -1414,7 +1414,7 @@ include_once 'layout/header.php'; ?>
                                     </div>
                                 </div>
                                 <div class="pricing-one__custom-pricing-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/resources/pricing-one-custom-pricing-img-1.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/resources/pricing-one-custom-pricing-img-1.png" alt="">
                                 </div>
                             </div>
                         </div>
@@ -1639,7 +1639,7 @@ include_once 'layout/header.php'; ?>
                             <div class="pricing-one__single-last">
                                 <div class="pricing-one__custom-pricing-box">
                                     <div class="pricing-one__custom-pricing-icon">
-                                        <img src="<?=web_url?>front_assets/assets/images/icon/pricing-one-custom-pricing-icon-1.png" alt="">
+                                        <img src="<?=link?>/front_assets/assets/images/icon/pricing-one-custom-pricing-icon-1.png" alt="">
                                     </div>
                                     <p class="pricing-one__custom-pricing-title">Need Custom?</p>
                                     <p class="pricing-one__custom-pricing-text">If you need any an custom packages
@@ -1650,7 +1650,7 @@ include_once 'layout/header.php'; ?>
                                     </div>
                                 </div>
                                 <div class="pricing-one__custom-pricing-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/resources/pricing-one-custom-pricing-img-1.png" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/resources/pricing-one-custom-pricing-img-1.png" alt="">
                                 </div>
                             </div>
                         </div>
@@ -1668,7 +1668,7 @@ include_once 'layout/header.php'; ?>
     <!-- Blog One Start -->
     <section class="blog-one">
         <div class="blog-one__star zoominout">
-            <img src="<?=web_url?>front_assets/assets/images/shapes/blog-one-star.png" alt="">
+            <img src="<?=link?>/front_assets/assets/images/shapes/blog-one-star.png" alt="">
         </div>
         <div class="container">
             <div class="section-title text-left sec-title-animation animation-style2">
@@ -1688,7 +1688,7 @@ include_once 'layout/header.php'; ?>
                 <div class="item">
                     <div class="blog-one__single">
                         <div class="blog-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/blog/blog-1-1.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/blog/blog-1-1.jpg" alt="">
                             <div class="blog-one__plus">
                                 <a href="blog-details.html"><span class="icon-plus"></span></a>
                             </div>
@@ -1704,7 +1704,7 @@ include_once 'layout/header.php'; ?>
                                 productivity and manage your time more efficiently.</p>
                             <div class="blog-one__user">
                                 <div class="blog-one__user-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/blog/blog-one-user-1-1.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/blog/blog-one-user-1-1.jpg" alt="">
                                 </div>
                                 <div class="blog-one__user-content">
                                     <h5 class="blog-one__user-name"><a href="blog-details.html">Michael Johnson</a>
@@ -1720,7 +1720,7 @@ include_once 'layout/header.php'; ?>
                 <div class="item">
                     <div class="blog-one__single">
                         <div class="blog-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/blog/blog-1-2.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/blog/blog-1-2.jpg" alt="">
                             <div class="blog-one__plus">
                                 <a href="blog-details.html"><span class="icon-plus"></span></a>
                             </div>
@@ -1736,7 +1736,7 @@ include_once 'layout/header.php'; ?>
                                 productivity and manage your time more efficiently.</p>
                             <div class="blog-one__user">
                                 <div class="blog-one__user-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/blog/blog-one-user-1-2.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/blog/blog-one-user-1-2.jpg" alt="">
                                 </div>
                                 <div class="blog-one__user-content">
                                     <h5 class="blog-one__user-name"><a href="blog-details.html">Michael Johnson</a>
@@ -1752,7 +1752,7 @@ include_once 'layout/header.php'; ?>
                 <div class="item">
                     <div class="blog-one__single">
                         <div class="blog-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/blog/blog-1-3.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/blog/blog-1-3.jpg" alt="">
                             <div class="blog-one__plus">
                                 <a href="blog-details.html"><span class="icon-plus"></span></a>
                             </div>
@@ -1768,7 +1768,7 @@ include_once 'layout/header.php'; ?>
                                 productivity and manage your time more efficiently.</p>
                             <div class="blog-one__user">
                                 <div class="blog-one__user-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/blog/blog-one-user-1-3.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/blog/blog-one-user-1-3.jpg" alt="">
                                 </div>
                                 <div class="blog-one__user-content">
                                     <h5 class="blog-one__user-name"><a href="blog-details.html">Michael Johnson</a>
@@ -1784,7 +1784,7 @@ include_once 'layout/header.php'; ?>
                 <div class="item">
                     <div class="blog-one__single">
                         <div class="blog-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/blog/blog-1-1.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/blog/blog-1-1.jpg" alt="">
                             <div class="blog-one__plus">
                                 <a href="blog-details.html"><span class="icon-plus"></span></a>
                             </div>
@@ -1800,7 +1800,7 @@ include_once 'layout/header.php'; ?>
                                 productivity and manage your time more efficiently.</p>
                             <div class="blog-one__user">
                                 <div class="blog-one__user-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/blog/blog-one-user-1-1.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/blog/blog-one-user-1-1.jpg" alt="">
                                 </div>
                                 <div class="blog-one__user-content">
                                     <h5 class="blog-one__user-name"><a href="blog-details.html">Michael Johnson</a>
@@ -1816,7 +1816,7 @@ include_once 'layout/header.php'; ?>
                 <div class="item">
                     <div class="blog-one__single">
                         <div class="blog-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/blog/blog-1-2.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/blog/blog-1-2.jpg" alt="">
                             <div class="blog-one__plus">
                                 <a href="blog-details.html"><span class="icon-plus"></span></a>
                             </div>
@@ -1832,7 +1832,7 @@ include_once 'layout/header.php'; ?>
                                 productivity and manage your time more efficiently.</p>
                             <div class="blog-one__user">
                                 <div class="blog-one__user-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/blog/blog-one-user-1-2.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/blog/blog-one-user-1-2.jpg" alt="">
                                 </div>
                                 <div class="blog-one__user-content">
                                     <h5 class="blog-one__user-name"><a href="blog-details.html">Michael Johnson</a>
@@ -1848,7 +1848,7 @@ include_once 'layout/header.php'; ?>
                 <div class="item">
                     <div class="blog-one__single">
                         <div class="blog-one__img">
-                            <img src="<?=web_url?>front_assets/assets/images/blog/blog-1-3.jpg" alt="">
+                            <img src="<?=link?>/front_assets/assets/images/blog/blog-1-3.jpg" alt="">
                             <div class="blog-one__plus">
                                 <a href="blog-details.html"><span class="icon-plus"></span></a>
                             </div>
@@ -1864,7 +1864,7 @@ include_once 'layout/header.php'; ?>
                                 productivity and manage your time more efficiently.</p>
                             <div class="blog-one__user">
                                 <div class="blog-one__user-img">
-                                    <img src="<?=web_url?>front_assets/assets/images/blog/blog-one-user-1-3.jpg" alt="">
+                                    <img src="<?=link?>/front_assets/assets/images/blog/blog-one-user-1-3.jpg" alt="">
                                 </div>
                                 <div class="blog-one__user-content">
                                     <h5 class="blog-one__user-name"><a href="blog-details.html">Michael Johnson</a>
@@ -1886,10 +1886,10 @@ include_once 'layout/header.php'; ?>
         <div class="container">
             <div class="newsletter-one__inner sec-title-animation animation-style2">
                 <div class="newsletter-one__img-1">
-                    <img src="<?=web_url?>front_assets/assets/images/resources/newsletter-one-img-1.jpg" alt="">
+                    <img src="<?=link?>/front_assets/assets/images/resources/newsletter-one-img-1.jpg" alt="">
                 </div>
                 <div class="newsletter-one__img-2 float-bob-x">
-                    <img src="<?=web_url?>front_assets/assets/images/resources/newsletter-one-img-2.png" alt="">
+                    <img src="<?=link?>/front_assets/assets/images/resources/newsletter-one-img-2.png" alt="">
                 </div>
                 <h2 class="newsletter-one__title title-animation">Subscribe Newsletter</h2>
                 <p class="newsletter-one__text">Get the latest SEO tips and software insights straight to your
