@@ -169,11 +169,11 @@
                 <ul class="info-list clearfix">
                     <li>
                         <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-9.png" alt=""></div>
-                        Talk to Us: <a href="tel:4188822333"><span>(+41) 888.22.333</span></a> / <a href="mailto:mailus@example.com"><span>mailus@example.com</span></a>
+                        Talk to Us: <a href="tel:<?=$site_phone?>"><span><?=$site_phone?></span></a> / <a href="mailto:<?=$site_email?>"><span><?=$site_email?></span></a>
                     </li>
                     <li>
                         <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-10.png" alt=""></div>
-                        Reach Us: <span>Hobert, LA 90010 /  Mon - Sat: 9am to 6pm</span>
+                        Reach Us: <span><?=$site_address?></span>
                     </li>
                 </ul>
                 <div class="language-box">

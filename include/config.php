@@ -9,6 +9,7 @@ $row = $result->fetch_assoc();
 $site_link = $row['site_link'];
 $site_name = $row['site_name'];
 $site_email = $row['site_email'];
+$site_address = $row['site_address'];
 $site_phone = $row['site_phone'];
 $site_logo = $row['site_logo'];
 $site_favicon = $row['site_favicon'];
