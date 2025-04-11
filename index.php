@@ -1,4 +1,6 @@
-<?php include_once 'include/config.php';
+<?php
+$page_name = 'Home';
+include_once 'include/config.php';
 include_once 'layout/header.php'; ?>
 
 

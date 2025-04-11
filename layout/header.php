@@ -6,26 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
-    <title>Counsolve - HTML 5 Template Preview</title>
+    <title><?=$page_name?> | <?=$site_name?></title>
 
     <!-- Fav Icon -->
-    <link rel="icon" href="<?=link?>/front_assets/images/favicon-2.ico" type="image/x-icon">
+    <link rel="icon" href="<?=$site_link?>/front_assets/images/<?=$site_favicon?>" type="image/x-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;0,1000;1,300;1,400;1,500;1,600;1,700;1,800;1,900;1,1000&amp;display=swap" rel="stylesheet">
 
     <!-- Stylesheets -->
-    <link href="<?=link?>/front_assets/css/font-awesome-all.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/flaticon.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/owl.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/bootstrap.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/jquery.fancybox.min.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/animate.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/nice-select.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/color.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/style.css" rel="stylesheet">
-    <link href="<?=link?>/front_assets/css/responsive.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/font-awesome-all.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/flaticon.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/owl.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/bootstrap.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/jquery.fancybox.min.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/animate.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/nice-select.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/color.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/style.css" rel="stylesheet">
+    <link href="<?=$site_link?>/front_assets/css/responsive.css" rel="stylesheet">
 
 </head>
 
@@ -83,13 +83,13 @@
     <div id="search-popup" class="search-popup">
         <div class="popup-inner">
             <div class="upper-box clearfix">
-                <figure class="logo-box pull-left"><a href="index.html"><img src="<?=link?>/front_assets/images/logo-3.png" alt=""></a></figure>
+                <figure class="logo-box pull-left"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>.png" alt="<?=$site_name?> logo"></a></figure>
                 <div class="close-search pull-right"><i class="fa-solid fa-xmark"></i></div>
             </div>
             <div class="overlay-layer"></div>
             <div class="auto-container">
                 <div class="search-form">
-                    <form method="post" action="https://azim.hostlin.com/Counsolve/index.html">
+                    <form method="post" action="">
                         <div class="form-group">
                             <fieldset>
                                 <input type="search" class="form-control" name="search-input" value="" placeholder="Type your keyword and hit" required >
@@ -119,7 +119,7 @@
                     <div class="sidebar-info-contents">
                         <div class="content-inner">
                             <div class="logo">
-                                <a href="index.html"><img src="<?=link?>/front_assets/images/logo-3.png" alt=""></a>
+                                <a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/logo-3.png" alt=""></a>
                             </div>
                             <div class="content-box">
                                 <h4>About Us</h4>
@@ -131,8 +131,8 @@
                                 <h4>Contact Info</h4>
                                 <ul>
                                     <li>Chicago 12, Melborne City, USA</li>
-                                    <li><a href="tel:+8801682648101">+88 01682648101</a></li>
-                                    <li><a href="mailto:info@example.com">info@example.com</a></li>
+                                    <li><a href="<?=$site_phone?>"><?=$site_phone?></a></li>
+                                    <li><a href="mailto:<?=$site_email?>"><?=$site_email?></a></li>
                                 </ul>
                             </div>
                             <ul class="social-box clearfix">
@@ -157,16 +157,16 @@
             <div class="outer-container">
                 <ul class="info-list clearfix">
                     <li>
-                        <div class="icon-box"><img src="<?=link?>/front_assets/images/icons/icon-9.png" alt=""></div>
+                        <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-9.png" alt=""></div>
                         Talk to Us: <a href="tel:4188822333"><span>(+41) 888.22.333</span></a> / <a href="mailto:mailus@example.com"><span>mailus@example.com</span></a>
                     </li>
                     <li>
-                        <div class="icon-box"><img src="<?=link?>/front_assets/images/icons/icon-10.png" alt=""></div>
+                        <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-10.png" alt=""></div>
                         Reach Us: <span>Hobert, LA 90010 /  Mon - Sat: 9am to 6pm</span>
                     </li>
                 </ul>
                 <div class="language-box">
-                    <h5><img src="<?=link?>/front_assets/images/icons/icon-11.png" alt="">Global:</h5>
+                    <h5><img src="<?=$site_link?>/front_assets/images/icons/icon-11.png" alt="">Global:</h5>
                     <div class="select-box">
                         <select class="selectmenu">
                             <option>Eng</option>
@@ -182,7 +182,7 @@
         <div class="header-lower">
             <div class="outer-container">
                 <div class="outer-box">
-                    <figure class="logo-box"><a href="index-2.html"><img src="<?=link?>/front_assets/images/logo-3.png" alt=""></a></figure>
+                    <figure class="logo-box"><a href="index-2.html"><img src="<?=$site_link?>/front_assets/images/logo-3.png" alt=""></a></figure>
                     <div class="menu-area">
                         <!--Mobile Navigation Toggler-->
                         <div class="mobile-nav-toggler">
@@ -268,13 +268,13 @@
                         <div class="menu-right-content">
                             <div class="support-box">
                                 <button>
-                                    <img src="<?=link?>/front_assets/images/icons/icon-12.png" alt="">
+                                    <img src="<?=$site_link?>/front_assets/images/icons/icon-12.png" alt="">
                                     Consult
                                     <span>with our experts</span>
                                 </button>
                             </div>
                             <div class="search-box">
-                                <div class="search-box-outer search-toggler"><img src="<?=link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
+                                <div class="search-box-outer search-toggler"><img src="<?=$site_link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
                             </div>
                             <ul class="social-links clearfix">
                                 <li><a href="index.html"><i class="fa-brands fa-facebook"></i></a></li>
@@ -282,7 +282,7 @@
                                 <li><a href="index.html"><i class="fa-brands fa-youtube"></i></a></li>
                             </ul>
                             <div class="nav-btn nav-toggler navSidebar-button clearfix">
-                                <img src="<?=link?>/front_assets/images/icons/icon-14.png" alt="">
+                                <img src="<?=$site_link?>/front_assets/images/icons/icon-14.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -294,7 +294,7 @@
         <div class="sticky-header">
             <div class="outer-container">
                 <div class="outer-box">
-                    <figure class="logo-box"><a href="index-2.html"><img src="<?=link?>/front_assets/images/logo-3.png" alt=""></a></figure>
+                    <figure class="logo-box"><a href="index-2.html"><img src="<?=$site_link?>/front_assets/images/logo-3.png" alt=""></a></figure>
                     <div class="menu-area clearfix">
                         <nav class="main-menu clearfix">
                             <!--Keep This Empty / Menu will come through Javascript-->
@@ -302,13 +302,13 @@
                         <div class="menu-right-content">
                             <div class="support-box">
                                 <button>
-                                    <img src="<?=link?>/front_assets/images/icons/icon-12.png" alt="">
+                                    <img src="<?=$site_link?>/front_assets/images/icons/icon-12.png" alt="">
                                     Consult
                                     <span>with our experts</span>
                                 </button>
                             </div>
                             <div class="search-box">
-                                <div class="search-box-outer search-toggler"><img src="<?=link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
+                                <div class="search-box-outer search-toggler"><img src="<?=$site_link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
                             </div>
                             <ul class="social-links clearfix">
                                 <li><a href="index.html"><i class="fa-brands fa-facebook"></i></a></li>
@@ -316,7 +316,7 @@
                                 <li><a href="index.html"><i class="fa-brands fa-youtube"></i></a></li>
                             </ul>
                             <div class="nav-btn nav-toggler navSidebar-button clearfix">
-                                <img src="<?=link?>/front_assets/images/icons/icon-14.png" alt="">
+                                <img src="<?=$site_link?>/front_assets/images/icons/icon-14.png" alt="">
                             </div>
                         </div>
                     </div>
@@ -332,7 +332,7 @@
         <div class="close-btn"><i class="fas fa-times"></i></div>
 
         <nav class="menu-box">
-            <div class="nav-logo"><a href="index.html"><img src="<?=link?>/front_assets/images/logo-2.png" alt="" title=""></a></div>
+            <div class="nav-logo"><a href="index.html"><img src="<?=$site_link?>/front_assets/images/logo-2.png" alt="" title=""></a></div>
             <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
             <div class="contact-info">
                 <h4>Contact Info</h4>
