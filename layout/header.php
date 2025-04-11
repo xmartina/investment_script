@@ -28,11 +28,13 @@
     <link href="<?=$site_link?>/front_assets/css/responsive.css" rel="stylesheet">
     <style>
         .header-style-two .header-lower .logo-box {
-            padding: 25px 0px;
             max-width: 100px;
         }
         .footer-logo img{
             max-width: 90px;
+        }
+        .logo-box{
+            max-width: 120px ;
         }
     </style>
 
