@@ -20,5 +20,13 @@ function list_menu($result, $active_url, $page_name) {
     }
 }
 
-
+function social_media($result)
+{
+    while ($row = $result->fetch_assoc()){
+        $social_name = $row['social_name'];
+        $social_link = $row['social_link'];
+        $social_icon = $row['social_icon']; ?>
+        <li><a href="<?=$social_link?>"><i class="fa-brands <?=$social_icon?>"></i></a></li>
+    <?php }
+}
 ?>

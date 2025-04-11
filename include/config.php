@@ -17,6 +17,9 @@ $site_favicon = $row['site_favicon'];
 $sql_front = "SELECT * FROM front_menus";
 $result = $conn_front->query($sql_front);
 
+$sql_front = "SELECT * FROM social_media";
+$result = $conn_front->query($sql_front);
+
 
 const web_url = 'exodusaipro.online';
 const link = 'https://exodusaipro.online';

@@ -220,9 +220,7 @@
                                 <div class="search-box-outer search-toggler"><img src="<?=$site_link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
                             </div>
                             <ul class="social-links clearfix">
-                                <li><a href="index.html"><i class="fa-brands fa-facebook"></i></a></li>
-                                <li><a href="index.html"><i class="fa-brands fa-square-twitter"></i></a></li>
-                                <li><a href="index.html"><i class="fa-brands fa-youtube"></i></a></li>
+                                <?php social_media($result)?>
                             </ul>
                             <div class="nav-btn nav-toggler navSidebar-button clearfix">
                                 <img src="<?=$site_link?>/front_assets/images/icons/icon-14.png" alt="">
@@ -254,9 +252,7 @@
                                 <div class="search-box-outer search-toggler"><img src="<?=$site_link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
                             </div>
                             <ul class="social-links clearfix">
-                                <li><a href="index.html"><i class="fa-brands fa-facebook"></i></a></li>
-                                <li><a href="index.html"><i class="fa-brands fa-square-twitter"></i></a></li>
-                                <li><a href="index.html"><i class="fa-brands fa-youtube"></i></a></li>
+                                <?php social_media($result) ?>
                             </ul>
                             <div class="nav-btn nav-toggler navSidebar-button clearfix">
                                 <img src="<?=$site_link?>/front_assets/images/icons/icon-14.png" alt="">
@@ -287,11 +283,7 @@
             </div>
             <div class="social-links">
                 <ul class="clearfix">
-                    <li><a href="index.html"><span class="fab fa-twitter"></span></a></li>
-                    <li><a href="index.html"><span class="fab fa-facebook-square"></span></a></li>
-                    <li><a href="index.html"><span class="fab fa-pinterest-p"></span></a></li>
-                    <li><a href="index.html"><span class="fab fa-instagram"></span></a></li>
-                    <li><a href="index.html"><span class="fab fa-youtube"></span></a></li>
+                    <?php social_media($result) ?>
                 </ul>
             </div>
         </nav>
