@@ -7,7 +7,7 @@ include_once 'layout/header.php'; ?>
 <section class="banner-style-two">
     <div class="banner-carousel owl-theme owl-carousel">
         <div class="slide-item style-one">
-            <div class="image-layer" style="background-image:url(assets/images/banner/banner-4.jpg)"></div>
+            <div class="image-layer" style="background-image:url(<?=$site_link?>/front_assets/images/banner/banner-4.jpg)"></div>
             <div class="auto-container">
                 <div class="content-box">
                     <h6>Invest under our expertise</h6>
@@ -20,7 +20,7 @@ include_once 'layout/header.php'; ?>
             </div>
         </div>
         <div class="slide-item">
-            <div class="image-layer" style="background-image:url(assets/images/banner/banner-5.jpg)"></div>
+            <div class="image-layer" style="background-image:url(<?=$site_link?>/front_assets/images/banner/banner-5.jpg)"></div>
             <div class="auto-container">
                 <div class="content-box">
                     <h6>Plans that never fails</h6>
@@ -33,14 +33,14 @@ include_once 'layout/header.php'; ?>
             </div>
         </div>
         <div class="slide-item">
-            <div class="image-layer" style="background-image:url(assets/images/banner/banner-6.jpg)"></div>
+            <div class="image-layer" style="background-image:url(<?=$site_link?>/front_assets/images/banner/banner-6.jpg)"></div>
             <div class="auto-container">
                 <div class="content-box">
                     <h6>Be a smart investor</h6>
                     <h2>Giving Good Directions to your Investment</h2>
                     <p>The moment, so blinded by desire, that they cannot foresee the pain <br />and trouble that are bound to ensue.</p>
                     <div class="btn-box">
-                        <a href="index-2.html" class="theme-btn btn-two">Services & Plan</a>
+                        <a href="<?=$register_link?>" class="theme-btn btn-two">Get Started</a>
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@ include_once 'layout/header.php'; ?>
 
 <!-- about-style-two -->
 <section class="about-style-two sec-pad">
-    <div class="pattern-layer" style="background-image: url(assets/images/shape/shape-13.png);"></div>
+    <div class="pattern-layer" style="background-image: url(<?=$site_link?>/front_assets/images/shape/shape-13.png);"></div>
     <div class="auto-container">
         <div class="sec-title">
             <span class="sub-title">About Us</span>
@@ -101,7 +101,7 @@ include_once 'layout/header.php'; ?>
 <section class="funfact-section">
     <div class="auto-container">
         <div class="inner-container">
-            <div class="bg-layer" style="background-image: url(assets/images/background/funfact-bg.jpg);"></div>
+            <div class="bg-layer" style="background-image: url(<?=$site_link?>/front_assets/images/background/funfact-bg.jpg);"></div>
             <div class="row clearfix">
                 <div class="col-lg-5 col-md-12 col-sm-12 content-column">
                     <div class="content-box">
@@ -151,7 +151,7 @@ include_once 'layout/header.php'; ?>
 
 <!-- service-style-two -->
 <section class="service-style-two sec-pad">
-    <div class="pattern-layer" style="background-image: url(assets/images/shape/shape-14.png);"></div>
+    <div class="pattern-layer" style="background-image: url(<?=$site_link?>/front_assets/images/shape/shape-14.png);"></div>
     <div class="auto-container">
         <div class="sec-title centred light">
             <span class="sub-title">Services</span>
@@ -220,7 +220,7 @@ include_once 'layout/header.php'; ?>
                         <h4>+25% per week</h4>
                         <div class="graph"><img src="assets/images/icons/graph-1.png" alt=""></div>
                     </div>
-                    <div class="image-shape" style="background-image: url(assets/images/shape/shape-15.png);"></div>
+                    <div class="image-shape" style="background-image: url(<?=$site_link?>/front_assets/images/shape/shape-15.png);"></div>
                 </div>
             </div>
             <div class="col-lg-6 col-md-12 col-sm-12 content-column">
@@ -286,7 +286,7 @@ include_once 'layout/header.php'; ?>
             <h2>Reason for Choose Counsolve</h2>
         </div>
         <div class="inner-container">
-            <div class="bg-layer" style="background-image: url(assets/images/background/chooseus-bg.jpg);"></div>
+            <div class="bg-layer" style="background-image: url(<?=$site_link?>/front_assets/images/background/chooseus-bg.jpg);"></div>
             <div class="inner-content clearfix">
                 <div class="chooseus-block-two">
                     <div class="inner-box">
@@ -773,7 +773,7 @@ include_once 'layout/header.php'; ?>
 <!-- testimonial-style-two -->
 <section class="testimonial-style-two">
     <div class="outer-container">
-        <div class="pattern-layer" style="background-image: url(assets/images/shape/shape-16.png);"></div>
+        <div class="pattern-layer" style="background-image: url(<?=$site_link?>/front_assets/images/shape/shape-16.png);"></div>
         <span class="big-text">Praise</span>
         <div class="auto-container">
             <div class="single-item-carousel owl-carousel owl-theme">
