@@ -16,7 +16,8 @@ $site_favicon = $row['site_favicon'];
 
 $sql_front = "SELECT * FROM front_menus";
 $menus_result = $conn_front->query($sql_front);
-while ($row = $menus_result->fetch_assoc()) {
+$single_menu_result = $conn_front->query($sql_front);
+while ($row = $single_menu_result->fetch_assoc()) {
     if ($row['menu_link'] == 'about') {
         $about_link_name = $row['menu_name'];
         $about_link = $row['menu_link'];
