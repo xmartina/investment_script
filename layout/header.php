@@ -130,7 +130,7 @@
                     <div class="sidebar-info-contents">
                         <div class="content-inner">
                             <div class="logo">
-                                <a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/logo-3.png" alt=""></a>
+                                <a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt=""></a>
                             </div>
                             <div class="content-box">
                                 <h4>About Us</h4>
