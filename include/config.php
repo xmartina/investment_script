@@ -13,7 +13,7 @@ $site_phone = $row['site_phone'];
 $site_logo = $row['site_logo'];
 $site_favicon = $row['site_favicon'];
 
-$sql_front = "SELECT * FROM front_menu";
+$sql_front = "SELECT * FROM front_menus";
 $result = $conn_front->query($sql_front);
 
 
