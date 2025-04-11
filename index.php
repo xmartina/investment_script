@@ -40,6 +40,16 @@ include_once 'layout/header.php'; ?>
                     <h2>Giving Good Directions to your Investment</h2>
                     <p>The moment, so blinded by desire, that they cannot foresee the pain <br />and trouble that are bound to ensue.</p>
                     <div class="btn-box">
+                        <?php
+                        $menu_data = single_menu('register', $conn_front);
+
+                        // Check if the menu data is returned
+                        if ($menu_data) {
+                            $register_link = $menu_data['menu_link']; // Assign the 'menu_link' to the $register_link variable
+                        } else {
+                            $register_link = '#'; // Fallback in case no link is found
+                        }
+                        ?>
                         <a href="<?=$register_link?>" class="theme-btn btn-two">Get Started</a>
                     </div>
                 </div>

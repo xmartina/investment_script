@@ -118,6 +118,15 @@
                                 <h4>About Us</h4>
                                 <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi</p>
                                 <p>Research oriented solutions for Data Science and Machine Learning business needs.</p>
+                                <?php
+                                $menu_data = single_menu('about', $conn_front);
+                                if ($menu_data) {
+                                    $about_link = $menu_data['menu_link'];
+                                    $about_link_name = $menu_data['menu_name'];
+                                } else {
+                                    $register_link = '#';
+                                }
+                                ?>
                                 <a href="<?=$about_link?>" class="theme-btn btn-two"><?=$about_link_name?></a>
                             </div>
                             <div class="contact-info">

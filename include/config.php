@@ -17,16 +17,6 @@ $site_favicon = $row['site_favicon'];
 $sql_front = "SELECT * FROM front_menus";
 $menus_result = $conn_front->query($sql_front);
 
-$sql_front_single = "SELECT * FROM front_menus";
-$single_menu_result = $conn_front->query($sql_front_single);
-$row = $single_menu_result->fetch_assoc();
-if ($row['menu_link'] == 'about') {
-    $about_link_name = $row['menu_name'];
-    $about_link = $row['menu_link'];
-}elseif ($row['menu_link'] == 'register') {
-    $register_link_name = $row['menu_name'];
-    $register_link = $row['menu_link'];
-}
 
 
 $sql_front = "SELECT * FROM social_media";
