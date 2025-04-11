@@ -182,7 +182,7 @@
         <div class="header-lower">
             <div class="outer-container">
                 <div class="outer-box">
-                    <figure class="logo-box"><a href="index-2.html"><img src="<?=$site_link?>/front_assets/images/logo-3.png" alt=""></a></figure>
+                    <figure class="logo-box"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt=""></a></figure>
                     <div class="menu-area">
                         <!--Mobile Navigation Toggler-->
                         <div class="mobile-nav-toggler">
