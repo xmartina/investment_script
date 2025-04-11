@@ -204,70 +204,7 @@
                         <nav class="main-menu navbar-expand-md navbar-light">
                             <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
                                 <ul class="navigation clearfix">
-                                    <li class="current">
-                                        <a href="<?=$site_link?>">Home</a>
-                                    </li>
-                                    <li class="dropdown"><a href="index.html">Services</a>
-                                        <ul>
-                                            <li><a href="service.html">Services</a></li>
-                                            <li class="dropdown"><a href="index.html">Private</a>
-                                                <ul>
-                                                    <li><a href="service-details.html">Traditional Consulting</a></li>
-                                                    <li><a href="service-details-2.html">Portfolio Management</a></li>
-                                                    <li><a href="service-details-3.html">Asset Allocation</a></li>
-                                                    <li><a href="service-details-4.html">Risk Management</a></li>
-                                                    <li><a href="service-details-5.html">Policy Development</a></li>
-                                                    <li><a href="service-details-6.html">Fiduciary Consulting</a></li>
-                                                </ul>
-                                            </li>
-                                            <li class="dropdown"><a href="index.html">Institution</a>
-                                                <ul>
-                                                    <li><a href="service-details-7.html">Traditional Consulting</a></li>
-                                                    <li><a href="service-details-8.html">Portfolio Management</a></li>
-                                                    <li><a href="service-details-9.html">Asset Allocation</a></li>
-                                                    <li><a href="service-details-10.html">Risk Management</a></li>
-                                                    <li><a href="service-details-11.html">Policy Development</a></li>
-                                                    <li><a href="service-details-12.html">Fiduciary Consulting</a></li>
-                                                </ul>
-                                            </li>
-                                            <li class="dropdown"><a href="index.html">Retirement</a>
-                                                <ul>
-                                                    <li><a href="service-details-13.html">Traditional Consulting</a></li>
-                                                    <li><a href="service-details-14.html">Portfolio Management</a></li>
-                                                    <li><a href="service-details-15.html">Asset Allocation</a></li>
-                                                    <li><a href="service-details-16.html">Risk Management</a></li>
-                                                    <li><a href="service-details-17.html">Policy Development</a></li>
-                                                    <li><a href="service-details-18.html">Fiduciary Consulting</a></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown"><a href="index.html">Projects</a>
-                                        <ul>
-                                            <li><a href="project.html">3 Columns</a></li>
-                                            <li><a href="project-2.html">2 Columns</a></li>
-                                            <li><a href="project-3.html">Masonry</a></li>
-                                            <li><a href="project-details.html">Project Details</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown"><a href="index.html">Blog</a>
-                                        <ul>
-                                            <li><a href="blog.html">Grid View</a></li>
-                                            <li><a href="blog-2.html">List View 01</a></li>
-                                            <li><a href="blog-3.html">List View 02</a></li>
-                                            <li><a href="blog-details.html">Blog Details</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown"><a href="index.html">Pages</a>
-                                        <ul>
-                                            <li><a href="about.html">About Us</a></li>
-                                            <li><a href="team.html">Our Team</a></li>
-                                            <li><a href="faq.html">Faq’s</a></li>
-                                            <li><a href="comingsoon.html">Coming Soon</a></li>
-                                            <li><a href="error.html">404</a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="contact.html">Contact</a></li>
+                                    <?php list_menu($result,$active_url,$page_name)?>
                                 </ul>
                             </div>
                         </nav>

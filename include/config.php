@@ -13,5 +13,13 @@ $site_phone = $row['site_phone'];
 $site_logo = $row['site_logo'];
 $site_favicon = $row['site_favicon'];
 
+$sql_front = "SELECT * FROM front_menu";
+$result = $conn_front->query($sql_front);
+
+$menu = $row['menu_name'];
+
+
 const web_url = 'exodusaipro.online';
 const link = 'https://exodusaipro.online';
+$active_url = $_SERVER['REQUEST_URI'];
+include_once '../functions/front_functions.php';
