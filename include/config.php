@@ -16,6 +16,13 @@ $site_favicon = $row['site_favicon'];
 
 $sql_front = "SELECT * FROM front_menus";
 $menus_result = $conn_front->query($sql_front);
+while ($row = $menus_result->fetch_assoc()) {
+    if ($row['id'] == 2) {
+        $about_link_name = $row['menu_name'];
+        $about_link = $row['menu_link'];
+        break; // Exit the loop once we find the row with id = 2
+    }
+}
 
 $sql_front = "SELECT * FROM social_media";
 $social_result = $conn_front->query($sql_front);

@@ -136,7 +136,7 @@
                                 <h4>About Us</h4>
                                 <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi</p>
                                 <p>Research oriented solutions for Data Science and Machine Learning business needs.</p>
-                                <a href="about.html" class="theme-btn btn-two">About Us</a>
+                                <a href="<?=$about_link?>" class="theme-btn btn-two"><?=$about_link_name?></a>
                             </div>
                             <div class="contact-info">
                                 <h4>Contact Info</h4>
