@@ -26,6 +26,15 @@
     <link href="<?=$site_link?>/front_assets/css/color.css" rel="stylesheet">
     <link href="<?=$site_link?>/front_assets/css/style.css" rel="stylesheet">
     <link href="<?=$site_link?>/front_assets/css/responsive.css" rel="stylesheet">
+    <style>
+        .header-style-two .header-lower .logo-box {
+            padding: 25px 0px;
+            max-width: 100px;
+        }
+        .footer-logo img{
+            max-width: 90px;
+        }
+    </style>
 
 </head>
 
