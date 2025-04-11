@@ -4,8 +4,8 @@ ini_set('display_errors', 1);
 include_once 'db.php';
 
 $sql_front = "SELECT * FROM general_settings";
-$result = $conn_front->query($sql_front);
-$row = $result->fetch_assoc();
+$settings_result = $conn_front->query($sql_front);
+$row = $settings_result->fetch_assoc();
 $site_link = $row['site_link'];
 $site_name = $row['site_name'];
 $site_email = $row['site_email'];
@@ -15,10 +15,10 @@ $site_logo = $row['site_logo'];
 $site_favicon = $row['site_favicon'];
 
 $sql_front = "SELECT * FROM front_menus";
-$result = $conn_front->query($sql_front);
+$menus_result = $conn_front->query($sql_front);
 
 $sql_front = "SELECT * FROM social_media";
-$result = $conn_front->query($sql_front);
+$social_result = $conn_front->query($sql_front);
 
 
 const web_url = 'exodusaipro.online';

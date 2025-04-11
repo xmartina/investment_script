@@ -1,8 +1,8 @@
 <?php
-function list_menu($result, $active_url, $page_name) {
+function list_menu($menus_result, $active_url, $page_name) {
     $first = true; // Flag to identify the first menu item
 
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $menus_result->fetch_assoc()) {
         $menu_name = $row['menu_name'];
         $menu_link = $row['menu_link'];
 
@@ -20,9 +20,9 @@ function list_menu($result, $active_url, $page_name) {
     }
 }
 
-function social_media($result)
+function social_media($social_result)
 {
-    while ($social_row = $result->fetch_assoc()){
+    while ($social_row = $social_result->fetch_assoc()){
         $social_name = $social_row['social_name'];
         $social_link = $social_row['social_link'];
         $social_icon = $social_row['social_icon']; ?>

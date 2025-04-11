@@ -147,10 +147,7 @@
                                 </ul>
                             </div>
                             <ul class="social-box clearfix">
-                                <li><a href="index.html"><i class="fa-brands fa-facebook"></i></a></li>
-                                <li><a href="index.html"><i class="fa-brands fa-square-twitter"></i></a></li>
-                                <li><a href="index.html"><i class="fa-solid fa-basketball"></i></a></li>
-                                <li><a href="index.html"><i class="fa-brands fa-youtube"></i></a></li>
+                                <?php social_media($social_result)?>
                             </ul>
                         </div>
                     </div>
@@ -204,7 +201,7 @@
                         <nav class="main-menu navbar-expand-md navbar-light">
                             <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
                                 <ul class="navigation clearfix">
-                                    <?php list_menu($result,$active_url,$page_name)?>
+                                    <?php list_menu($menus_result,$active_url,$page_name)?>
                                 </ul>
                             </div>
                         </nav>
@@ -220,7 +217,7 @@
                                 <div class="search-box-outer search-toggler"><img src="<?=$site_link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
                             </div>
                             <ul class="social-links clearfix">
-                                <?php social_media($result)?>
+                                <?php social_media($social_result)?>
                             </ul>
                             <div class="nav-btn nav-toggler navSidebar-button clearfix">
                                 <img src="<?=$site_link?>/front_assets/images/icons/icon-14.png" alt="">
@@ -252,7 +249,7 @@
                                 <div class="search-box-outer search-toggler"><img src="<?=$site_link?>/front_assets/images/icons/icon-2.png" alt="">Search</div>
                             </div>
                             <ul class="social-links clearfix">
-                                <?php social_media($result) ?>
+                                <?php social_media($social_result)?>
                             </ul>
                             <div class="nav-btn nav-toggler navSidebar-button clearfix">
                                 <img src="<?=$site_link?>/front_assets/images/icons/icon-14.png" alt="">
@@ -283,7 +280,7 @@
             </div>
             <div class="social-links">
                 <ul class="clearfix">
-                    <?php social_media($result) ?>
+                    <?php social_media($social_result)?>
                 </ul>
             </div>
         </nav>
