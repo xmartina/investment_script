@@ -16,7 +16,9 @@ $site_favicon = $row['site_favicon'];
 
 $sql_front = "SELECT * FROM front_menus";
 $menus_result = $conn_front->query($sql_front);
-$single_menu_result = $conn_front->query($sql_front);
+
+$sql_front_single = "SELECT * FROM front_menus";
+$single_menu_result = $conn_front->query($sql_front_single);
 
 $about_link_name = '';
 $about_link = '';
