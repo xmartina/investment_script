@@ -193,13 +193,8 @@
                         <nav class="main-menu navbar-expand-md navbar-light">
                             <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
                                 <ul class="navigation clearfix">
-                                    <li class="current dropdown"><a href="index.html">Home</a>
-                                        <ul>
-                                            <li><a href="index.html">Home Page 01</a></li>
-                                            <li><a href="index-2.html">Home Page 02</a></li>
-                                            <li><a href="index-3.html">Home Page 03</a></li>
-                                            <li><a href="index-4.html">Home Page 04</a></li>
-                                        </ul>
+                                    <li class="current">
+                                        <a href="<?=$site_link?>">Home</a>
                                     </li>
                                     <li class="dropdown"><a href="index.html">Services</a>
                                         <ul>
@@ -294,7 +289,7 @@
         <div class="sticky-header">
             <div class="outer-container">
                 <div class="outer-box">
-                    <figure class="logo-box"><a href="index-2.html"><img src="<?=$site_link?>/front_assets/images/logo-3.png" alt=""></a></figure>
+                    <figure class="logo-box"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt="<?=$site_name?> logo"></a></figure>
                     <div class="menu-area clearfix">
                         <nav class="main-menu clearfix">
                             <!--Keep This Empty / Menu will come through Javascript-->
@@ -332,14 +327,14 @@
         <div class="close-btn"><i class="fas fa-times"></i></div>
 
         <nav class="menu-box">
-            <div class="nav-logo"><a href="index.html"><img src="<?=$site_link?>/front_assets/images/logo-2.png" alt="" title=""></a></div>
+            <div class="nav-logo"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt="" title=""></a></div>
             <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
             <div class="contact-info">
                 <h4>Contact Info</h4>
                 <ul>
                     <li>Chicago 12, Melborne City, USA</li>
-                    <li><a href="tel:+8801682648101">+88 01682648101</a></li>
-                    <li><a href="mailto:info@example.com">info@example.com</a></li>
+                    <li><a href="tel:<?=$site_phone?>"><?=$site_phone?></a></li>
+                    <li><a href="mailto:<?=$site_email?>"><?=$site_email?></a></li>
                 </ul>
             </div>
             <div class="social-links">
