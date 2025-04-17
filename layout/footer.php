@@ -39,7 +39,7 @@
                         <div class="widget-content">
                             <h4><span>Over 30 Offices in more</span><br /> <span>than 16 Countries</span></h4>
                             <h5>Head Office</h5>
-                            <p>280 Granite Run Drive Suite <br />Hobert, LA 90010, <br />United States.</p>
+                            <p><?=$site_address?></p>
                             <div class="map-box">
                                 <div class="icon-box"><i class="fas fa-map-location"></i></div>
                                 <h6><a href="https://www.google.com/maps/@23.235815,89.5731704,17.1z" target="_blank">Google Map</a></h6>
