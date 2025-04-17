@@ -54,13 +54,13 @@
                         </div>
                         <div class="widget-content">
                             <ul class="links-list clearfix">
-                                <li><a href="javascript:void(0);">Home</a></li>
-                                <li><a href="javascript:void(0);">About Us</a></li>
+                                <li><a href="<?=$home['link']?>">Home</a></li>
+                                <li><a href="<?=$about['link']?>">About Us</a></li>
                                 <li><a href="javascript:void(0);">Professionals</a></li>
                                 <li><a href="javascript:void(0);">Insights</a></li>
                                 <li><a href="javascript:void(0);">Services</a></li>
                                 <li><a href="javascript:void(0);">Why Choose</a></li>
-                                <li><a href="javascript:void(0);">Get in Touch</a></li>
+                                <li><a href="<?=$contact['link']?>">Get in Touch</a></li>
                             </ul>
                         </div>
                     </div>
@@ -72,12 +72,12 @@
                         </div>
                         <div class="widget-content">
                             <ul class="links-list clearfix">
-                                <li><a href="javascript:void(0);">How it’s Work</a></li>
+                                <li><a href="<?=$faq['link']?>">How it’s Work</a></li>
                                 <li><a href="javascript:void(0);">Partners</a></li>
                                 <li><a href="javascript:void(0);">Testimonials</a></li>
                                 <li><a href="javascript:void(0);">Case Studies</a></li>
                                 <li><a href="javascript:void(0);">Free Quote</a></li>
-                                <li><a href="javascript:void(0);">Plan & Pricing</a></li>
+                                <li><a href="<?=$plans['link']?>">Plan & Pricing</a></li>
                             </ul>
                         </div>
                     </div>
