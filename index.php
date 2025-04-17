@@ -686,8 +686,6 @@ include_once 'layout/header.php'; ?>
     </div>
 </section>
 
-
-<!-- news-style-two -->
 <!-- news-style-two -->
 <section class="news-style-two sec-pad">
     <div class="auto-container">
@@ -773,7 +771,6 @@ include_once 'layout/header.php'; ?>
 </section>
 <!-- news-style-two end -->
 
-
 <!-- clients-style-two -->
 <section class="clients-style-two">
     <div class="auto-container">
@@ -784,45 +781,46 @@ include_once 'layout/header.php'; ?>
         <div class="inner-container">
             <ul class="clients-list clearfix">
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-1.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-1.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-2.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-2.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-3.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-3.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-4.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-4.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-5.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-5.png" alt=""></a></figure>
                 </li>
             </ul>
             <ul class="clients-list clearfix">
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-6.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-6.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-7.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-7.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-8.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-8.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-9.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-9.png" alt=""></a></figure>
                 </li>
                 <li>
-                    <figure class="clients-logo"><a href="index-2.html"><img src="assets/images/clients/clients-10.png" alt=""></a></figure>
+                    <figure class="clients-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/clients/clients-10.png" alt=""></a></figure>
                 </li>
             </ul>
         </div>
         <div class="more-text centred">
-            <h5>2.6k Companies & Individuals Trusted  Us. <a href="index-2.html"><i class="flaticon-right-chevron"></i>View All Clients</a></h5>
+            <h5>2.6k Companies & Individuals Trusted  Us. <a href="javascript:void(0);"><i class="flaticon-right-chevron"></i>View All Clients</a></h5>
         </div>
     </div>
 </section>
 <!-- clients-style-two end -->
+
 
 
 <?php include_once 'layout/footer.php'; ?>
