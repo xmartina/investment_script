@@ -704,16 +704,16 @@ include_once 'layout/header.php'; ?>
                                 <span class="category">Smart Investing</span>
                                 <ul class="post-info clearfix">
                                     <li><span>On</span> Mar 14, 2023</li>
-                                    <li><span>By</span> <a href="<?=$about['link']?>">Justin Langer</a></li>
+                                    <li><span>By</span> <a href="javascript:void(0);">Justin Langer</a></li>
                                 </ul>
                             </div>
                             <div class="image-box">
-                                <figure class="image"><a href="<?=$about['link']?>"><img src="<?=$site_link?>/front_assets/images/news/news-1.jpg" alt=""></a></figure>
+                                <figure class="image"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/news/news-1.jpg" alt=""></a></figure>
                                 <div class="view-btn"><a href="<?=$site_link?>/front_assets/images/news/news-1.jpg" class="lightbox-image" data-fancybox="gallery"><i class="flaticon-zoom-in"></i></a></div>
                             </div>
                             <div class="lower-box">
-                                <h3><a href="<?=$about['link']?>">How to Realign Your Investment Goals in 2025</a></h3>
-                                <div class="link"><a href="<?=$about['link']?>"><span>Explore More</span></a></div>
+                                <h3><a href="javascript:void(0);">How to Realign Your Investment Goals in 2025</a></h3>
+                                <div class="link"><a href="javascript:void(0);"><span>Explore More</span></a></div>
                             </div>
                         </div>
                     </div>
@@ -726,16 +726,16 @@ include_once 'layout/header.php'; ?>
                                 <span class="category">Wealth Growth</span>
                                 <ul class="post-info clearfix">
                                     <li><span>On</span> Feb 26, 2023</li>
-                                    <li><span>By</span> <a href="<?=$about['link']?>">Colmin Neil</a></li>
+                                    <li><span>By</span> <a href="javascript:void(0);">Colmin Neil</a></li>
                                 </ul>
                             </div>
                             <div class="image-box">
-                                <figure class="image"><a href="<?=$about['link']?>"><img src="<?=$site_link?>/front_assets/images/news/news-2.jpg" alt=""></a></figure>
+                                <figure class="image"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/news/news-2.jpg" alt=""></a></figure>
                                 <div class="view-btn"><a href="<?=$site_link?>/front_assets/images/news/news-2.jpg" class="lightbox-image" data-fancybox="gallery"><i class="flaticon-zoom-in"></i></a></div>
                             </div>
                             <div class="lower-box">
-                                <h3><a href="<?=$about['link']?>">Interview: AI in Wealth Management</a></h3>
-                                <div class="link"><a href="<?=$about['link']?>"><span>Explore More</span></a></div>
+                                <h3><a href="javascript:void(0);">Interview: AI in Wealth Management</a></h3>
+                                <div class="link"><a href="javascript:void(0);"><span>Explore More</span></a></div>
                             </div>
                         </div>
                     </div>
@@ -744,34 +744,33 @@ include_once 'layout/header.php'; ?>
                 <div class="col-lg-4 col-md-6 col-sm-12 post-column">
                     <div class="post-block-one">
                         <div class="inner-box">
-                            <figure class="post-thumb"><a href="<?=$about['link']?>"><img src="<?=$site_link?>/front_assets/images/news/post-1.jpg" alt=""></a></figure>
+                            <figure class="post-thumb"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/news/post-1.jpg" alt=""></a></figure>
                             <span class="category">Financial Strategy</span>
-                            <h4><a href="<?=$about['link']?>">Want to Give Back in 2025? Here's How to Do It Smartly</a></h4>
+                            <h4><a href="javascript:void(0);">Want to Give Back in 2025? Here's How to Do It Smartly</a></h4>
                         </div>
                     </div>
                     <div class="post-block-one">
                         <div class="inner-box">
-                            <figure class="post-thumb"><a href="<?=$about['link']?>"><img src="<?=$site_link?>/front_assets/images/news/post-2.jpg" alt=""></a></figure>
+                            <figure class="post-thumb"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/news/post-2.jpg" alt=""></a></figure>
                             <span class="category">Market Outlook</span>
-                            <h4><a href="<?=$about['link']?>">Q1 Investment Report: Key Trends & Projections</a></h4>
+                            <h4><a href="javascript:void(0);">Q1 Investment Report: Key Trends & Projections</a></h4>
                         </div>
                     </div>
                     <div class="post-block-one">
                         <div class="inner-box">
-                            <figure class="post-thumb"><a href="<?=$about['link']?>"><img src="<?=$site_link?>/front_assets/images/news/post-3.jpg" alt=""></a></figure>
+                            <figure class="post-thumb"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/news/post-3.jpg" alt=""></a></figure>
                             <span class="category">Retirement</span>
-                            <h4><a href="<?=$about['link']?>">Recovering from Market Dips: What Retirees Should Know</a></h4>
+                            <h4><a href="javascript:void(0);">Recovering from Market Dips: What Retirees Should Know</a></h4>
                         </div>
                     </div>
                     <div class="btn-box">
-                        <a href="<?=$about['link']?>" class="theme-btn btn-two">Read All Posts</a>
+                        <a href="javascript:void(0);" class="theme-btn btn-two">Read All Posts</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 <!-- news-style-two end -->
 
 
