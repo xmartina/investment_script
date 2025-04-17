@@ -1,7 +1,7 @@
 <?php
 $page_name = 'Home';
-include_once 'include/config.php';
-include_once 'layout/header.php'; ?>
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
 
 <!-- banner-section -->
 <section class="banner-style-two">
@@ -823,4 +823,4 @@ include_once 'layout/header.php'; ?>
 
 
 
-<?php include_once 'layout/footer.php'; ?>
+<?php include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php'; ?>

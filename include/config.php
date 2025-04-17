@@ -26,4 +26,4 @@ $social_result = $conn_front->query($sql_front);
 const web_url = 'exodusaipro.online';
 const link = 'https://exodusaipro.online';
 $active_url = $_SERVER['REQUEST_URI'];
-include_once 'functions/front_functions.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/front_functions.php';
