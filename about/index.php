@@ -1,7 +1,7 @@
 <?php
 $page_name = 'About';
-include_once 'include/config.php';
-include_once 'layout/header.php'; ?>
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
 
 
-<?php include_once 'layout/footer.php'; ?>
+<?php include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php'; ?>
