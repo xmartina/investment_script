@@ -289,7 +289,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/breadcrumb.php';
         <div class="pattern-layer" style="background-image: url(<?=$site_link?>/front_assets/images/shape/shape-25.png);"></div>
         <div class="image-box-one">
             <figure class="image"><img src="<?=$site_link?>/front_assets/images/resource/cta-1.jpg" alt=""></figure>
-            <div class="phone"><h4>Call: <a href="tel:41888765432">(+41) 888.76.5432</a></h4></div>
+            <div class="phone"><h4>Call: <a href="tel:41888765432"><?=$site_phone?></a></h4></div>
         </div>
         <div class="image-box-two">
             <figure class="image"><img src="<?=$site_link?>/front_assets/images/resource/cta-2.jpg" alt=""></figure>
