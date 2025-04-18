@@ -272,9 +272,7 @@
                                 <a class="dropdown-item" href="investment-settings.html"><i data-feather="settings" class="avatar avatar-18 me-1"></i>Account Setting</a></div>
                             <div>
                                 <a class="dropdown-item theme-red" href="javascript:void(0);">
-                                    <form method="POST">
-                                        <div type="submit" name="logout">Logout</div>
-                                    </form>
+                                    logout
                                     <i data-feather="power"></i>
                                 </a>
                             </div>
