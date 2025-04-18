@@ -34,6 +34,13 @@ get('/register', function() {
 get('/user/dashboard', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/dashboard.php';
 });
+// Add these to your index.php
+post('/user/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
+});
+post('/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
+});
 
 
 dispatch();
