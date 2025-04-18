@@ -53,4 +53,7 @@ post('/user/register', function() {
 post('/register', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
 });
+post('/user/dashboard', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/dashboard.php';
+});
 dispatch();
