@@ -9,7 +9,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     <title><?=$page_name?> | <?=$site_name?></title>
-    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <link rel="icon" type="image/png" href="<?=$site_favicon?>">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,7 @@
         }
     </style>
 
-    <script defer="" src="assets/js/app-1.js?9f8f4c0fd8ab1c96ef5e"></script><link href="assets/css/app-1.css?9f8f4c0fd8ab1c96ef5e" rel="stylesheet"></head>
+    <script defer="" src="<?=$site_link?>/back_assets/js/app-1.js?9f8f4c0fd8ab1c96ef5e"></script><link href="<?=$site_link?>/back_assets/css/app-1.css?9f8f4c0fd8ab1c96ef5e" rel="stylesheet"></head>
 
 <body class="main-bg main-bg-opac main-bg-blur adminuiux-sidebar-fill-white adminuiux-sidebar-boxed  theme-blue roundedui" data-theme="theme-blue" data-sidebarfill="adminuiux-sidebar-fill-white" data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true" tabindex="0">
 <!-- Pageloader -->
@@ -33,9 +33,7 @@
         <div class="row justify-content-center align-items-center text-center h-100">
             <div class="col-12 mb-auto pt-4"></div>
             <div class="col-auto">
-                <img src="assets/img/logo.svg" alt="" class="height-60 mb-3">
-                <p class="h6 mb-0">AdminUIUX</p>
-                <p class="h3 mb-4">Investment</p>
+                <img src="<?=$site_logo?>" alt="" class="height-60 mb-3">
                 <div class="loader10 mb-2 mx-auto"></div>
             </div>
             <div class="col-12 mt-auto pb-4">
@@ -61,13 +59,9 @@
                         <nav class="navbar">
                             <div class="container-fluid">
                                 <!-- logo -->
-                                <a class="navbar-brand" href="investment-dashboard.html">
-                                    <img data-bs-img="light" src="assets/img/logo-light.svg" alt="">
-                                    <img data-bs-img="dark" src="assets/img/logo.svg" alt="">
-                                    <div class="">
-                                        <span class="h4">Investment<b>UX</b></span>
-                                        <p class="company-tagline">AdminUIUX HTML template</p>
-                                    </div>
+                                <a class="navbar-brand" href="<?=$dashboard['link']?>">
+                                    <img data-bs-img="light" src="<?=$site_link?>/back_assets/img/logo-light.svg" alt="">
+                                    <img data-bs-img="dark" src="<?=$site_link?>/back_assets/img/logo.svg" alt="">
                                 </a>
 
                                 <div class=" ms-auto "></div>

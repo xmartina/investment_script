@@ -15,6 +15,7 @@ $site_phone = $row['site_phone'];
 $site_logo = $row['site_logo'];
 $site_favicon = $row['site_favicon'];
 $site_logo = $site_link . '/front_assets/images/' .$site_logo;
+$site_favicon = $site_link. '/front_assets/images/' .$site_favicon;
 
 $sql_front = "SELECT * FROM front_menus";
 $menus_result = $conn_front->query($sql_front);

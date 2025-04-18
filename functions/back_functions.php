@@ -31,3 +31,23 @@ function back_menu($menus_result, $active_url, $page_name)
         <?php
     }
 }
+
+function back_single_menu($menu_name, $conn_front) {
+    $menu_name = mysqli_real_escape_string($conn_front, $menu_name); // basic SQL safety
+    $sql = "SELECT menu_name, menu_link FROM front_menus WHERE menu_name = '$menu_name' LIMIT 1";
+    $result = $conn_front->query($sql);
+
+    if ($row = $result->fetch_assoc()) {
+        return [
+            'name' => $row['menu_name'],
+            'link' => $row['menu_link']
+        ];
+    } else {
+        return [
+            'name' => ucfirst($menu_name),
+            'link' => '#'
+        ];
+    }
+}
+
+$dashboard = single_menu('dashboard', $conn_back);
