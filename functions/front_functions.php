@@ -7,16 +7,14 @@ function list_menu($menus_result, $active_url, $page_name)
         $menu_name = $row['menu_name'];
         $menu_link = $row['menu_link'];
 
-        if (strpos($menu_link, 'privacy') !== false) {
-            continue;
-        }
-
         if ($first && (strpos($active_url, $page_name) !== false )) {
             $current = 'current';
             $first = false; // Apply only once
         } elseif ( $page_name == 'Home') {
             $current = 'current';
             $first = false; // Apply only once
+        }elseif (strpos($menu_link, 'privacy') !== false) {
+            continue;
         }
 
         else {
