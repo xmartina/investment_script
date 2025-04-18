@@ -9,7 +9,7 @@ $error = '';
 
 // Check if user is already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: /user/dashboard.php');
+    header('Location: /user/dashboard');
     exit;
 }
 
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Redirect to secure area
-        header('Location: /user/dashboard.php');
+        header('Location: /user/dashboard');
         exit;
 
     } catch (Exception $e) {
