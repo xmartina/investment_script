@@ -14,6 +14,9 @@ get('/about', function() {
 get('/faq', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/pages/faqpage.php';
 });
+get('/contact', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/pages/contactpage.php';
+});
 
 //User Dashboard
 get('/user/login', function() {
