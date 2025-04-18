@@ -12,7 +12,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/auth/header.php';
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="emailadd" placeholder="Enter email address" value="info@adminuiux">
+                    <input type="email" class="form-control" id="emailadd" placeholder="Enter email address">
                     <label for="emailadd">Email Address</label>
                 </div>
 
@@ -43,25 +43,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/auth/header.php';
                     Don't have account? <a href="<?=$register['link']?>" class=" ">Create Account</a>
                 </div>
 
-                <div class="row align-items-center mb-3">
-                    <div class="col">
-                        <hr class="">
-                    </div>
-                    <div class="col-auto">
-                        <p class="text-secondary">OR</p>
-                    </div>
-                    <div class="col">
-                        <hr class="">
-                    </div>
-                </div>
-
-                <button class="btn btn-lg btn-outline-theme w-100 mb-3 text-start">
-                    <img src="<?=$site_link?>/back_assets/img/g-logo.png" alt="" class="me-2"> Sign in with Google
-                </button>
-                <button class="btn btn-lg btn-outline-theme w-100 mb-4 text-start">
-                    <img src="<?=$site_link?>/back_assets/img/f-logo.png" alt="" class="me-2"> Sign in with Facebook
-                </button>
-                <br><br>
             </div>
         </div>
     </div>
