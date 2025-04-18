@@ -76,7 +76,7 @@
     <div id="search-popup" class="search-popup">
         <div class="popup-inner">
             <div class="upper-box clearfix">
-                <figure class="logo-box pull-left"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>.png" alt="<?=$site_name?> logo"></a></figure>
+                <figure class="logo-box pull-left"><a href="<?=$site_link?>"><img src="<?=$site_logo?>.png" alt="<?=$site_name?> logo"></a></figure>
                 <div class="close-search pull-right"><i class="fa-solid fa-xmark"></i></div>
             </div>
             <div class="overlay-layer"></div>
@@ -112,7 +112,7 @@
                     <div class="sidebar-info-contents">
                         <div class="content-inner">
                             <div class="logo">
-                                <a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt=""></a>
+                                <a href="<?=$site_link?>"><img src="<?=$site_logo?>" alt=""></a>
                             </div>
                             <div class="content-box">
                                 <h4>About Us</h4>
@@ -173,7 +173,7 @@
         <div class="header-lower">
             <div class="outer-container">
                 <div class="outer-box">
-                    <figure class="logo-box p-3"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt=""></a></figure>
+                    <figure class="logo-box p-3"><a href="<?=$site_link?>"><img src="<?=$site_logo?>" alt=""></a></figure>
                     <div class="menu-area">
                         <!--Mobile Navigation Toggler-->
                         <div class="mobile-nav-toggler">
@@ -215,7 +215,7 @@
         <div class="sticky-header">
             <div class="outer-container">
                 <div class="outer-box">
-                    <figure class="logo-box"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt="<?=$site_name?> logo"></a></figure>
+                    <figure class="logo-box"><a href="<?=$site_link?>"><img src="<?=$site_logo?>" alt="<?=$site_name?> logo"></a></figure>
                     <div class="menu-area clearfix">
                         <nav class="main-menu clearfix">
                             <!--Keep This Empty / Menu will come through Javascript-->
@@ -251,7 +251,7 @@
         <div class="close-btn"><i class="fas fa-times"></i></div>
 
         <nav class="menu-box">
-            <div class="nav-logo"><a href="<?=$site_link?>"><img src="<?=$site_link?>/front_assets/images/<?=$site_logo?>" alt="" title=""></a></div>
+            <div class="nav-logo"><a href="<?=$site_link?>"><img src="<?=$site_logo?>" alt="" title=""></a></div>
             <div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
             <div class="contact-info">
                 <h4>Contact Info</h4>
