@@ -93,7 +93,8 @@ function get_user($user_id, $conn_back) {
             'fname' => $row['first_name'],  # Change key to match header.php
             'lname' => $row['last_name'],
             'email' => $row['email'],
-            'balance' => $row['balance']
+            'balance' => $row['balance'],
+            'currency' => $row['currency']
         ];
     } else {
         return [
@@ -110,3 +111,6 @@ $profile = back_single_menu('profile', $conn_back);
 $transactions = back_single_menu('transactions', $conn_back);
 
 $get_user = get_user($user_id, $conn_back);
+if ($get_user['currency'] == 'USD'){
+    $user_currency  = '$';
+}

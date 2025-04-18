@@ -35,5 +35,7 @@ if (isset($_POST['logout'])) {
     header("Location: /user/login"); // optional: redirect after logout
     exit;
 }
+
+
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/front_functions.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/back_functions.php';
