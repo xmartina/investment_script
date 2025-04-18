@@ -33,9 +33,9 @@ function back_menu($menus_result, $active_url, $page_name)
 }
 
 function back_single_menu($menu_name, $conn_front) {
-    $menu_name = mysqli_real_escape_string($conn_front, $menu_name); // basic SQL safety
+    $menu_name = mysqli_real_escape_string($conn_back, $menu_name); // basic SQL safety
     $sql = "SELECT menu_name, menu_link FROM back_menus WHERE menu_name = '$menu_name' LIMIT 1";
-    $result = $conn_front->query($sql);
+    $result = $conn_back->query($sql);
 
     if ($row = $result->fetch_assoc()) {
         return [
