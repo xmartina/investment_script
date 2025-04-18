@@ -46,8 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $expire = time() + 60 * 60 * 24 * 30; // 30 days
 
             // Store token in database without prepared statement
-            $update_query = "UPDATE users SET remember_token = '" . addslashes($token) . "' WHERE id = " . intval($user['id']);
-            $pdo->exec($update_query);
+            $update_query = "UPDATE users SET remember_token = '" . mysqli_real_escape_string($conn_back, $token) . "' WHERE id = " . intval($user['id']);
 
             setcookie('remember', $token, $expire, '/', '', true, true);
         }
