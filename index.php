@@ -41,6 +41,16 @@ post('/user/login', function() {
 post('/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
 });
-
-
+post('/user/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
+});
+post('/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
+});
+post('/user/register', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
+});
+post('/register', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
+});
 dispatch();
