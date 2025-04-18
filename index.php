@@ -6,16 +6,11 @@ error_reporting(E_ALL);
 require $_SERVER['DOCUMENT_ROOT'] . '/routes.php';
 
 get('/', function() {
-    include 'pages/homepage.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/pages/homepage.php';
 });
 
 get('/about', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/about/index.php';
 });
 
-//get('/user/{id}', function($id) {
-//    echo "User ID: $id";
-//});
-
 dispatch();
-

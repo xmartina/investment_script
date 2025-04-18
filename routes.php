@@ -15,13 +15,6 @@ function post($route, $callback) {
     $routes['POST'][$route] = $callback;
 }
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$uri = rtrim($uri, '/');
-if ($uri === '') {
-    $uri = '/';
-}
-
-
 // Dispatch route
 function dispatch() {
     global $routes;
@@ -29,6 +22,10 @@ function dispatch() {
     $method = $_SERVER['REQUEST_METHOD'];
     $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $uri = rtrim($uri, '/');
+    // Handle root path
+    if ($uri === '') {
+        $uri = '/';
+    }
 
     // 👇 Debug line: shows what URI PHP is seeing
     echo "<pre>REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n";
@@ -45,4 +42,3 @@ function dispatch() {
     http_response_code(404);
     echo "404 Not Found";
 }
-
