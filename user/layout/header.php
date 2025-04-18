@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title><?=$page_name?> | <?=$site_name?></title>
-    <link rel="icon" type="image/png" href="<?=$site_favicon?>">
+    <title><?= $page_name ?> | <?= $site_name ?></title>
+    <link rel="icon" type="image/png" href="<?= $site_favicon ?>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="../../css2?family=Lexend:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
@@ -16,19 +16,20 @@
             --adminuiux-title-font: "Lexend", sans-serif;
             --adminuiux-title-font-weight: 600
         }</style>
-    <script defer="defer" src="<?=$site_link?>/back_assets/js/app.js?ff1e8ee7ca91d18f44ea"></script>
-    <link href="<?=$site_link?>/back_assets/css/app.css?ff1e8ee7ca91d18f44ea" rel="stylesheet">
+    <script defer="defer" src="<?= $site_link ?>/back_assets/js/app.js?ff1e8ee7ca91d18f44ea"></script>
+    <link href="<?= $site_link ?>/back_assets/css/app.css?ff1e8ee7ca91d18f44ea" rel="stylesheet">
 </head>
-<body class="main-bg main-bg-opac main-bg-blur adminuiux-sidebar-fill-white adminuiux-sidebar-boxed theme-blue roundedui"
-      data-theme="theme-blue" data-sidebarfill="adminuiux-sidebar-fill-white" data-bs-spy="scroll"
-      data-bs-target="#list-example" data-bs-smooth-scroll="true" tabindex="0">
+<body
+    class="main-bg main-bg-opac main-bg-blur adminuiux-sidebar-fill-white adminuiux-sidebar-boxed theme-blue roundedui"
+    data-theme="theme-blue" data-sidebarfill="adminuiux-sidebar-fill-white" data-bs-spy="scroll"
+    data-bs-target="#list-example" data-bs-smooth-scroll="true" tabindex="0">
 </body>
 </html>
 <div class="pageloader">
     <div class="container h-100">
         <div class="row justify-content-center align-items-center text-center h-100">
             <div class="col-12 mb-auto pt-4"></div>
-            <div class="col-auto"><img src="<?=$site_logo?>" alt="" class="height-60 mb-3">
+            <div class="col-auto"><img src="<?= $site_logo ?>" alt="" class="height-60 mb-3">
             </div>
             <div class="col-12 mt-auto pb-4"><p class="text-secondary">Please wait we are preparing awesome things to
                     preview...</p></div>
@@ -40,14 +41,15 @@
         <div class="container-fluid">
             <button class="btn btn-link btn-square sidebar-toggler" type="button" onclick="initSidebar()"><i
                     class="sidebar-svg" data-feather="menu"></i></button>
-            <a class="navbar-brand" href="investment-dashboard.html"><img data-bs-img="light" src="<?=$site_logo?>" alt="">
-                <img data-bs-img="dark" src="<?=$site_logo?>" alt="">
+            <a class="navbar-brand" href="investment-dashboard.html"><img data-bs-img="light" src="<?= $site_logo ?>"
+                                                                          alt="">
+                <img data-bs-img="dark" src="<?= $site_logo ?>" alt="">
             </a>
             <div class="collapse navbar-collapse right-in-device justify-content-center" id="header-navbar">
                 <ul class="navbar-nav mx-lg-3 mb-2 mb-md-0">
-                    <li class="nav-item"><a class="nav-link" href="<?=$dashboard['link']?>">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?=$profile['link']?>">Portfolio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?=$transactions['link']?>">Transaction</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $dashboard['link'] ?>">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $profile['link'] ?>">Portfolio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= $transactions['link'] ?>">Transaction</a></li>
                     <li class="nav-item"><a class="nav-link" href="investment-blogs.html">News</a></li>
                 </ul>
             </div>
@@ -78,16 +80,19 @@
                                         <p class="mb-0">Network</p>
                                         <p class="fs-12 opacity-50 mb-2">Stabilize</p></a></div>
                                 <div class="col-4"><a class="dropdown-item square-item" href="app-ecommerce.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i class="bi bi-box fs-4 mx-0"></i></div>
+                                        <div class="avatar avatar-40 rounded mb-2"><i class="bi bi-box fs-4 mx-0"></i>
+                                        </div>
                                         <p class="mb-0">Inventory</p>
                                         <p class="fs-12 opacity-50 mb-2">Assuring</p></a></div>
                                 <div class="col-4"><a class="dropdown-item square-item" href="app-project.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i class="bi bi-folder fs-4 mx-0"></i>
+                                        <div class="avatar avatar-40 rounded mb-2"><i
+                                                class="bi bi-folder fs-4 mx-0"></i>
                                         </div>
                                         <p class="mb-0">Project</p>
                                         <p class="fs-12 opacity-50 mb-2">Management</p></a></div>
                                 <div class="col-4"><a class="dropdown-item square-item" href="app-social.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i class="bi bi-people fs-4 mx-0"></i>
+                                        <div class="avatar avatar-40 rounded mb-2"><i
+                                                class="bi bi-people fs-4 mx-0"></i>
                                         </div>
                                         <p class="mb-0">Social</p>
                                         <p class="fs-12 opacity-50 mb-2">Tracking</p></a></div>
@@ -116,7 +121,8 @@
                 <div class="dropdown d-inline-block">
                     <button class="btn btn-link btn-square btn-icon btn-link-header dropdown-toggle no-caret"
                             type="button" data-bs-toggle="dropdown" aria-expanded="false"><i data-feather="bell"></i>
-                        <span class="position-absolute top-0 end-0 badge rounded-pill bg-danger p-1"><small>9+</small> <span
+                        <span
+                            class="position-absolute top-0 end-0 badge rounded-pill bg-danger p-1"><small>9+</small> <span
                                 class="visually-hidden">unread messages</span></span></button>
                     <ul class="dropdown-menu dropdown-menu-end notification-dd sm-mi-95px">
                         <li><a class="dropdown-item p-2" href="#">
@@ -153,7 +159,8 @@
                                     </div>
                                     <div class="col"><p class="mb-2 small">User <span class="fw-bold">Rahana</span> has
                                             updated <span class="fw-bold">#H10215</span> property.</p><span class="row"><span
-                                                class="col"><span class="badge badge-light rounded-pill text-bg-success small">team</span></span> <span
+                                                class="col"><span
+                                                    class="badge badge-light rounded-pill text-bg-success small">team</span></span> <span
                                                 class="col-auto small opacity-75">1:00 am</span></span></div>
                                 </div>
                             </a></li>
@@ -165,7 +172,8 @@
                                                 class="bi bi-bell text-white"></i></figure>
                                     </div>
                                     <div class="col"><p class="mb-2 small">Your subscription going to expire soon.
-                                            Please <a href="profile-subscription.html">upgrade</a> to get service interrupt
+                                            Please <a href="profile-subscription.html">upgrade</a> to get service
+                                            interrupt
                                             free.</p>
                                         <p class="opacity-75 small">4 days ago</p></div>
                                 </div>
@@ -183,7 +191,8 @@
                         <div class="row gx-0 d-inline-flex">
                             <div class="col-auto align-self-center">
                                 <figure class="avatar avatar-28 rounded-circle coverimg align-middle"><img
-                                        src="<?=$site_link?>/back_assets/img/modern-ai-image/user-6.jpg" alt="" id="userphotoonboarding2">
+                                        src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt=""
+                                        id="userphotoonboarding2">
                                 </figure>
                             </div>
                         </div>
@@ -194,9 +203,11 @@
                             <div class="row gx-0">
                                 <div class="col-auto px-3">
                                     <figure class="avatar avatar-50 rounded-circle coverimg align-middle"><img
-                                            src="<?=$site_link?>/back_assets/img/modern-ai-image/user-6.jpg" alt=""></figure>
+                                            src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt="">
+                                    </figure>
                                 </div>
-                                <div class="col align-self-center"><p class="mb-1"><span><?=$get_user['fname']?></span></p>
+                                <div class="col align-self-center"><p class="mb-1">
+                                        <span><?= $get_user['fname'] ?></span></p>
                                     <p><i class="bi bi-wallet2 me-2"></i> $1100.00 <small
                                             class="opacity-50">Balance</small></p></div>
                             </div>
@@ -207,15 +218,22 @@
                                     My Profile</a></div>
                             <div><a class="dropdown-item" href="investment-dashboard.html">
                                     <div class="row g-0">
-                                        <div class="col align-self-center"><i data-feather="layout" class="avatar avatar-18 me-1"></i> My Dashboard </div>
+                                        <div class="col align-self-center"><i data-feather="layout"
+                                                                              class="avatar avatar-18 me-1"></i> My
+                                            Dashboard
+                                        </div>
                                         <div class="col-auto">
                                             <figure class="avatar avatar-20 coverimg rounded-circle"><img
-                                                    src="<?=$site_link?>/back_assets/img/modern-ai-image/user-1.jpg" alt=""></figure>
+                                                    src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-1.jpg"
+                                                    alt=""></figure>
                                             <figure class="avatar avatar-20 coverimg rounded-circle"><img
-                                                    src="<?=$site_link?>/back_assets/img/modern-ai-image/user-2.jpg" alt=""></figure>
+                                                    src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-2.jpg"
+                                                    alt=""></figure>
                                             <figure class="avatar avatar-20 coverimg rounded-circle"><img
-                                                    src="<?=$site_link?>/back_assets/img/modern-ai-image/user-4.jpg" alt=""></figure>
-                                            <div class="avatar avatar-20 bg-theme-1 rounded-circle text-center align-middle">
+                                                    src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-4.jpg"
+                                                    alt=""></figure>
+                                            <div
+                                                class="avatar avatar-20 bg-theme-1 rounded-circle text-center align-middle">
                                                 <small class="fs-10 align-middle">9+</small></div>
                                         </div>
                                     </div>
@@ -344,10 +362,9 @@
                                         <div class="row">
                                             <div class="col">News and Blogs</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch4"> <label
-                                                        class="form-check-label" for="searchswitch4"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch4">
+                                                    <label class="form-check-label" for="searchswitch4"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -360,10 +377,9 @@
                                         <div class="row">
                                             <div class="col">Show order ID</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch5"> <label
-                                                        class="form-check-label" for="searchswitch5"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch5">
+                                                    <label class="form-check-label" for="searchswitch5"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -371,11 +387,9 @@
                                         <div class="row">
                                             <div class="col">International Order</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch6"
-                                                                                           checked=""> <label
-                                                        class="form-check-label" for="searchswitch6"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch6" checked="">
+                                                    <label class="form-check-label" for="searchswitch6"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -383,11 +397,9 @@
                                         <div class="row">
                                             <div class="col">Taxable Product</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch7"
-                                                                                           checked=""> <label
-                                                        class="form-check-label" for="searchswitch7"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch7" checked="">
+                                                    <label class="form-check-label" for="searchswitch7"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -395,10 +407,9 @@
                                         <div class="row">
                                             <div class="col">Published Product</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch8"> <label
-                                                        class="form-check-label" for="searchswitch8"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch8">
+                                                    <label class="form-check-label" for="searchswitch8"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -411,10 +422,9 @@
                                         <div class="row">
                                             <div class="col">Have email ID</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch9"> <label
-                                                        class="form-check-label" for="searchswitch9"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch9">
+                                                    <label class="form-check-label" for="searchswitch9"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -422,11 +432,9 @@
                                         <div class="row">
                                             <div class="col">Have phone number</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch10"
-                                                                                           checked=""> <label
-                                                        class="form-check-label" for="searchswitch10"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch10" checked="">
+                                                    <label class="form-check-label" for="searchswitch10"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -434,11 +442,9 @@
                                         <div class="row">
                                             <div class="col">Photo available</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch11"
-                                                                                           checked=""> <label
-                                                        class="form-check-label" for="searchswitch11"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch11" checked="">
+                                                    <label class="form-check-label" for="searchswitch11"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -446,10 +452,9 @@
                                         <div class="row">
                                             <div class="col">Referral</div>
                                             <div class="col-auto">
-                                                <div class="form-check form-switch"><input class="form-check-input"
-                                                                                           type="checkbox" role="switch"
-                                                                                           id="searchswitch12"> <label
-                                                        class="form-check-label" for="searchswitch12"></label></div>
+                                                <div class="form-check form-switch"><input class="form-check-input" type="checkbox" role="switch" id="searchswitch12">
+                                                    <label class="form-check-label" for="searchswitch12"></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -484,7 +489,7 @@
                 </div>
                 <div class="text-center collapse" id="usersidebarprofile">
                     <figure class="avatar avatar-100 rounded-circle coverimg my-3"><img
-                            src="<?=$site_link?>/back_assets/img/modern-ai-image/user-6.jpg" alt=""></figure>
+                            src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt=""></figure>
                     <h5 class="mb-1 fw-medium">AdminUIUX</h5>
                     <p class="small">The Investment UI Kit</p></div>
             </div>
@@ -502,25 +507,30 @@
                         <span class="menu-name">Investment</span></a>
                     <div class="dropdown-menu">
                         <div class="nav-item"><a href="investment-company-shares.html" class="nav-link"><i
-                                    class="menu-icon bi bi-bank"></i> <span class="menu-name">Company Share</span></a></div>
+                                    class="menu-icon bi bi-bank"></i> <span class="menu-name">Company Share</span></a>
+                        </div>
                         <div class="nav-item"><a href="investment-mutual-funds.html" class="nav-link"><i
-                                    class="menu-icon bi bi-cash-coin"></i> <span class="menu-name">Mutual Fund</span></a>
+                                    class="menu-icon bi bi-cash-coin"></i> <span
+                                    class="menu-name">Mutual Fund</span></a>
                         </div>
                         <div class="nav-item"><a href="investment-deposit.html" class="nav-link"><i
-                                    class="menu-icon bi bi-percent"></i> <span class="menu-name">Deposit</span></a></div>
+                                    class="menu-icon bi bi-percent"></i> <span class="menu-name">Deposit</span></a>
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item"><a href="investment-explore.html" class="nav-link"><i
                             class="menu-icon bi bi-search"></i> <span class="menu-name">Explore</span></a></li>
                 <li class="nav-item"><a href="investment-statistics.html" class="nav-link"><i
-                            class="menu-icon bi bi-bar-chart-line"></i> <span class="menu-name">Statistics</span></a></li>
+                            class="menu-icon bi bi-bar-chart-line"></i> <span class="menu-name">Statistics</span></a>
+                </li>
                 <li class="nav-item"><a href="investment-calculator.html" class="nav-link"><i
                             class="menu-icon bi bi-calculator"></i> <span class="menu-name">Calculators</span></a></li>
                 <li class="nav-item"><a href="investment-pages.html" class="nav-link"><i
                             class="menu-icon bi bi-layers"></i> <span class="menu-name">Pages</span> <span
                             class="badge text-bg-primary mx-2">55+</span></a></li>
                 <li class="nav-item"><a href="investment-personalization.html" class="nav-link"><i
-                            class="menu-icon bi bi-palette h4"></i> <span class="menu-name">Personalize ❤️</span></a></li>
+                            class="menu-icon bi bi-palette h4"></i> <span class="menu-name">Personalize ❤️</span></a>
+                </li>
                 <li class="nav-item"><a class="nav-link" href="components.html"><i class="menu-icon bi bi-cpu"></i>
                         <span class="menu-name">Components</span></a></li>
             </ul>
