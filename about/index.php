@@ -283,39 +283,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/breadcrumb.php';
 </section>
 <!-- industries-section end -->
 
-<!-- cta-section -->
-<section class="cta-section alternat-2">
-    <div class="outer-container">
-        <div class="pattern-layer" style="background-image: url(<?=$site_link?>/front_assets/images/shape/shape-25.png);"></div>
-        <div class="image-box-one">
-            <figure class="image"><img src="<?=$site_link?>/front_assets/images/resource/cta-1.jpg" alt=""></figure>
-            <div class="phone"><h4>Call: <a href="tel:41888765432"><?=$site_phone?></a></h4></div>
-        </div>
-        <div class="image-box-two">
-            <figure class="image"><img src="<?=$site_link?>/front_assets/images/resource/cta-2.jpg" alt=""></figure>
-            <div class="text-box">
-                <h6>Do you have <br />any idea to join <br />with us?</h6>
-            </div>
-        </div>
-        <div class="auto-container">
-            <div class="row clearfix">
-                <div class="col-lg-8 col-md-12 col-sm-12 offset-lg-2 content-column">
-                    <div class="content-box">
-                        <h2>Trust us with your investment <br />and see your portfolio grow</h2>
-                        <div class="inner-box">
-                            <figure class="image-box"><img src="<?=$site_link?>/front_assets/images/resource/cart-1.jpg" alt=""></figure>
-                            <p>We provide expert investment strategies designed to maximize your returns and minimize risks in an ever-changing market.</p>
-                            <a href="<?=$about['link']?>" class="theme-btn btn-two">Send Request</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<!-- cta-section end -->
-
-
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer_cta.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php';
