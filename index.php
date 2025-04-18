@@ -10,12 +10,12 @@ get('/', function() {
 });
 
 get('/about', function() {
-    include 'pages/about.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/about/index.php';
 });
 
-get('/user/{id}', function($id) {
-    echo "User ID: $id";
-});
+//get('/user/{id}', function($id) {
+//    echo "User ID: $id";
+//});
 
 dispatch();
 
