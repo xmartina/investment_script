@@ -13,3 +13,16 @@ if (!$conn_front) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+// Database credentials
+$back_host = 'localhost';
+$back_user = 'summitgu_exodusaipro_back';
+$back_password = 'exodusaipro_back';
+$back_database = 'summitgu_exodusaipro_back';
+
+// Create connection
+$conn_back = mysqli_connect($back_host, $back_user, $back_password, $back_database);
+
+// Check connection
+if (!$conn_back) {
+    die("Connection failed: " . mysqli_connect_error());
+}

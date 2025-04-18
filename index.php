@@ -22,5 +22,11 @@ get('/user/login', function() {
 get('/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/login.php';
 });
+get('/user/register', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/register.php';
+});
+get('/register', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/register.php';
+});
 
 dispatch();
