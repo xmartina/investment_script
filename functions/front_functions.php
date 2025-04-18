@@ -7,7 +7,7 @@ function list_menu($menus_result, $active_url, $page_name)
         $menu_name = $row['menu_name'];
         $menu_link = $row['menu_link'];
 
-        if (strpos($menu_link, 'privacy') !== false) {
+        if (strpos($menu_link, 'privacy') !== false || strpos($menu_link, 'forgot_password') !== false) {
             continue;
         }
 
