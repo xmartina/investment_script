@@ -32,7 +32,7 @@ $active_url = $_SERVER['REQUEST_URI'];
 if (isset($_POST['logout'])) {
     unset($_SESSION['user']); // remove specific session variable
     session_destroy(); // optional: completely destroy session
-    header("Location: login.php"); // optional: redirect after logout
+    header("Location: /user/login"); // optional: redirect after logout
     exit;
 }
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/front_functions.php';
