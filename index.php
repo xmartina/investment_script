@@ -13,4 +13,12 @@ get('/about', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/about/index.php';
 });
 
+get('/user/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/login.php';
+});
+
+get('/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/login.php';
+});
+
 dispatch();
