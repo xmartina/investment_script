@@ -208,7 +208,7 @@
                                 </div>
                                 <div class="col align-self-center"><p class="mb-1">
                                         <span><?= $get_user['fname'] ?></span></p>
-                                    <p><i class="bi bi-wallet2 me-2"></i> <?= $get_user['balance'] ?> <small
+                                    <p><i class="bi bi-wallet2 me-2"></i> <?= number_format($get_user['balance']) ?> <small
                                             class="opacity-50">Balance</small></p></div>
                             </div>
                         </div>
