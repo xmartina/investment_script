@@ -104,6 +104,110 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/breadcrumb.php';
 </section>
 <!-- contact-section end -->
 
+    <!-- contact-style-two -->
+    <section class="contact-style-two">
+        <div class="outer-container sec-pad">
+            <div class="pattern-layer">
+                <div class="pattern-1"></div>
+                <div class="pattern-2"></div>
+            </div>
+            <figure class="image-layer">
+                <img src="<?=$site_link?>/front_assets/images/resource/contact-1.png" alt="Contact Illustration">
+            </figure>
+            <div class="auto-container">
+                <div class="row clearfix">
+
+                    <!-- Section Title -->
+                    <div class="col-lg-6 col-md-12 col-sm-12 title-column">
+                        <div class="sec-title light">
+                            <span class="sub-title">Get in Touch</span>
+                            <h2>Let’s Talk! <br />We’d Love to Hear From You</h2>
+                            <p>Fill out the form below and our team will respond shortly.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="col-lg-6 col-md-12 col-sm-12 content-column">
+                        <div class="content-box">
+                            <div class="form-inner">
+                                <form method="post" action="" id="contact-form" class="default-form">
+                                    <div class="row clearfix">
+
+                                        <!-- First Name -->
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label>First Name</label>
+                                            <input type="text" name="fname" placeholder="Enter your first name" required>
+                                        </div>
+
+                                        <!-- Last Name -->
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label>Last Name</label>
+                                            <input type="text" name="lname" placeholder="Enter your last name" required>
+                                        </div>
+
+                                        <!-- Company or Project -->
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label>Project / Company</label>
+                                            <input type="text" name="subject" placeholder="E.g., Exodus Holdings Ltd." required>
+                                        </div>
+
+                                        <!-- Phone -->
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label>Phone Number</label>
+                                            <input type="text" name="phone" placeholder="+1 234 567 890" required>
+                                        </div>
+
+                                        <!-- Email -->
+                                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                            <label>Email Address</label>
+                                            <input type="email" name="email" placeholder="Enter your email address" required>
+                                        </div>
+
+                                        <!-- Services -->
+                                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                            <label>Interested In</label>
+                                            <div class="select-box">
+                                                <select class="selectmenu" name="interest">
+                                                    <option value="Traditional Consulting">Traditional Consulting</option>
+                                                    <option value="Portfolio Management">Portfolio Management</option>
+                                                    <option value="Asset Allocation">Asset Allocation</option>
+                                                    <option value="Risk Management">Risk Management</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Message -->
+                                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                            <label>Your Message</label>
+                                            <textarea name="message" placeholder="Type your message here..."></textarea>
+                                        </div>
+
+                                        <!-- Privacy Checkbox -->
+                                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                            <div class="check-box">
+                                                <input class="check" type="checkbox" id="privacyCheck" required>
+                                                <label for="privacyCheck">I confirm that I have read and agree to the <a href="<?=$privacy['link']?> target="_blank">Privacy Policy</a>.</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="col-lg-12 col-md-12 col-sm-12 form-group message-btn">
+                                            <button class="theme-btn btn-two" type="submit" name="submit-form"><span>Send Message</span></button>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- .row -->
+            </div>
+        </div>
+    </section>
+    <!-- contact-style-two end -->
+
+
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer_cta.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php';
