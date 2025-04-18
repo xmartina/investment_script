@@ -92,7 +92,8 @@ function get_user($user_id, $conn_back) {
         return [
             'fname' => $row['first_name'],  # Change key to match header.php
             'lname' => $row['last_name'],
-            'email' => $row['email']
+            'email' => $row['email'],
+            'balance' => $row['balance']
         ];
     } else {
         return [
