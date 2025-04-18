@@ -4,10 +4,7 @@ $page_name = 'Login';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/auth/header.php';
 
-// Initialize variables
 $error = '';
-
-// Check if user is already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: /user/dashboard');
     exit;

@@ -72,3 +72,5 @@ function login_user($conn_back, $email, $password)
 
 
 $dashboard = back_single_menu('dashboard', $conn_back);
+$profile = back_single_menu('profile', $conn_back);
+$transactions = back_single_menu('transactions', $conn_back);
