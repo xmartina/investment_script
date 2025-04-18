@@ -56,10 +56,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/auth/header.php';
                 </div>
 
                 <button class="btn btn-lg btn-outline-theme w-100 mb-3 text-start">
-                    <img src="assets/img/g-logo.png" alt="" class="me-2"> Sign in with Google
+                    <img src="<?=$site_link?>/back_assets/img/g-logo.png" alt="" class="me-2"> Sign in with Google
                 </button>
                 <button class="btn btn-lg btn-outline-theme w-100 mb-4 text-start">
-                    <img src="assets/img/f-logo.png" alt="" class="me-2"> Sign in with Facebook
+                    <img src="<?=$site_link?>/back_assets/img/f-logo.png" alt="" class="me-2"> Sign in with Facebook
                 </button>
                 <br><br>
             </div>
