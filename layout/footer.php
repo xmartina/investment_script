@@ -5,7 +5,7 @@
             <div class="row clearfix">
                 <div class="col-lg-6 col-md-12 col-sm-12 footer-column">
                     <div class="logo-widget">
-                        <figure class="footer-logo"><a href="javascript:void(0);"><img src="<?=$site_link?>/front_assets/images/logo.png" alt=""></a></figure>
+                        <figure class="footer-logo"><a href="javascript:void(0);"><img src="<?=$site_logo?>" alt=""></a></figure>
                         <div class="copyright"><h5>Copyright &copy; 2025 <a href="javascript:void(0);"><?=$site_name?></a> All Rights Reserved.</h5></div>
                         <div class="text-box">
                             <p>Provides advice & guidance to clients regarding their investments & manage their investment portfolios.</p>
