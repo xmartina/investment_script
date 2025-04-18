@@ -15,6 +15,13 @@ function post($route, $callback) {
     $routes['POST'][$route] = $callback;
 }
 
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$uri = rtrim($uri, '/');
+if ($uri === '') {
+    $uri = '/';
+}
+
+
 // Dispatch route
 function dispatch() {
     global $routes;

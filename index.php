@@ -14,7 +14,8 @@ get('/about', function() {
 });
 
 get('/user/{id}', function($id) {
-    include 'pages/user.php'; // Pass ID using $_GET or pass directly
+    echo "User ID: $id";
 });
 
 dispatch();
+
