@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = "Please fill all fields.";
     } else {
-        $login = login_user($email, $password);
+        $login = login_user($conn_back, $email, $password);
         if ($login['success']) {
             header("Location: /user/dashboard");
             exit;
