@@ -29,9 +29,11 @@ const link = 'https://exodusaipro.online';
 $active_url = $_SERVER['REQUEST_URI'];
 
 //backend config
-if (isset($_POST['logout'])){
-    unset($_SESSION['user']);
+if (isset($_POST['logout'])) {
+    unset($_SESSION['user']); // remove specific session variable
+    session_destroy(); // optional: completely destroy session
+    header("Location: login.php"); // optional: redirect after logout
+    exit;
 }
-
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/front_functions.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/back_functions.php';

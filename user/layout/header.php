@@ -268,12 +268,16 @@
                                     <div><a class="dropdown-item" data-value="HI">HI - Hindi</a></div>
                                 </div>
                             </div>
-                            <div><a class="dropdown-item" href="investment-settings.html"><i data-feather="settings"
-                                                                                             class="avatar avatar-18 me-1"></i>
-                                    Account Setting</a></div>
-                            <div><a class="dropdown-item theme-red" href="investment-login.html"><i data-feather="power"
-                                                                                                    class="avatar avatar-18 me-1"></i>
-                                    Logout</a></div>
+                            <div>
+                                <a class="dropdown-item" href="investment-settings.html"><i data-feather="settings" class="avatar avatar-18 me-1"></i>Account Setting</a></div>
+                            <div>
+                                <a class="dropdown-item theme-red" href="javascript:void(0);">
+                                    <form method="POST">
+                                        <button type="submit" name="logout">Logout</button>
+                                    </form>
+                                    <i data-feather="power"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
