@@ -50,4 +50,4 @@ function back_single_menu($menu_name, $conn_front) {
     }
 }
 
-$dashboard = single_menu('dashboard', $conn_back);
+$dashboard = back_single_menu('dashboard', $conn_back);
