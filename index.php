@@ -10,7 +10,11 @@ get('/', function() {
 });
 
 get('/about', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/about/index.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/pages/aboutpage.php';
+});
+
+get('/faq', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/pages/faqpage.php';
 });
 
 get('/user/login', function() {
