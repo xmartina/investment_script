@@ -34,13 +34,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/auth/header.php';
                         </div>
                     </div>
                     <div class="col-auto">
-                        <a href="investment-forgot-password.html" class=" ">Forget Password?</a>
+                        <a href="<?=$forgot_password['link']?>" class=" ">Forget Password?</a>
                     </div>
                 </div>
-                <a href="investment-dashboard.html" class="btn btn-lg btn-theme w-100 mb-4">Login</a>
+                <a href="<?=$dashboard['link']?>" class="btn btn-lg btn-theme w-100 mb-4">Login</a>
                 <!-- <button class="btn btn-lg btn-theme w-100 mb-4">Login</button> -->
                 <div class="text-center mb-3">
-                    Don't have account? <a href="investment-signup.html" class=" ">Create Account</a>
+                    Don't have account? <a href="<?=$register['link']?>" class=" ">Create Account</a>
                 </div>
 
                 <div class="row align-items-center mb-3">

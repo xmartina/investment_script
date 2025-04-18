@@ -69,4 +69,5 @@ $plans = single_menu('plans', $conn_front);
 $home = single_menu('home', $conn_front);
 $faq = single_menu('faq', $conn_front);
 $privacy = single_menu('privacy', $conn_front);
+$forgot_password = single_menu('forgot_password', $conn_front);
 ?>
