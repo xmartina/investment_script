@@ -27,10 +27,6 @@ function dispatch() {
         $uri = '/';
     }
 
-    // 👇 Debug line: shows what URI PHP is seeing
-    echo "<pre>REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n";
-    echo "Parsed URI: $uri\n</pre>";
-
     foreach ($routes[$method] ?? [] as $route => $callback) {
         $pattern = "@^" . preg_replace('/\{([\w]+)\}/', '([\w-]+)', $route) . "$@";
         if (preg_match($pattern, $uri, $matches)) {
