@@ -273,7 +273,7 @@
                             <div>
                                 <a class="dropdown-item theme-red" href="javascript:void(0);">
                                     <form method="POST">
-                                        <button type="submit" name="logout">Logout</button>
+                                        <div type="submit" name="logout">Logout</div>
                                     </form>
                                     <i data-feather="power"></i>
                                 </a>
