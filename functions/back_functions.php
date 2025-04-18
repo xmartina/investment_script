@@ -1,6 +1,6 @@
 <?php
 
-function list_menu($menus_result, $active_url, $page_name)
+function back_menu($menus_result, $active_url, $page_name)
 {
     $first = true; // Flag to identify the first active menu item
 
