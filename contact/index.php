@@ -209,6 +209,5 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/breadcrumb.php';
 
 
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer_cta.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php';
 ?>
