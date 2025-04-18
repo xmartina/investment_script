@@ -90,9 +90,9 @@ function get_user($user_id, $conn_back) {
 
     if ($row = mysqli_fetch_assoc($get_user_result)) {
         return [
-            'user_fname' => $row['first_name'],
-            'user_lname' => $row['last_name'],
-            'user_email' => $row['email']
+            'fname' => $row['first_name'],  # Change key to match header.php
+            'lname' => $row['last_name'],
+            'email' => $row['email']
         ];
     } else {
         return [
