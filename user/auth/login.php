@@ -39,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Set session variables
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $email;
+        $user_id = $_SESSION['user_id'];
 
         // Handle "Remember me" functionality
         if (isset($_POST['rememberme'])) {
