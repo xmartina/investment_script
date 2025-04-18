@@ -14,6 +14,7 @@ $site_address = $row['site_address'];
 $site_phone = $row['site_phone'];
 $site_logo = $row['site_logo'];
 $site_favicon = $row['site_favicon'];
+ob_start();
 $site_logo = '<?=$site_link?>/front_assets/images/<?=$site_logo?>';
 
 $sql_front = "SELECT * FROM front_menus";
