@@ -271,8 +271,25 @@
                             <div>
                                 <a class="dropdown-item" href="investment-settings.html"><i data-feather="settings" class="avatar avatar-18 me-1"></i>Account Setting</a></div>
                             <div>
-                                <a class="dropdown-item theme-red" href="javascript:void(0)"><i data-feather="power" class="avatar avatar-18 me-1"></i>Logout</a>
+                                <a id="logout-btn" class="dropdown-item theme-red" href="javascript:void(0)"><i data-feather="power" class="avatar avatar-18 me-1"></i>Logout</a>
                             </div>
+                            <script>
+                                document.getElementById("logout-btn").addEventListener("click", function () {
+                                    // Create a fake form and submit it as POST
+                                    const form = document.createElement("form");
+                                    form.method = "POST";
+                                    form.style.display = "none";
+
+                                    const logoutInput = document.createElement("input");
+                                    logoutInput.type = "hidden";
+                                    logoutInput.name = "logout";
+                                    logoutInput.value = "1";
+
+                                    form.appendChild(logoutInput);
+                                    document.body.appendChild(form);
+                                    form.submit();
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>
