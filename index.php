@@ -20,16 +20,16 @@ get('/contact', function() {
 
 //User Dashboard
 get('/user/login', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/user/login.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
 });
 get('/login', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/user/login.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
 });
 get('/user/register', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/user/register.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
 });
 get('/register', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/user/register.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
 });
 
 dispatch();
