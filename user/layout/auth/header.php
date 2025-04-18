@@ -60,8 +60,8 @@
                             <div class="container-fluid">
                                 <!-- logo -->
                                 <a class="navbar-brand" href="<?=$dashboard['link']?>">
-                                    <img data-bs-img="light" src="<?=$site_link?>/back_assets/img/logo-light.svg" alt="">
-                                    <img data-bs-img="dark" src="<?=$site_link?>/back_assets/img/logo.svg" alt="">
+                                    <img data-bs-img="light" src="<?=$site_logo?>" alt="">
+                                    <img data-bs-img="dark" src="<?=$site_logo?>" alt="">
                                 </a>
 
                                 <div class=" ms-auto "></div>
