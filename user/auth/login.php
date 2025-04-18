@@ -60,9 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
-
-?>
     <div class="h-100 py-4 px-3">
         <div class="row h-100 align-items-center justify-content-center mt-md-4">
             <div class="col-11 col-sm-8 col-md-11 col-xl-11 col-xxl-10 login-box">
