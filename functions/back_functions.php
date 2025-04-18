@@ -70,7 +70,30 @@ function login_user($conn_back, $email, $password)
     }
 }
 
+function get_user($user_id, $conn_back) {
+    $user_id = mysqli_real_escape_string($conn_back, $user_id); // sanitize input
+    $getusersql = "SELECT * FROM users WHERE id = '$user_id'";
+    $get_user_result = mysqli_query($conn_back, $getusersql);
+
+    if ($row = mysqli_fetch_assoc($get_user_result)) {
+        return [
+            'user_fname' => $row['first_name'],
+            'user_lname' => $row['last_name'],
+            'user_email' => $row['email']
+        ];
+    } else {
+        return [
+            'user_fname' => 'not set',
+            'user_lname' => 'not set',
+            'user_email' => 'not set'
+        ];
+    }
+}
+
 
 $dashboard = back_single_menu('dashboard', $conn_back);
 $profile = back_single_menu('profile', $conn_back);
 $transactions = back_single_menu('transactions', $conn_back);
+
+
+$get_user = get_user($user_id, $conn_back);

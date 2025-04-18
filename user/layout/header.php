@@ -196,7 +196,7 @@
                                     <figure class="avatar avatar-50 rounded-circle coverimg align-middle"><img
                                             src="<?=$site_link?>/back_assets/img/modern-ai-image/user-6.jpg" alt=""></figure>
                                 </div>
-                                <div class="col align-self-center"><p class="mb-1"><span>AdminUIUX</span></p>
+                                <div class="col align-self-center"><p class="mb-1"><span><?=$get_user['fname']?></span></p>
                                     <p><i class="bi bi-wallet2 me-2"></i> $1100.00 <small
                                             class="opacity-50">Balance</small></p></div>
                             </div>
@@ -207,10 +207,7 @@
                                     My Profile</a></div>
                             <div><a class="dropdown-item" href="investment-dashboard.html">
                                     <div class="row g-0">
-                                        <div class="col align-self-center"><i data-feather="layout"
-                                                                              class="avatar avatar-18 me-1"></i> My
-                                            Dashboard
-                                        </div>
+                                        <div class="col align-self-center"><i data-feather="layout" class="avatar avatar-18 me-1"></i> My Dashboard </div>
                                         <div class="col-auto">
                                             <figure class="avatar avatar-20 coverimg rounded-circle"><img
                                                     src="<?=$site_link?>/back_assets/img/modern-ai-image/user-1.jpg" alt=""></figure>
