@@ -31,5 +31,9 @@ get('/user/register', function() {
 get('/register', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
 });
+get('/user/dashboard', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/dashboard.php';
+});
+
 
 dispatch();

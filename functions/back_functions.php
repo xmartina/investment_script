@@ -50,4 +50,25 @@ function back_single_menu($menu_name, $conn_back) {
     }
 }
 
+
+function login_user($conn_back, $email, $password)
+{
+    // Query (NOT SECURE - for simple use only)
+    $sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+    $result = mysqli_query($conn_back, $sql);
+
+    if (!$result) {
+        return ['success' => false, 'message' => 'Query failed.'];
+    }
+
+    if (mysqli_num_rows($result) === 1) {
+        $user = mysqli_fetch_assoc($result);
+        $_SESSION['user'] = $user;
+        return ['success' => true, 'message' => 'Login successful.'];
+    } else {
+        return ['success' => false, 'message' => 'Invalid email or password.'];
+    }
+}
+
+
 $dashboard = back_single_menu('dashboard', $conn_back);
