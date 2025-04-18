@@ -1,4 +1,9 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 function back_menu($menus_result, $active_url, $page_name)
 {
@@ -71,7 +76,15 @@ function login_user($conn_back, $email, $password)
 }
 
 function get_user($user_id, $conn_back) {
-    $user_id = mysqli_real_escape_string($conn_back, $user_id); // sanitize input
+    if ($user_id === null || $user_id === '') {
+        return [
+            'user_fname' => 'not set',
+            'user_lname' => 'not set',
+            'user_email' => 'not set'
+        ];
+    }
+
+    $user_id = mysqli_real_escape_string($conn_back, $user_id);
     $getusersql = "SELECT * FROM users WHERE id = '$user_id'";
     $get_user_result = mysqli_query($conn_back, $getusersql);
 
