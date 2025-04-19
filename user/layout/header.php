@@ -41,7 +41,7 @@
         <div class="container-fluid">
             <button class="btn btn-link btn-square sidebar-toggler" type="button" onclick="initSidebar()"><i
                     class="sidebar-svg" data-feather="menu"></i></button>
-            <a class="navbar-brand" href="investment-dashboard.html"><img data-bs-img="light" src="<?= $site_logo ?>"
+            <a class="navbar-brand" href="<?= $site_link ?>"><img data-bs-img="light" src="<?= $site_logo ?>"
                                                                           alt="">
                 <img data-bs-img="dark" src="<?= $site_logo ?>" alt="">
             </a>
@@ -50,7 +50,6 @@
                     <li class="nav-item"><a class="nav-link" href="<?= $dashboard['link'] ?>">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= $profile['link'] ?>">Portfolio</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= $transactions['link'] ?>">Transaction</a></li>
-                    <li class="nav-item"><a class="nav-link" href="investment-blogs.html">News</a></li>
                 </ul>
             </div>
             <div class="ms-auto">
@@ -65,42 +64,61 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-end width-300 pt-0 px-0">
                         <div class="bg-theme-1-space rounded py-3 mb-2 dropdown-dontclose text-center"><p class="mb-0">
-                                Applications</p>
-                            <p class="opacity-50 small">Make your app innovative</p></div>
+                                Quick Links</p>
+                            <p class="opacity-50 small">Fast Navigation</p></div>
                         <div class="px-2">
+                            <?php
+                            $apps = [
+                                [
+                                    'href' => 'app-finance.html',
+                                    'icon' => 'bi-bank',
+                                    'title' => 'Finance',
+                                    'subtitle' => 'Accounting'
+                                ],
+                                [
+                                    'href' => 'app-network.html',
+                                    'icon' => 'bi-globe',
+                                    'title' => 'Network',
+                                    'subtitle' => 'Stabilize'
+                                ],
+                                [
+                                    'href' => 'app-ecommerce.html',
+                                    'icon' => 'bi-box',
+                                    'title' => 'Inventory',
+                                    'subtitle' => 'Assuring'
+                                ],
+                                [
+                                    'href' => 'app-project.html',
+                                    'icon' => 'bi-folder',
+                                    'title' => 'Project',
+                                    'subtitle' => 'Management'
+                                ],
+                                [
+                                    'href' => 'app-social.html',
+                                    'icon' => 'bi-people',
+                                    'title' => 'Social',
+                                    'subtitle' => 'Tracking'
+                                ],
+                                [
+                                    'href' => 'app-learning.html',
+                                    'icon' => 'bi-journal-bookmark',
+                                    'title' => 'Learning',
+                                    'subtitle' => 'Make-easy'
+                                ]
+                            ];
+                            ?>
                             <div class="row g-0 text-center mb-2">
-                                <div class="col-4"><a class="dropdown-item square-item" href="app-finance.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i class="bi bi-bank fs-4 mx-0"></i>
-                                        </div>
-                                        <p class="mb-0">Finance</p>
-                                        <p class="fs-12 opacity-50 mb-2">Accounting</p></a></div>
-                                <div class="col-4"><a class="dropdown-item square-item" href="app-network.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i class="bi bi-globe fs-4 mx-0"></i>
-                                        </div>
-                                        <p class="mb-0">Network</p>
-                                        <p class="fs-12 opacity-50 mb-2">Stabilize</p></a></div>
-                                <div class="col-4"><a class="dropdown-item square-item" href="app-ecommerce.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i class="bi bi-box fs-4 mx-0"></i>
-                                        </div>
-                                        <p class="mb-0">Inventory</p>
-                                        <p class="fs-12 opacity-50 mb-2">Assuring</p></a></div>
-                                <div class="col-4"><a class="dropdown-item square-item" href="app-project.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i
-                                                class="bi bi-folder fs-4 mx-0"></i>
-                                        </div>
-                                        <p class="mb-0">Project</p>
-                                        <p class="fs-12 opacity-50 mb-2">Management</p></a></div>
-                                <div class="col-4"><a class="dropdown-item square-item" href="app-social.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i
-                                                class="bi bi-people fs-4 mx-0"></i>
-                                        </div>
-                                        <p class="mb-0">Social</p>
-                                        <p class="fs-12 opacity-50 mb-2">Tracking</p></a></div>
-                                <div class="col-4"><a class="dropdown-item square-item" href="app-learning.html">
-                                        <div class="avatar avatar-40 rounded mb-2"><i
-                                                class="bi bi-journal-bookmark fs-4 mx-0"></i></div>
-                                        <p class="mb-0">Learning</p>
-                                        <p class="fs-12 opacity-50 mb-2">Make-easy</p></a></div>
+                                <?php foreach ($apps as $app): ?>
+                                    <div class="col-4">
+                                        <a class="dropdown-item square-item" href="<?= $app['href']; ?>">
+                                            <div class="avatar avatar-40 rounded mb-2">
+                                                <i class="bi <?= $app['icon']; ?> fs-4 mx-0"></i>
+                                            </div>
+                                            <p class="mb-0"><?= $app['title']; ?></p>
+                                            <p class="fs-12 opacity-50 mb-2"><?= $app['subtitle']; ?></p>
+                                        </a>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                         <div class="text-center"><a class="btn btn-link text-center" href="app-demo.html">View all <i

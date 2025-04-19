@@ -111,6 +111,44 @@ $profile = back_single_menu('profile', $conn_back);
 $transactions = back_single_menu('transactions', $conn_back);
 
 $get_user = get_user($user_id, $conn_back);
-if ($get_user['currency'] == 'USD'){
-    $user_currency  = '$';
+switch ($get_user['currency']) {
+    case 'USD':
+        $user_currency = '$';
+        break;
+    case 'EUR':
+        $user_currency = '€';
+        break;
+    case 'GBP':
+        $user_currency = '£';
+        break;
+    case 'JPY':
+        $user_currency = '¥';
+        break;
+    case 'CAD':
+        $user_currency = 'C$';
+        break;
+    case 'AUD':
+        $user_currency = 'A$';
+        break;
+    case 'NGN':
+        $user_currency = '₦';
+        break;
+    case 'CHF':
+        $user_currency = 'CHF'; // Swiss Franc
+        break;
+    case 'CNY':
+        $user_currency = '¥'; // Chinese Yuan
+        break;
+    case 'INR':
+        $user_currency = '₹'; // Indian Rupee
+        break;
+    case 'ZAR':
+        $user_currency = 'R'; // South African Rand
+        break;
+    case 'NZD':
+        $user_currency = 'NZ$'; // New Zealand Dollar
+        break;
+    default:
+        $user_currency = '$'; // default fallback
+        break;
 }
