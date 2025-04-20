@@ -104,11 +104,12 @@ function get_user($user_id, $conn_back) {
         ];
     }
 }
-
+$default_photo = $site_link . '/back_assets/img/users/profile_photo/default_photo.jpg';
 
 $dashboard = back_single_menu('dashboard', $conn_back);
 $profile = back_single_menu('profile', $conn_back);
 $transactions = back_single_menu('transactions', $conn_back);
+$settings = back_single_menu('settings', $conn_back);
 
 $get_user = get_user($user_id, $conn_back);
 switch ($get_user['currency']) {

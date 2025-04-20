@@ -214,7 +214,7 @@
                         <div class="row gx-0 d-inline-flex">
                             <div class="col-auto align-self-center">
                                 <figure class="avatar avatar-28 rounded-circle coverimg align-middle">
-                                    <img src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt="" id="userphotoonboarding2">
+                                    <img src="<?= $default_photo ?>" alt="" id="userphotoonboarding2">
                                 </figure>
                             </div>
                         </div>
@@ -225,7 +225,7 @@
                             <div class="row gx-0">
                                 <div class="col-auto px-3">
                                     <figure class="avatar avatar-50 rounded-circle coverimg align-middle">
-                                        <img src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt="">
+                                        <img src="<?= $default_photo ?>" alt="">
                                     </figure>
                                 </div>
                                 <div class="col align-self-center">
@@ -238,52 +238,26 @@
                             </div>
                         </div>
                         <div class="px-2">
-                            <div><a class="dropdown-item" href="investment-myprofile.html"><i data-feather="user"
-                                                                                              class="avatar avatar-18 me-1"></i>
-                                    My Profile</a></div>
-                            <div><a class="dropdown-item" href="investment-dashboard.html">
-                                    <div class="row g-0">
-                                        <div class="col align-self-center"><i data-feather="layout"
-                                                                              class="avatar avatar-18 me-1"></i> My
-                                            Dashboard
+                            <div>
+                                <a class="dropdown-item" href="<?= $profile['link'] ?>"><i data-feather="user" class="avatar avatar-18 me-1"></i> My Profile</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item" href="<?= $transactions['link'] ?>">
+                                    <i data-feather="dollar-sign" class="avatar avatar-18 me-1"></i>Earning
+                                </a>
+                            </div>
+                            <div class="dropdown open-left dropdown-dontclose">
+                                <a class="dropdown-item" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                                    <div class="row">
+                                        <div class="col">
+                                            <i class="bi bi-translate avatar avatar-18 me-1"></i> Language
                                         </div>
                                         <div class="col-auto">
-                                            <figure class="avatar avatar-20 coverimg rounded-circle"><img
-                                                    src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-1.jpg"
-                                                    alt=""></figure>
-                                            <figure class="avatar avatar-20 coverimg rounded-circle"><img
-                                                    src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-2.jpg"
-                                                    alt=""></figure>
-                                            <figure class="avatar avatar-20 coverimg rounded-circle"><img
-                                                    src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-4.jpg"
-                                                    alt=""></figure>
-                                            <div
-                                                class="avatar avatar-20 bg-theme-1 rounded-circle text-center align-middle">
-                                                <small class="fs-10 align-middle">9+</small></div>
+                                            <small class="vm">EN - English</small> <i class="bi bi-translate"></i>
                                         </div>
-                                    </div>
-                                </a></div>
-                            <div><a class="dropdown-item" href="investment-earning.html"><i data-feather="dollar-sign"
-                                                                                            class="avatar avatar-18 me-1"></i>
-                                    Earning</a></div>
-                            <div><a class="dropdown-item" href="investment-mysubscription.html">
-                                    <div class="row">
-                                        <div class="col"><i data-feather="gift" class="avatar avatar-18 me-1"></i>
-                                            Subscription
+                                        <div class="col-auto">
+                                            <span class="arrow bi bi-chevron-right"></span>
                                         </div>
-                                        <div class="col-auto"><p class="small text-success">Upgrade</p></div>
-                                        <div class="col-auto"><span class="arrow bi bi-chevron-right"></span></div>
-                                    </div>
-                                </a></div>
-                            <div class="dropdown open-left dropdown-dontclose"><a class="dropdown-item"
-                                                                                  data-bs-toggle="dropdown"
-                                                                                  aria-expanded="false" role="button">
-                                    <div class="row">
-                                        <div class="col"><i class="bi bi-translate avatar avatar-18 me-1"></i> Language
-                                        </div>
-                                        <div class="col-auto"><small class="vm">EN - English</small> <i
-                                                class="bi bi-translate"></i></div>
-                                        <div class="col-auto"><span class="arrow bi bi-chevron-right"></span></div>
                                     </div>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
@@ -294,7 +268,7 @@
                                 </div>
                             </div>
                             <div>
-                                <a class="dropdown-item" href="investment-settings.html"><i data-feather="settings" class="avatar avatar-18 me-1"></i>Account Setting</a></div>
+                                <a class="dropdown-item" href="<?= $settings['link'] ?>"><i data-feather="settings" class="avatar avatar-18 me-1"></i>Account Setting</a></div>
                             <div>
                                 <a id="logout-btn" class="dropdown-item theme-red" href="javascript:void(0)"><i data-feather="power" class="avatar avatar-18 me-1"></i>Logout</a>
                             </div>
