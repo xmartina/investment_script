@@ -34,6 +34,15 @@ get('/register', function() {
 get('/user/dashboard', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/dashboard.php';
 });
+get('/user/staking', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking.php';
+});
+get('/user/profile', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/profile.php';
+});
+get('/user/settings', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/settings.php';
+});
 // Add these to your index.php
 post('/user/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
@@ -47,6 +56,9 @@ post('/user/login', function() {
 post('/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
 });
+post('/user/staking', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking.php';
+});
 post('/user/register', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
 });
@@ -55,5 +67,8 @@ post('/register', function() {
 });
 post('/user/dashboard', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/dashboard.php';
+});
+post('/user/settings', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/settings.php';
 });
 dispatch();
