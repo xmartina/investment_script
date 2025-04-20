@@ -314,7 +314,7 @@
                 </div>
                 <div class="text-center collapse" id="usersidebarprofile">
                     <figure class="avatar avatar-100 rounded-circle coverimg my-3">
-                        <img src="<?= $profile_photo ?>" alt=""></figure>
+                        <img src="<?= htmlspecialchars($profile_photo) ?>" alt=""></figure>
                     <h5 class="mb-1 fw-medium"><?= $get_user['fname'] ?></h5>
                     <p class="small">The Investment UI Kit</p></div>
             </div>
