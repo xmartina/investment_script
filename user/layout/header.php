@@ -53,8 +53,8 @@
                 </ul>
             </div>
             <div class="ms-auto">
-                <button class="btn btn-link btn-square btn-icon btn-link-header" type="button" onclick="openSearch()"><i
-                        data-feather="search"></i></button>
+<!--                <button class="btn btn-link btn-square btn-icon btn-link-header" type="button" onclick="openSearch()"><i-->
+<!--                        data-feather="search"></i></button>-->
                 <button class="btn btn-link btn-square btnsunmoon btn-link-header" id="btn-layout-modes-dark-page"><i
                         class="sun mx-auto" data-feather="sun"></i> <i class="moon mx-auto" data-feather="moon"></i>
                 </button>
@@ -134,81 +134,103 @@
                         <li><a class="dropdown-item" data-value="HI">HI - Hindi</a></li>
                     </ul>
                 </div>
+                <?php
+                $notifications = [
+                    [
+                        'icon' => 'bi-gift',
+                        'bg' => 'bg-pink',
+                        'message' => 'Congratulation! Your property <span class="fw-bold">#H10215</span> has reached 1000 views.',
+                        'tag' => 'Directory',
+                        'tag_class' => 'text-bg-warning',
+                        'time' => '1:00 am',
+                        'link' => '#'
+                    ],
+                    [
+                        'icon' => 'bi-patch-check',
+                        'bg' => 'bg-success',
+                        'message' => 'Your property <span class="fw-bold">#H10215</span> is published and live now.',
+                        'tag' => 'System',
+                        'tag_class' => 'text-bg-primary',
+                        'time' => '1:00 am',
+                        'link' => '#'
+                    ],
+                    [
+                        'icon' => 'bi-clipboard-check',
+                        'bg' => 'bg-info',
+                        'message' => 'User <span class="fw-bold">Rahana</span> has updated <span class="fw-bold">#H10215</span> property.',
+                        'tag' => 'Team',
+                        'tag_class' => 'text-bg-success',
+                        'time' => '1:00 am',
+                        'link' => '#'
+                    ],
+                    [
+                        'icon' => 'bi-bell',
+                        'bg' => 'bg-warning',
+                        'message' => 'Your subscription going to expire soon. Please <a href="profile-subscription.html">upgrade</a> to get service interrupt free.',
+                        'tag' => null,
+                        'tag_class' => null,
+                        'time' => '4 days ago',
+                        'link' => null // no link
+                    ]
+                ];
+                ?>
+
                 <div class="dropdown d-inline-block">
                     <button class="btn btn-link btn-square btn-icon btn-link-header dropdown-toggle no-caret"
-                            type="button" data-bs-toggle="dropdown" aria-expanded="false"><i data-feather="bell"></i>
-                        <span
-                            class="position-absolute top-0 end-0 badge rounded-pill bg-danger p-1"><small>9+</small> <span
-                                class="visually-hidden">unread messages</span></span></button>
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i data-feather="bell"></i>
+                        <span class="position-absolute top-0 end-0 badge rounded-pill bg-danger p-1">
+                            <small>9+</small><span class="visually-hidden">unread messages</span>
+                        </span>
+                    </button>
                     <ul class="dropdown-menu dropdown-menu-end notification-dd sm-mi-95px">
-                        <li><a class="dropdown-item p-2" href="#">
-                                <div class="row gx-3">
-                                    <div class="col-auto">
-                                        <figure class="avatar avatar-40 rounded-circle bg-pink"><i
-                                                class="bi bi-gift text-white"></i></figure>
-                                    </div>
-                                    <div class="col"><p class="mb-2 small">Congratulation! Your property <span
-                                                class="fw-bold">#H10215</span> has reached 1000 views.</p><span
-                                            class="row"><span class="col"><span
-                                                    class="badge badge-light rounded-pill text-bg-warning small">Directory</span></span> <span
-                                                class="col-auto small opacity-75">1:00 am</span></span></div>
-                                </div>
-                            </a></li>
-                        <li><a class="dropdown-item p-2" href="#">
-                                <div class="row gx-3">
-                                    <div class="col-auto">
-                                        <figure class="avatar avatar-40 rounded-circle bg-success"><i
-                                                class="bi bi-patch-check text-white"></i></figure>
-                                    </div>
-                                    <div class="col"><p class="mb-2 small">Your property <span
-                                                class="fw-bold">#H10215</span> is published and live now.</p><span
-                                            class="row"><span class="col"><span
-                                                    class="badge badge-light rounded-pill text-bg-primary small">System</span></span> <span
-                                                class="col-auto small opacity-75">1:00 am</span></span></div>
-                                </div>
-                            </a></li>
-                        <li><a class="dropdown-item p-2" href="#">
-                                <div class="row gx-3">
-                                    <div class="col-auto">
-                                        <figure class="avatar avatar-40 rounded-circle bg-info"><i
-                                                class="bi bi-clipboard-check text-white"></i></figure>
-                                    </div>
-                                    <div class="col"><p class="mb-2 small">User <span class="fw-bold">Rahana</span> has
-                                            updated <span class="fw-bold">#H10215</span> property.</p><span class="row"><span
-                                                class="col"><span
-                                                    class="badge badge-light rounded-pill text-bg-success small">team</span></span> <span
-                                                class="col-auto small opacity-75">1:00 am</span></span></div>
-                                </div>
-                            </a></li>
+                        <?php foreach ($notifications as $notif): ?>
                         <li>
-                            <div class="dropdown-item p-2">
-                                <div class="row gx-3">
-                                    <div class="col-auto">
-                                        <figure class="avatar avatar-40 rounded-circle bg-warning"><i
-                                                class="bi bi-bell text-white"></i></figure>
+                            <?php if ($notif['link']): ?>
+                            <a class="dropdown-item p-2" href="<?= $notif['link']; ?>">
+                                <?php else: ?>
+                                <div class="dropdown-item p-2">
+                                    <?php endif; ?>
+                                    <div class="row gx-3">
+                                        <div class="col-auto">
+                                            <figure class="avatar avatar-40 rounded-circle <?= $notif['bg']; ?>">
+                                                <i class="bi <?= $notif['icon']; ?> text-white"></i>
+                                            </figure>
+                                        </div>
+                                        <div class="col">
+                                            <p class="mb-2 small"><?= $notif['message']; ?></p>
+                                            <span class="row">
+                                    <?php if ($notif['tag']): ?>
+                                        <span class="col">
+                                            <span class="badge badge-light rounded-pill <?= $notif['tag_class']; ?> small">
+                                                <?= $notif['tag']; ?>
+                                            </span>
+                                        </span>
+                                    <?php endif; ?>
+                                    <span class="col-auto small opacity-75"><?= $notif['time']; ?></span>
+                                </span>
+                                        </div>
                                     </div>
-                                    <div class="col"><p class="mb-2 small">Your subscription going to expire soon.
-                                            Please <a href="profile-subscription.html">upgrade</a> to get service
-                                            interrupt
-                                            free.</p>
-                                        <p class="opacity-75 small">4 days ago</p></div>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="text-center">
-                            <button class="btn btn-link text-center" onclick="notifcationAll()">View all <i
-                                    class="bi bi-arrow-right fs-14"></i></button>
-                        </li>
-                    </ul>
+                                    <?php if ($notif['link']): ?>
+                            </a>
+                            <?php else: ?>
                 </div>
-                <div class="dropdown d-inline-block"><a
-                        class="dropdown-toggle btn btn-link btn-square btn-link-header style-none no-caret px-0"
-                        id="userprofiledd" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                <?php endif; ?>
+                </li>
+                <?php endforeach; ?>
+                <li class="text-center">
+                    <button class="btn btn-link text-center" onclick="notifcationAll()">View all
+                        <i class="bi bi-arrow-right fs-14"></i>
+                    </button>
+                </li>
+                </ul>
+            </div>
+            <div class="dropdown d-inline-block">
+                    <a class="dropdown-toggle btn btn-link btn-square btn-link-header style-none no-caret px-0" id="userprofiledd" data-bs-toggle="dropdown" aria-expanded="false" role="button">
                         <div class="row gx-0 d-inline-flex">
                             <div class="col-auto align-self-center">
-                                <figure class="avatar avatar-28 rounded-circle coverimg align-middle"><img
-                                        src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt=""
-                                        id="userphotoonboarding2">
+                                <figure class="avatar avatar-28 rounded-circle coverimg align-middle">
+                                    <img src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt="" id="userphotoonboarding2">
                                 </figure>
                             </div>
                         </div>
@@ -218,14 +240,17 @@
                         <div class="bg-theme-1-space rounded py-3 mb-3 dropdown-dontclose">
                             <div class="row gx-0">
                                 <div class="col-auto px-3">
-                                    <figure class="avatar avatar-50 rounded-circle coverimg align-middle"><img
-                                            src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt="">
+                                    <figure class="avatar avatar-50 rounded-circle coverimg align-middle">
+                                        <img src="<?= $site_link ?>/back_assets/img/modern-ai-image/user-6.jpg" alt="">
                                     </figure>
                                 </div>
-                                <div class="col align-self-center"><p class="mb-1">
-                                        <span><?= $get_user['fname'] ?></span></p>
-                                    <p><i class="bi bi-wallet2 me-2"></i> <?= $user_currency . number_format($get_user['balance']) ?> <small
-                                            class="opacity-50">Balance</small></p></div>
+                                <div class="col align-self-center">
+                                    <p class="mb-1">
+                                        <span><?= $get_user['fname'] ?></span>
+                                    </p>
+                                    <p><i class="bi bi-wallet2 me-2"></i> <?= $user_currency . number_format($get_user['balance']) ?> <small class="opacity-50">Balance</small>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div class="px-2">
