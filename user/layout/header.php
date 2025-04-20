@@ -316,48 +316,61 @@
                     <figure class="avatar avatar-100 rounded-circle coverimg my-3">
                         <img src="<?= htmlspecialchars($profile_photo) ?>" alt=""></figure>
                     <h5 class="mb-1 fw-medium"><?= $get_user['fname'] ?></h5>
-                    <p class="small">The Investment UI Kit</p></div>
+                    <p class="small">investor</p></div>
             </div>
+            <?php
+            $menu_items = [
+                ['url' => 'investment-dashboard.html', 'icon' => 'bi-columns-gap', 'name' => 'Dashboard'],
+                ['url' => 'investment-wallet.html', 'icon' => 'bi-wallet', 'name' => 'Wallet'],
+                ['url' => 'investment-goals.html', 'icon' => 'bi-bullseye', 'name' => 'My Goals'],
+                ['url' => 'investment-loan-list.html', 'icon' => 'bi-bank', 'name' => 'My Loans'],
+                'dropdown' => [
+                    'icon' => 'bi-piggy-bank', 'name' => 'Investment', 'items' => [
+                        ['url' => 'investment-company-shares.html', 'icon' => 'bi-bank', 'name' => 'Company Share'],
+                        ['url' => 'investment-mutual-funds.html', 'icon' => 'bi-cash-coin', 'name' => 'Mutual Fund'],
+                        ['url' => 'investment-deposit.html', 'icon' => 'bi-percent', 'name' => 'Deposit'],
+                    ]
+                ],
+                ['url' => 'investment-explore.html', 'icon' => 'bi-search', 'name' => 'Explore'],
+                ['url' => 'investment-statistics.html', 'icon' => 'bi-bar-chart-line', 'name' => 'Statistics'],
+                ['url' => 'investment-calculator.html', 'icon' => 'bi-calculator', 'name' => 'Calculators'],
+                ['url' => 'investment-pages.html', 'icon' => 'bi-layers', 'name' => 'Pages', 'badge' => '55+'],
+                ['url' => 'investment-personalization.html', 'icon' => 'bi-palette h4', 'name' => 'Personalize ❤️'],
+                ['url' => 'components.html', 'icon' => 'bi-cpu', 'name' => 'Components']
+            ];
+            ?>
+
             <ul class="nav flex-column menu-active-line">
-                <li class="nav-item"><a href="investment-dashboard.html" class="nav-link"><i
-                            class="menu-icon bi bi-columns-gap"></i> <span class="menu-name">Dashboard</span></a></li>
-                <li class="nav-item"><a href="investment-wallet.html" class="nav-link"><i
-                            class="menu-icon bi bi-wallet"></i> <span class="menu-name">Wallet</span></a></li>
-                <li class="nav-item"><a href="investment-goals.html" class="nav-link"><i
-                            class="menu-icon bi bi-bullseye"></i> <span class="menu-name">My Goals</span></a></li>
-                <li class="nav-item"><a href="investment-loan-list.html" class="nav-link"><i
-                            class="menu-icon bi bi-bank"></i> <span class="menu-name">My Loans</span></a></li>
-                <li class="nav-item dropdown"><a href="javascrit:void(0)" class="nav-link dropdown-toggle"
-                                                 data-bs-toggle="dropdown"><i class="menu-icon bi bi-piggy-bank"></i>
-                        <span class="menu-name">Investment</span></a>
-                    <div class="dropdown-menu">
-                        <div class="nav-item"><a href="investment-company-shares.html" class="nav-link"><i
-                                    class="menu-icon bi bi-bank"></i> <span class="menu-name">Company Share</span></a>
-                        </div>
-                        <div class="nav-item"><a href="investment-mutual-funds.html" class="nav-link"><i
-                                    class="menu-icon bi bi-cash-coin"></i> <span
-                                    class="menu-name">Mutual Fund</span></a>
-                        </div>
-                        <div class="nav-item"><a href="investment-deposit.html" class="nav-link"><i
-                                    class="menu-icon bi bi-percent"></i> <span class="menu-name">Deposit</span></a>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item"><a href="investment-explore.html" class="nav-link"><i
-                            class="menu-icon bi bi-search"></i> <span class="menu-name">Explore</span></a></li>
-                <li class="nav-item"><a href="investment-statistics.html" class="nav-link"><i
-                            class="menu-icon bi bi-bar-chart-line"></i> <span class="menu-name">Statistics</span></a>
-                </li>
-                <li class="nav-item"><a href="investment-calculator.html" class="nav-link"><i
-                            class="menu-icon bi bi-calculator"></i> <span class="menu-name">Calculators</span></a></li>
-                <li class="nav-item"><a href="investment-pages.html" class="nav-link"><i
-                            class="menu-icon bi bi-layers"></i> <span class="menu-name">Pages</span> <span
-                            class="badge text-bg-primary mx-2">55+</span></a></li>
-                <li class="nav-item"><a href="investment-personalization.html" class="nav-link"><i
-                            class="menu-icon bi bi-palette h4"></i> <span class="menu-name">Personalize ❤️</span></a>
-                </li>
-                <li class="nav-item"><a class="nav-link" href="components.html"><i class="menu-icon bi bi-cpu"></i>
-                        <span class="menu-name">Components</span></a></li>
+                <?php foreach ($menu_items as $key => $item): ?>
+                    <?php if ($key === 'dropdown'): ?>
+                        <li class="nav-item dropdown">
+                            <a href="javascript:void(0)" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="menu-icon bi <?= $item['icon'] ?>"></i>
+                                <span class="menu-name"><?= $item['name'] ?></span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <?php foreach ($item['items'] as $drop): ?>
+                                    <div class="nav-item">
+                                        <a href="<?= $drop['url'] ?>" class="nav-link">
+                                            <i class="menu-icon bi <?= $drop['icon'] ?>"></i>
+                                            <span class="menu-name"><?= $drop['name'] ?></span>
+                                        </a>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </li>
+                    <?php elseif (is_array($item)): ?>
+                        <li class="nav-item">
+                            <a href="<?= $item['url'] ?>" class="nav-link">
+                                <i class="menu-icon bi <?= $item['icon'] ?>"></i>
+                                <span class="menu-name"><?= $item['name'] ?></span>
+                                <?php if (isset($item['badge'])): ?>
+                                    <span class="badge text-bg-primary mx-2"><?= $item['badge'] ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </ul>
             <div class="mt-auto"></div>
             <div class="px-3 mb-3 not-iconic"><h6 class="mb-3 fw-medium">Quick Links</h6>
