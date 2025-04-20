@@ -72,39 +72,39 @@
                                 [
                                     'href' => 'app-finance.html',
                                     'icon' => 'bi-bank',
-                                    'title' => 'Finance',
-                                    'subtitle' => 'Accounting'
+                                    'title' => 'Investment',
+                                    'subtitle' => 'invest'
                                 ],
                                 [
                                     'href' => 'app-network.html',
                                     'icon' => 'bi-globe',
-                                    'title' => 'Network',
-                                    'subtitle' => 'Stabilize'
+                                    'title' => 'Transactions',
+                                    'subtitle' => 'Inflow & Outflow'
                                 ],
                                 [
                                     'href' => 'app-ecommerce.html',
                                     'icon' => 'bi-box',
-                                    'title' => 'Inventory',
-                                    'subtitle' => 'Assuring'
+                                    'title' => 'Stacking',
+                                    'subtitle' => 'Invest'
                                 ],
-                                [
-                                    'href' => 'app-project.html',
-                                    'icon' => 'bi-folder',
-                                    'title' => 'Project',
-                                    'subtitle' => 'Management'
-                                ],
-                                [
-                                    'href' => 'app-social.html',
-                                    'icon' => 'bi-people',
-                                    'title' => 'Social',
-                                    'subtitle' => 'Tracking'
-                                ],
-                                [
-                                    'href' => 'app-learning.html',
-                                    'icon' => 'bi-journal-bookmark',
-                                    'title' => 'Learning',
-                                    'subtitle' => 'Make-easy'
-                                ]
+//                                [
+//                                    'href' => 'app-project.html',
+//                                    'icon' => 'bi-folder',
+//                                    'title' => 'Project',
+//                                    'subtitle' => 'Management'
+//                                ],
+//                                [
+//                                    'href' => 'app-social.html',
+//                                    'icon' => 'bi-people',
+//                                    'title' => 'Social',
+//                                    'subtitle' => 'Tracking'
+//                                ],
+//                                [
+//                                    'href' => 'app-learning.html',
+//                                    'icon' => 'bi-journal-bookmark',
+//                                    'title' => 'Learning',
+//                                    'subtitle' => 'Make-easy'
+//                                ]
                             ];
                             ?>
                             <div class="row g-0 text-center mb-2">
@@ -121,8 +121,6 @@
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                        <div class="text-center"><a class="btn btn-link text-center" href="app-demo.html">View all <i
-                                    class="bi bi-arrow-right fs-14"></i></a></div>
                     </div>
                 </div>
                 <div class="dropdown d-none d-sm-inline-block">
