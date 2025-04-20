@@ -313,9 +313,9 @@
                                              aria-controls="usersidebarprofile"><i data-feather="user"></i></a></div>
                 </div>
                 <div class="text-center collapse" id="usersidebarprofile">
-                    <figure class="avatar avatar-100 rounded-circle coverimg my-3"><img
-                            src="<?= $profile_photo ?>" alt=""></figure>
-                    <h5 class="mb-1 fw-medium"><?= $profile_photo ?></h5>
+                    <figure class="avatar avatar-100 rounded-circle coverimg my-3">
+                        <img src="<?= $profile_photo ?>" alt=""></figure>
+                    <h5 class="mb-1 fw-medium"><?= $fname ?></h5>
                     <p class="small">The Investment UI Kit</p></div>
             </div>
             <ul class="nav flex-column menu-active-line">
