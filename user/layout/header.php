@@ -136,42 +136,24 @@
                 </div>
                 <?php
                 $notifications = [
-                    [
-                        'icon' => 'bi-gift',
-                        'bg' => 'bg-pink',
-                        'message' => 'Congratulation! Your property <span class="fw-bold">#H10215</span> has reached 1000 views.',
-                        'tag' => 'Directory',
-                        'tag_class' => 'text-bg-warning',
-                        'time' => '1:00 am',
-                        'link' => '#'
-                    ],
-                    [
-                        'icon' => 'bi-patch-check',
-                        'bg' => 'bg-success',
-                        'message' => 'Your property <span class="fw-bold">#H10215</span> is published and live now.',
-                        'tag' => 'System',
-                        'tag_class' => 'text-bg-primary',
-                        'time' => '1:00 am',
-                        'link' => '#'
-                    ],
-                    [
-                        'icon' => 'bi-clipboard-check',
-                        'bg' => 'bg-info',
-                        'message' => 'User <span class="fw-bold">Rahana</span> has updated <span class="fw-bold">#H10215</span> property.',
-                        'tag' => 'Team',
-                        'tag_class' => 'text-bg-success',
-                        'time' => '1:00 am',
-                        'link' => '#'
-                    ],
-                    [
-                        'icon' => 'bi-bell',
-                        'bg' => 'bg-warning',
-                        'message' => 'Your subscription going to expire soon. Please <a href="profile-subscription.html">upgrade</a> to get service interrupt free.',
-                        'tag' => null,
-                        'tag_class' => null,
-                        'time' => '4 days ago',
-                        'link' => null // no link
-                    ]
+//                    [
+//                        'icon' => 'bi-gift',
+//                        'bg' => 'bg-pink',
+//                        'message' => 'Congratulation! Your property <span class="fw-bold">#H10215</span> has reached 1000 views.',
+//                        'tag' => 'Directory',
+//                        'tag_class' => 'text-bg-warning',
+//                        'time' => '1:00 am',
+//                        'link' => '#'
+//                    ],
+//                    [
+//                        'icon' => 'bi-patch-check',
+//                        'bg' => 'bg-success',
+//                        'message' => 'Your property <span class="fw-bold">#H10215</span> is published and live now.',
+//                        'tag' => 'System',
+//                        'tag_class' => 'text-bg-primary',
+//                        'time' => '1:00 am',
+//                        'link' => '#'
+//                    ],
                 ];
                 ?>
                 <div class="dropdown d-inline-block">
