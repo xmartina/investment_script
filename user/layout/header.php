@@ -174,16 +174,21 @@
                     ]
                 ];
                 ?>
-
                 <div class="dropdown d-inline-block">
                     <button class="btn btn-link btn-square btn-icon btn-link-header dropdown-toggle no-caret"
                             type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i data-feather="bell"></i>
                         <span class="position-absolute top-0 end-0 badge rounded-pill bg-danger p-1">
-                            <small>9+</small><span class="visually-hidden">unread messages</span>
-                        </span>
+            <small><?= count($notifications) > 0 ? '9+' : '0'; ?></small>
+            <span class="visually-hidden">unread messages</span>
+        </span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end notification-dd sm-mi-95px">
+                        <?php if (empty($notifications)): ?>
+                            <li class="text-center p-3">
+                                <span class="small text-muted">No notifications</span>
+                            </li>
+                        <?php else: ?>
                         <?php foreach ($notifications as $notif): ?>
                         <li>
                             <?php if ($notif['link']): ?>
@@ -200,15 +205,15 @@
                                         <div class="col">
                                             <p class="mb-2 small"><?= $notif['message']; ?></p>
                                             <span class="row">
-                                    <?php if ($notif['tag']): ?>
-                                        <span class="col">
-                                            <span class="badge badge-light rounded-pill <?= $notif['tag_class']; ?> small">
-                                                <?= $notif['tag']; ?>
+                                        <?php if ($notif['tag']): ?>
+                                            <span class="col">
+                                                <span class="badge badge-light rounded-pill <?= $notif['tag_class']; ?> small">
+                                                    <?= $notif['tag']; ?>
+                                                </span>
                                             </span>
-                                        </span>
-                                    <?php endif; ?>
-                                    <span class="col-auto small opacity-75"><?= $notif['time']; ?></span>
-                                </span>
+                                        <?php endif; ?>
+                                        <span class="col-auto small opacity-75"><?= $notif['time']; ?></span>
+                                    </span>
                                         </div>
                                     </div>
                                     <?php if ($notif['link']): ?>
@@ -218,13 +223,10 @@
                 <?php endif; ?>
                 </li>
                 <?php endforeach; ?>
-                <li class="text-center">
-                    <button class="btn btn-link text-center" onclick="notifcationAll()">View all
-                        <i class="bi bi-arrow-right fs-14"></i>
-                    </button>
-                </li>
+                <?php endif; ?>
                 </ul>
             </div>
+
             <div class="dropdown d-inline-block">
                     <a class="dropdown-toggle btn btn-link btn-square btn-link-header style-none no-caret px-0" id="userprofiledd" data-bs-toggle="dropdown" aria-expanded="false" role="button">
                         <div class="row gx-0 d-inline-flex">
