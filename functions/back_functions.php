@@ -155,4 +155,9 @@ switch ($get_user['currency']) {
         break;
 }
 
-$profile_photo = !empty($get_user['profile_photo']) ? $site_link . '/back_assets/img/users/profile_photo/'.$get_user['profile_photo'] : $default_photo;
+if ($get_user['profile_photo'] !== '') {
+    $encoded_filename = urlencode($get_user['profile_photo']);
+    $profile_photo = $site_link . '/back_assets/img/users/profile_photo/' . $encoded_filename;
+} else {
+    $profile_photo = $default_photo;
+}
