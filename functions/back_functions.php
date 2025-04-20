@@ -153,3 +153,9 @@ switch ($get_user['currency']) {
         $user_currency = '$'; // default fallback
         break;
 }
+
+if ($get_user['profile_photo'] !== ''){
+    $profile_photo = $site_link . '/back_assets/img/users/profile_photo/'.$get_user['profile_photo'];
+}else{
+    $profile_photo = $default_photo;
+}
