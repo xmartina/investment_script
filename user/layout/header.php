@@ -70,19 +70,19 @@
                             <?php
                             $apps = [
                                 [
-                                    'href' => 'app-finance.html',
+                                    'href' => '/user/investment',
                                     'icon' => 'bi-bank',
                                     'title' => 'Investment',
                                     'subtitle' => 'invest'
                                 ],
                                 [
-                                    'href' => 'app-network.html',
+                                    'href' => '/user/transactions',
                                     'icon' => 'bi-globe',
                                     'title' => 'Transactions',
                                     'subtitle' => 'Inflow & Outflow'
                                 ],
                                 [
-                                    'href' => 'app-ecommerce.html',
+                                    'href' => '/user/staking',
                                     'icon' => 'bi-box',
                                     'title' => 'Stacking',
                                     'subtitle' => 'Invest'
