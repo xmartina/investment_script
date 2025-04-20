@@ -94,7 +94,8 @@ function get_user($user_id, $conn_back) {
             'lname' => $row['last_name'],
             'email' => $row['email'],
             'balance' => $row['balance'],
-            'currency' => $row['currency']
+            'currency' => $row['currency'],
+            'profile_photo' => $row['profile_photo']
         ];
     } else {
         return [
