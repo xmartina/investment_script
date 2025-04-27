@@ -1,0 +1,541 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /login');
+    exit;
+}
+$page_name = 'Dashboard';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
+?>
+
+<div class="container mt-4" id="main-content">
+    <div class="row align-items-center">
+        <div class="col-12 col-lg mb-4">
+            <h3 class="fw-normal mb-0 text-secondary">Good Morning,</h3>
+            <h1><?= $get_user['fname'] ?></h1>
+        </div>
+
+        <div class="col-6 col-sm-4 col-lg-3 col-xl-2 mb-4">
+            <div class="card adminuiux-card">
+                <div class="card-body">
+                    <p class="text-secondary small mb-2">Total Investment Profit</p>
+                    <h4 class="mb-3"><?= $total_returns ?></h4>
+                    <span class="badge badge-light text-bg-success">
+                        <i class="me-1 bi bi-arrow-up-short"></i>
+                        <span class="percent-value">28.50%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-sm-4 col-lg-3 col-xl-2 mb-4">
+            <div class="card adminuiux-card">
+                <div class="card-body">
+                    <p class="text-secondary small mb-2">Total Staked Profit</p>
+                    <h4 class="mb-3"><?= $total_returns_stakes ?></h4>
+                    <span class="badge badge-light text-bg-success">
+                        <i class="me-1 bi bi-arrow-up-short"></i>
+                        <span class="percent-value">54.35%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-4 col-lg-3 col-xl-2 mb-4">
+            <div class="card adminuiux-card">
+                <div class="card-body">
+                    <p class="text-secondary small mb-2">Top Profit</p>
+                    <h4 class="mb-3"><?= $total_profit ?></h4>
+                    <span class="badge badge-light text-bg-danger">
+                        <i class="me-1 bi bi-arrow-down-short"></i>
+                        <span class="percent-value">18.25%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function generateRandomPercentage(min = 10, max = 99) {
+                return (Math.random() * (max - min) + min).toFixed(2) + '%';
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const percentEls = document.getElementsByClassName('percent-value');
+                for (let i = 0; i < percentEls.length; i++) {
+                    percentEls[i].textContent = generateRandomPercentage();
+                }
+            });
+        </script>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-lg-6 col-xl-4 mb-4">
+            <div class="card adminuiux-card position-relative overflow-hidden bg-theme-1 h-100">
+                <div class="position-absolute top-0 start-0 h-100 w-100 z-index-0 coverimg opacity-50">
+                    <img src="<?= $site_link ?>/back_assets/img/modern-ai-image/flamingo-4.jpg" alt="">
+                </div>
+                <div class="card-body z-index-1">
+                    <div class="row align-items-center justify-content-center h-100 py-4">
+                        <div class="col-11">
+                            <h2 class="fw-normal">Your portfolio value has been grown by</h2>
+                            <h1 class="mb-3"><?= $user_currency . $total_returns ?></h1>
+                            <p>In last 7 days</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6 col-xl-8 mb-4">
+            <div class="card adminuiux-card">
+                <div class="row gx-0">
+                    <div class="col-12 col-xl-4">
+                        <div class="card-header"><h6>Summary</h6></div>
+                        <div class="card-body pb-0">
+                            <div class="card adminuiux-card bg-theme-1 mb-3">
+                                <div class="card-body">
+                                    <p class="text-white mb-2">Total Investments</p>
+                                    <h4 class="fw-medium"><?= $user_currency . $total_invested ?></h4>
+                                </div>
+                            </div>
+                            <div class="card adminuiux-card bg-theme-1-subtle mb-3">
+                                <div class="card-body">
+                                    <p class="text-secondary mb-2">Total Stock Purchased</p>
+                                    <h4 class="fw-medium">
+                                        <?= $user_currency . $total_stakes_invested ?>
+                                        <span class="text-success fs-14">
+                                            <i class="bi bi-arrow-up-short me-1"></i>11.5%
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="card adminuiux-card bg-theme-1-subtle mb-3">
+                                <div class="card-body">
+                                    <p class="text-secondary mb-2">Total Investments</p>
+                                    <h4 class="fw-medium"><?= $user_currency . $total_investments ?></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-8">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <nav aria-label="Page navigation example"></nav>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body px-1">
+                            <div class="row mb-2">
+                                <div class="col-6 col-md-4 col-lg-4 col-xl-4 mb-3">
+                                    <a href="<?= $site_link ?>/user/deposit" class="card adminuiux-card style-none text-center h-100">
+                                        <div class="card-body">
+                                            <i class="avatar avatar-40 text-theme-1 h3 bi bi-bank mb-3"></i>
+                                            <p class="text-secondary small">Make Deposit</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-6 col-md-4 col-lg-4 col-xl-4 mb-3">
+                                    <a href="<?= $site_link ?>/user/staking" class="card adminuiux-card style-none text-center h-100">
+                                        <div class="card-body">
+                                            <i class="avatar avatar-40 text-theme-1 bi bi-calendar-event h3 mb-3"></i>
+                                            <p class="text-secondary small">Stake Asset</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-6 col-md-4 col-lg-4 col-xl-4 mb-3">
+                                    <a href="<?= $site_link ?>/user/investment" class="card adminuiux-card style-none text-center h-100">
+                                        <div class="card-body">
+                                            <i class="avatar avatar-40 text-theme-1 bi bi-percent h3 mb-3"></i>
+                                            <p class="text-secondary small">Investments</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-6 col-md-6 col-lg-6 col-xl-6 mb-3">
+                                    <a href="<?= $site_link ?>/user/transactions" class="card adminuiux-card style-none text-center h-100">
+                                        <div class="card-body">
+                                            <i class="avatar avatar-40 text-theme-1 bi bi-cash-stack h3 mb-3"></i>
+                                            <p class="text-secondary small">View transactions</p>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <div class="col-6 col-md-6 col-lg-6 col-xl-6 mb-3">
+                                    <a href="<?= $site_link ?>/user/withdraw" class="card adminuiux-card style-none text-center h-100">
+                                        <div class="card-body">
+                                            <i class="avatar avatar-40 text-theme-1 bi bi-person-walking h3 mb-3"></i>
+                                            <p class="text-secondary small">Withdraw Funds</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div> <!-- row -->
+                        </div> <!-- card-body -->
+                    </div> <!-- col-xl-8 -->
+                </div> <!-- row gx-0 -->
+            </div> <!-- card -->
+        </div> <!-- col-xl-8 -->
+
+        <div class="col-12 mb-4">
+            <div class="row align-items-center">
+                <div class="col"><h6 class="mb-0">Updates:</h6>
+                    <p class="small text-secondary">Today <span class="text-danger">Live</span></p>
+                </div>
+                <div class="col-12 col-sm-10">
+                    <!-- TradingView Widget BEGIN -->
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+                            {
+                                "symbols": [
+                                {
+                                    "proName": "FOREXCOM:SPXUSD",
+                                    "title": "S&P 500 Index"
+                                },
+                                {
+                                    "proName": "FOREXCOM:NSXUSD",
+                                    "title": "US 100 Cash CFD"
+                                },
+                                {
+                                    "proName": "FX_IDC:EURUSD",
+                                    "title": "EUR to USD"
+                                },
+                                {
+                                    "proName": "BITSTAMP:BTCUSD",
+                                    "title": "Bitcoin"
+                                },
+                                {
+                                    "proName": "BITSTAMP:ETHUSD",
+                                    "title": "Ethereum"
+                                }
+                            ],
+                                "showSymbolLogo": true,
+                                "isTransparent": false,
+                                "displayMode": "adaptive",
+                                "colorTheme": "dark",
+                                "locale": "en"
+                            }
+                        </script>
+                    </div>
+                    <!-- TradingView Widget END -->
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-square btn-link"><i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card adminuiux-card mb-4">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col"><h6>Market with Technical Trend</h6></div>
+                        <div class="col-auto px-0"><select class="form-select form-select-sm">
+                                <option selected="selected">All Trend</option>
+                                <option>Bullish</option>
+                                <option>Bearish</option>
+                            </select></div>
+                        <div class="col-auto">
+                            <button class="btn btn-sm btn-square btn-link"><i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table mb-0" data-show-toggle="true" id="dataTable">
+                        <thead>
+                        <tr>
+                            <th class="">Company</th>
+                            <th>Price</th>
+                            <th data-breakpoints="xs">Holding</th>
+                            <th data-breakpoints="xs sm">Profit/Loss</th>
+                            <th data-breakpoints="xs">Today's Trend</th>
+                            <th>% Change</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><p class="mb-0">Jintudal</p>
+                                <p class="small text-theme-1"><i class="bi bi-award-fill"></i> Event</p></td>
+                            <td><p class="mb-0">$ 100.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 152</p></td>
+                            <td><p class="mb-0">102 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 1400.45</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 25.30%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 305.5</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Ciplasc</p></td>
+                            <td><p class="mb-0">$ 520.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 521.05</p></td>
+                            <td><p class="mb-0">50 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 1520.45</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 15.40%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 408.65</p></td>
+                            <td><p class="mb-0 text-danger"><i class="bi bi-graph-down-arrow"></i> Bearish</p>
+                            </td>
+                            <td><p class="mb-0 text-danger"><i class="bi bi-caret-down-fill"></i> 0.85%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Trisha LLC</p></td>
+                            <td><p class="mb-0">$ 856.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 856.55</p></td>
+                            <td><p class="mb-0">20 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 2050.00</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 35.15%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 685.00</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.03%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Cyborgous</p></td>
+                            <td><p class="mb-0">$ 150.00</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 153.00</p></td>
+                            <td><p class="mb-0">3 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 450.00</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 10.00%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 45.0</p></td>
+                            <td><p class="mb-0 text-danger"><i class="bi bi-graph-down-arrow"></i> Bearish</p>
+                            </td>
+                            <td><p class="mb-0 text-danger"><i class="bi bi-caret-down-fill"></i> 0.65%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Spanishwebs</p>
+                                <p class="small text-theme-1"><i class="bi bi-award-fill"></i> Event</p></td>
+                            <td><p class="mb-0">$ 130.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 135.52</p></td>
+                            <td><p class="mb-0">100 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 150.45</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 5.52%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 10.15</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Jintudal</p>
+                                <p class="small text-theme-1"><i class="bi bi-award-fill"></i> Event</p></td>
+                            <td><p class="mb-0">$ 100.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 152</p></td>
+                            <td><p class="mb-0">102 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 1400.45</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 25.30%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 305.5</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Jintudal</p>
+                                <p class="small text-theme-1"><i class="bi bi-award-fill"></i> Event</p></td>
+                            <td><p class="mb-0">$ 100.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 152</p></td>
+                            <td><p class="mb-0">102 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 1400.45</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 25.30%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 305.5</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Jintudal</p>
+                                <p class="small text-theme-1"><i class="bi bi-award-fill"></i> Event</p></td>
+                            <td><p class="mb-0">$ 100.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 152</p></td>
+                            <td><p class="mb-0">102 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 1400.45</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 25.30%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 305.5</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><p class="mb-0">Jintudal</p>
+                                <p class="small text-theme-1"><i class="bi bi-award-fill"></i> Event</p></td>
+                            <td><p class="mb-0">$ 100.45</p>
+                                <p class="small"><span class="text-secondary" data-bs-toggle="tooltip"
+                                                       title="Last top price">LTP:</span> 152</p></td>
+                            <td><p class="mb-0">102 units</p>
+                                <p class="small"><span class="text-secondary">Invested:</span> $ 1400.45</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 25.30%</p>
+                                <p class="small"><span class="text-secondary">Profit:</span> $ 305.5</p></td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                            </td>
+                            <td><p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-success">Invest</button>
+                                <button class="btn btn-sm btn-outline-danger">Sell</button>
+                                <div class="dropdown d-inline-block"><a class="btn btn-link btn-square no-caret"
+                                                                        data-bs-toggle="dropdown"><i
+                                            class="bi bi-three-dots"></i></a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)">Company
+                                                Events</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- row -->
+</div> <!-- container -->
+
+<?php
+include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php';
+?>
