@@ -197,7 +197,7 @@ if (isset($user_id)) {
     }
 
 // Fetch investments
-    $sql_investments = "SELECT * FROM investments WHERE user_id = '$user_id'";
+    $sql_investments = "SELECT * FROM investments WHERE user_id = '$user_id' AND trans_type = 'investment'";
     $get_investments = $conn_back->query($sql_investments);
 
     if ($get_investments && $get_investments->num_rows > 0) {
@@ -211,7 +211,7 @@ if (isset($user_id)) {
     $total_invested = abbreviate_number($amount_invested);
 
 // Fetch stakes
-    $sql_stakes = "SELECT * FROM stakes WHERE user_id = '$user_id'";
+    $sql_stakes = "SELECT * FROM investments WHERE user_id = '$user_id' AND trans_type = 'staking'";
     $get_stakes = $conn_back->query($sql_stakes);
 
     if ($get_stakes && $get_stakes->num_rows > 0) {
