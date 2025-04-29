@@ -13,7 +13,7 @@
 //Navigation Components
 
 //Cards
-function TransactionsCard($user_id){
+function TransactionsCard($conn_back,$user_id){
     $ListUserTransactions = selectTransactionsByUserId($conn_back,$user_id);
     foreach ($ListUserTransactions as $SingleTransactions) {
  ?>
