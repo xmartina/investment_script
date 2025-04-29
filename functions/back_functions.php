@@ -2,7 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
+include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/transactions.php';
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 function back_menu($menus_result, $active_url, $page_name)
@@ -229,5 +229,7 @@ if (isset($user_id)) {
     $total_investments = abbreviate_number($amount_invested + $amount_stakes_invested);
 
 
-
 }
+
+include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/components/back_components.php';
