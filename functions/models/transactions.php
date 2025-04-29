@@ -47,15 +47,7 @@ function updateTransaction($conn_back,$transaction_id, $new_status) {
 
 // Example usage:
 
-// Select all transactions
-$all_transactions = selectAllTransactions($conn_back);
-foreach ($all_transactions as $transaction) {
-    echo "Transaction ID: " . $transaction['transaction_id'] . "<br>";
-    echo "Type: " . $transaction['transaction_type'] . "<br>";
-    echo "Amount: " . $transaction['amount'] . "<br>";
-    echo "Status: " . $transaction['status'] . "<br>";
-    echo "Date & Time: " . $transaction['date_time'] . "<br><br>";
-}
+
 
 // Update a transaction
 //$transaction_id_to_update = 'TXN123456';
