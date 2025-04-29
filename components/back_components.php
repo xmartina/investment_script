@@ -114,13 +114,13 @@ function TransactionsCard($conn_back,$user_id){
                         <p class="mb-0"><?=$trans_currency.$SingleTransactions['amount']?></p>
                     </td>
                     <td>
-                        <p class="mb-0 text-secondary"><?=$trans_type?></p>
+                        <?=$trans_type?>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-outline-success"><?=$trans_status?></button>
+                        <?=$trans_status?>
                     </td>
                     <td>
-                        <p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p>
+                        <p class="mb-0 text-success"><i class="bi bi-calendar-check-fill"></i> <?=$SingleTransactions['date_time']?></p>
                     </td>
                 </tr>
                 <!-- Additional Rows can be added below in similar format -->
