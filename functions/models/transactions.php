@@ -12,7 +12,6 @@ function selectAllTransactions($conn_back) {
         }
     }
 
-    $conn_back->close();
     return $transactions;
 }
 
@@ -29,7 +28,6 @@ function selectTransactionsByUserId($conn_back,$user_id) {
         }
     }
 
-    $conn_back->close();
     return $transactions;
 }
 
@@ -44,7 +42,6 @@ function updateTransaction($conn_back,$transaction_id, $new_status) {
         $response = false;
     }
 
-    $conn_back->close();
     return $response;
 }
 
