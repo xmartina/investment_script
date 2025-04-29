@@ -1,6 +1,6 @@
 <?php
 // Function to select all transactions
-function selectAllTransactions() {
+function selectAllTransactions($conn_back) {
     $sql = "SELECT * FROM transactions";
     $result = $conn_back->query($sql);
 
@@ -17,7 +17,7 @@ function selectAllTransactions() {
 }
 
 // Function to select transactions by user_id
-function selectTransactionsByUserId($user_id) {
+function selectTransactionsByUserId($conn_back,$user_id) {
     $sql = "SELECT * FROM transactions WHERE user_id = '$user_id'";
     $result = $conn_back->query($sql);
 
@@ -34,7 +34,7 @@ function selectTransactionsByUserId($user_id) {
 }
 
 // Function to update a transaction
-function updateTransaction($transaction_id, $new_status) {
+function updateTransaction($conn_back,$transaction_id, $new_status) {
     $sql = "UPDATE transactions SET status = '$new_status' WHERE transaction_id = '$transaction_id'";
     $result = $conn_back->query($sql);
 
@@ -51,7 +51,7 @@ function updateTransaction($transaction_id, $new_status) {
 // Example usage:
 
 // Select all transactions
-$all_transactions = selectAllTransactions();
+$all_transactions = selectAllTransactions($conn_back);
 foreach ($all_transactions as $transaction) {
     echo "Transaction ID: " . $transaction['transaction_id'] . "<br>";
     echo "Type: " . $transaction['transaction_type'] . "<br>";

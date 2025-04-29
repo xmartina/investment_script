@@ -14,7 +14,7 @@
 
 //Cards
 function TransactionsCard($user_id){
-    $ListUserTransactions = selectTransactionsByUserId($user_id);
+    $ListUserTransactions = selectTransactionsByUserId($conn_back,$user_id);
     foreach ($ListUserTransactions as $SingleTransactions) {
  ?>
 
