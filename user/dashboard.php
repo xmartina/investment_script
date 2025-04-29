@@ -235,7 +235,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
             <div class="card adminuiux-card mb-4">
                 <div class="card-header">
                     <div class="row align-items-center">
-                        <div class="col"><h6>Market with Technical Trend</h6></div>
+                        <div class="col"><h6>All Transactions</h6></div>
                         <div class="col-auto px-0"><select class="form-select form-select-sm">
                                 <option selected="selected">All Trend</option>
                                 <option>Bullish</option>
