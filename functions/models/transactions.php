@@ -61,13 +61,13 @@ foreach ($all_transactions as $transaction) {
 }
 
 // Update a transaction
-$transaction_id_to_update = 'TXN123456';
-$new_status = 'Completed';
-$update_result = updateTransaction($transaction_id_to_update, $new_status);
-
-if ($update_result) {
-    echo "Transaction updated successfully.";
-} else {
-    echo "Failed to update transaction.";
-}
+//$transaction_id_to_update = 'TXN123456';
+//$new_status = 'Completed';
+//$update_result = updateTransaction($transaction_id_to_update, $new_status);
+//
+//if ($update_result) {
+//    echo "Transaction updated successfully.";
+//} else {
+//    echo "Failed to update transaction.";
+//}
 ?>
