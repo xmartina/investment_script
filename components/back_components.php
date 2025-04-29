@@ -16,6 +16,81 @@
 function TransactionsCard($conn_back,$user_id){
     $ListUserTransactions = selectTransactionsByUserId($conn_back,$user_id);
     foreach ($ListUserTransactions as $SingleTransactions) {
+        switch ($SingleTransactions['currency']) {
+            case 'USD':
+                $trans_currency = '$';
+                break;
+            case 'EUR':
+                $trans_currency = '€';
+                break;
+            case 'GBP':
+                $trans_currency = '£';
+                break;
+            case 'JPY':
+                $trans_currency = '¥';
+                break;
+            case 'CAD':
+                $trans_currency = 'C$';
+                break;
+            case 'AUD':
+                $trans_currency = 'A$';
+                break;
+            case 'NGN':
+                $trans_currency = '₦';
+                break;
+            case 'CHF':
+                $trans_currency = 'CHF'; // Swiss Franc
+                break;
+            case 'CNY':
+                $trans_currency = '¥'; // Chinese Yuan
+                break;
+            case 'INR':
+                $trans_currency = '₹'; // Indian Rupee
+                break;
+            case 'ZAR':
+                $trans_currency = 'R'; // South African Rand
+                break;
+            case 'NZD':
+                $trans_currency = 'NZ$'; // New Zealand Dollar
+                break;
+            default:
+                $trans_currency = '$'; // default fallback
+                break;
+        }
+        switch ($SingleTransactions['transaction_type']) {
+            case 'withdraw':
+                $trans_type = '<p class="mb-0 text-danger">Withdrawal</p>';
+                break;
+            case 'deposit':
+                $trans_type = '<p class="mb-0 text-primary">Deposit</p>';
+                break;
+            case 'investment':
+                $trans_type = '<p class="mb-0 text-secondary">Investment</p>';
+                break;
+            case 'stake':
+                $trans_type = '<p class="mb-0 text-warning">Stacked</p>';
+                break;
+            default:
+                $trans_type = '<p class="mb-0 text-primary">Transaction</p>'; // default fallback
+                break;
+        }
+        switch ($SingleTransactions['transaction_type']) {
+            case 'pending':
+                $trans_status = '<button class="btn btn-sm btn-outline-warning">Pending</button>';
+                break;
+            case 'approved':
+                $trans_status = '<button class="btn btn-sm btn-outline-success">Approved</button>';
+                break;
+            case 'running':
+                $trans_status = '<button class="btn btn-sm btn-outline-primary">Running</button>';
+                break;
+            case 'declined':
+                $trans_status = '<button class="btn btn-sm btn-outline-danger">Declined</button>';
+                break;
+            default:
+                $trans_status = '<button class="btn btn-sm btn-outline-warning">Pending</button>'; // default fallback
+                break;
+        }
  ?>
 
         <div class="card-body">
@@ -25,8 +100,6 @@ function TransactionsCard($conn_back,$user_id){
                     <th>Transaction ID</th>
                     <th>Amount</th>
                     <th data-breakpoints="xs">Transaction Type</th>
-                    <th data-breakpoints="xs sm">Profit/Loss</th>
-                    <th data-breakpoints="xs">Today's Trend</th>
                     <th>Status</th>
                     <th>Date/Time</th>
                 </tr>
@@ -38,38 +111,16 @@ function TransactionsCard($conn_back,$user_id){
                         <p class="mb-0"><?=$SingleTransactions['reference_id']?></p>
                     </td>
                     <td>
-                        <p class="mb-0">$ 100.45</p>
-                        <p class="small">
-                            <span class="text-secondary" data-bs-toggle="tooltip" title="Last top price">LTP:</span> 152
-                        </p>
+                        <p class="mb-0"><?=$trans_currency.$SingleTransactions['amount']?></p>
                     </td>
                     <td>
-                        <p class="mb-0">102 units</p>
-                        <p class="small"><span class="text-secondary">Invested:</span> $ 1400.45</p>
+                        <p class="mb-0 text-secondary"><?=$trans_type?></p>
                     </td>
                     <td>
-                        <p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 25.30%</p>
-                        <p class="small"><span class="text-secondary">Profit:</span> $ 305.5</p>
-                    </td>
-                    <td>
-                        <p class="mb-0 text-success"><i class="bi bi-graph-up-arrow"></i> Bullish</p>
+                        <button class="btn btn-sm btn-outline-success"><?=$trans_status?></button>
                     </td>
                     <td>
                         <p class="mb-0 text-success"><i class="bi bi-caret-up-fill"></i> 1.24%</p>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-success">Invest</button>
-                        <button class="btn btn-sm btn-outline-danger">Sell</button>
-                        <div class="dropdown d-inline-block">
-                            <a class="btn btn-link btn-square no-caret" data-bs-toggle="dropdown">
-                                <i class="bi bi-three-dots"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="javascript:void(0)">Favorite</a></li>
-                                <li><a class="dropdown-item" href="javascript:void(0)">View Chart</a></li>
-                                <li><a class="dropdown-item" href="javascript:void(0)">Company Events</a></li>
-                            </ul>
-                        </div>
                     </td>
                 </tr>
                 <!-- Additional Rows can be added below in similar format -->
