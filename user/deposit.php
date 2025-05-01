@@ -65,80 +65,21 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     </div>
                     <div id="step-2" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-2">
                         <div class="row my-2">
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
+                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
                                 <div class="card h-100 bg-theme-1-subtle theme-blue selectable anyone">
                                     <div class="card-body">
-                                        <div class="avatar avatar-60 rounded bg-theme-1 mb-3"><i
-                                                class="bi bi-house h4"></i></div>
-                                        <h6 class="text-theme-1">Home</h6>
-                                        <p class="opacity-50">I want to buy a own home</p></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-purple selectable anyone">
-                                    <div class="card-body">
-                                        <div class="avatar avatar-60 rounded bg-theme-1 mb-3"><i
-                                                class="bi bi-people h4"></i></div>
-                                        <h6 class="text-theme-1">Family</h6>
-                                        <p class="opacity-50">I need regular saving for family</p></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-red selectable anyone">
-                                    <div class="card-body">
-                                        <div class="avatar avatar-60 rounded bg-theme-1 mb-3"><i
-                                                class="bi bi-mortarboard h4"></i></div>
-                                        <h6 class="text-theme-1">Education</h6>
-                                        <p class="opacity-50">Creating planning for kids</p></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-orange selectable anyone">
-                                    <div class="card-body">
-                                        <div class="avatar avatar-60 rounded bg-theme-1 mb-3"><i
-                                                class="bi bi-luggage h4"></i></div>
-                                        <h6 class="text-theme-1">Vacation</h6>
-                                        <p class="opacity-50">Planning for trip</p></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-brown selectable anyone">
-                                    <div class="card-body">
-                                        <div class="avatar avatar-60 rounded bg-theme-1 mb-3"><i
-                                                class="bi bi-person-walking h4"></i></div>
-                                        <h6 class="text-theme-1">Retirement</h6>
-                                        <p class="opacity-50">Planning for better future</p></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-teal selectable anyone">
-                                    <div class="card-body">
-                                        <div class="avatar avatar-60 rounded bg-theme-1 mb-3"><i
-                                                class="bi bi-puzzle h4"></i></div>
-                                        <h6 class="text-theme-1">Other</h6>
-                                        <p class="opacity-50">I have independent self plan</p></div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card h-100">
-                                    <div class="card-body z-index-1"><h4 class="fw-normal mb-3">What is your goal
-                                            name?</h4>
-                                        <div class="form-floating text-dark"><input class="form-control" id="name"
-                                                                                    placeholder="Enter name"> <label
-                                                for="name">Name</label></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card adminuiux-card position-relative overflow-hidden bg-theme-1 h-100">
-                                    <div class="position-absolute top-0 start-0 h-100 w-100 z-index-0 coverimg opacity-50">
-                                        <img src="assets/img/modern-ai-image/flamingo-4.jpg" alt=""></div>
-                                    <div class="card-body z-index-1"><h4 class="fw-normal mb-3">How much amount need
-                                            for your goal?</h4>
-                                        <div class="form-floating text-dark"><input type="number"
-                                                                                    class="form-control" id="amount"
-                                                                                    placeholder="Enter amount">
-                                            <label for="amount">Amount</label></div>
+                                        <div class="list-group">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <a href="#" class="list-group-item list-group-item-action list-group-item-light">Wallet Address</a>
+                                                </div>
+                                                <div class="col-6">
+                                                    <a href="#" class="list-group-item list-group-item-action list-group-item-dark">
+                                                        <input type="text" id="wallet_address" name="wallet_address" class="form-control" readonly>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -315,6 +256,26 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
             </div>
         </div>
     </div>
+    <script>
+  // Define wallet addresses
+  const walletAddresses = {
+    USDT: "TXX123USDTWalletExample",
+    BTC: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    ETH: "0x1234567890abcdef1234567890abcdef12345678"
+  };
+
+  // Handle payment method change
+  document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
+    const selectedMethod = this.value;
+    const walletInput = document.getElementById('wallet_address');
+
+    if (walletAddresses[selectedMethod]) {
+      walletInput.value = walletAddresses[selectedMethod];
+    } else {
+      walletInput.value = "";
+    }
+  });
+</script>
 
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php';
