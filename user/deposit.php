@@ -105,6 +105,28 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
+                                <div class="card h-100 selectable anyone">
+                                    <div class="card-body">
+                                        <div class="list-group">
+                                            <div class="row">
+                                                <div class="col-12 col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="exampleFormControlInput1" class="form-label">Enter Transaction ID/Reference</label>
+                                                        <input type="text" class="form-control" name="transactionId" id="exampleFormControlInput1" placeholder="ID/REF1235">
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="formFile" class="form-label">Upload Proof of Payment</label>
+                                                        <input class="form-control" type="file" name="paymentProof" id="formFile">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div id="step-3" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-3">
