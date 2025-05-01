@@ -53,10 +53,11 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                 <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
                                     <div class="card-body">
                                         <label for="exampleFormControlInput1" class="form-label">Enter Deposit Amount</label>
-                                        <div></div>
-                                        <span class="input-group-text"><?=$user_currency?></span>
-                                        <input name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                        <span class="input-group-text">.00</span>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><?=$user_currency?></span>
+                                            <input name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                            <span class="input-group-text">.00</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
