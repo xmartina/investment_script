@@ -7,7 +7,9 @@ if (!isset($_SESSION['user_id'])) {
 $page_name = 'Deposit';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 ?>
+
 
     <div class="container mt-4" id="main-content">
         <div class="card adminuiux-card overflow-hidden mb-4" id="smartwizard">
