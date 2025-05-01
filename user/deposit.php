@@ -69,12 +69,16 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                 <div class="card h-100 bg-theme-1-subtle theme-green selectable anyone">
                                     <div class="card-body">
                                         <div class="list-group">
+                                            <div class="alert alert-warning" role="alert">Use the wallet address below to make payment</div>
                                             <div class="row">
                                                 <div class="col-4">
                                                     <a href="#" class="list-group-item list-group-item-action list-group-item-light">Wallet Address</a>
                                                 </div>
-                                                <div class="col-8">
-                                                        <input type="text" id="wallet_address" name="wallet_address" class="form-control" readonly>
+                                                <div class="col-6">
+                                                    <input type="text" id="wallet_address" class="form-control" readonly>
+                                                </div>
+                                                <div class="col-4">
+                                                    <a href="#" id="walletType" class="list-group-item list-group-item-action list-group-item-light">Wallet Address</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -262,6 +266,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
     ETH: "0x1234567890abcdef1234567890abcdef12345678"
   };
 
+  const walletTypes = {
+    USDT: "USDT",
+    BTC: "BTC",
+    ETH: "ETH"
+  };
+
   // Handle payment method change
   document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
     const selectedMethod = this.value;
@@ -269,6 +279,17 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 
     if (walletAddresses[selectedMethod]) {
       walletInput.value = walletAddresses[selectedMethod];
+    } else {
+      walletInput.value = "";
+    }
+  });
+
+  document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
+    const selectedMethod = this.value;
+    const walletInput = document.getElementById('walletType');
+
+    if (walletTypes[selectedMethod]) {
+      walletInput.value = walletTypes[selectedMethod];
     } else {
       walletInput.value = "";
     }
