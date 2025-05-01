@@ -94,7 +94,9 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                     <span class="list-group-item list-group-item-action list-group-item-light">Deposit Amount</span>
                                                 </div>
                                                 <div class="col-12 col-md-7">
-                                                    <input type="text" id="deposit_amount" class="form-control" readonly>
+                                                    <span class="input-group-text"><?=$user_currency?></span>
+                                                    <input id="deposit_amount"  type="number" class="form-control" aria-label="Amount (to the nearest dollar)" readonly>
+                                                    <span class="input-group-text">.00</span>
                                                 </div>
                                             </div>
                                         </div>
