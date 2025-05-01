@@ -2,7 +2,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/transactions.fn.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/transactions.php';
+
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 function back_menu($menus_result, $active_url, $page_name)
