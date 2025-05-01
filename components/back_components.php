@@ -14,7 +14,6 @@
 
 //Cards
 
-<?php
 function TransactionsCard($conn_back) {
     // Helper functions inside the main function
     function selectTransactionsByUserIdPaginated($conn_back, $user_id, $offset, $per_page) {
@@ -197,7 +196,7 @@ function TransactionsCard($conn_back) {
         });
     </script>
 
-<?php } ?>
+<?php }
 
 
 //Avatar/Profile Picture
