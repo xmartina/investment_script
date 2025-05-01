@@ -85,6 +85,22 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-12 col-md-4 col-lg-4 col-xl-4 mb-4">
+                                <div class="card h-100 bg-theme-1-subtle selectable anyone">
+                                    <div class="card-body">
+                                        <div class="list-group">
+                                            <div class="row">
+                                                <div class="col-3">
+                                                    <span class="list-group-item list-group-item-action list-group-item-light">Deposit Amount</span>
+                                                </div>
+                                                <div class="col-6">
+                                                    <input type="text" id="deposit_amount" class="form-control" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div id="step-3" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-3">
@@ -259,7 +275,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
         </div>
     </div>
     <script>
-  // Define wallet addresses and types
   const walletAddresses = {
     USDT: "TXX123USDTWalletExample",
     BTC: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
@@ -272,22 +287,21 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
     ETH: "Ethereum"
   };
 
-  // Single event listener
+  // Update wallet info on payment method change
   document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
     const selectedMethod = this.value;
     const walletInput = document.getElementById('wallet_address');
     const walletTypeText = document.getElementById('walletType');
 
-    if (walletAddresses[selectedMethod]) {
-      walletInput.value = walletAddresses[selectedMethod];
-      walletTypeText.textContent = walletTypes[selectedMethod] || '';
-    } else {
-      walletInput.value = "";
-      walletTypeText.textContent = "";
-    }
+    walletInput.value = walletAddresses[selectedMethod] || "";
+    walletTypeText.textContent = walletTypes[selectedMethod] || "";
+  });
+
+  // Mirror deposit amount from Step 1 to Step 2
+  document.getElementById('deposit_amount_input').addEventListener('input', function () {
+    document.getElementById('deposit_amount').value = this.value;
   });
 </script>
-
 
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php';
