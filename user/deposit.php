@@ -34,32 +34,31 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                 <div class="tab-content">
                     <div id="step-1" class="tab-pane px-0" role="tabpanel" aria-labelledby="step-1">
                         <div class="row my-2">
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
+                            <div class="col-6 col-md-4 col-lg-4 col-xl-4 mb-4">
                                 <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
-                                    <div class="card-body"><img src="assets/img/investment/regular-saving.jpg"
-                                                                alt="" class="mw-100 rounded mb-3"><h6
-                                            class="text-theme-1">Regular Saving</h6></div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlInput1" class="form-label">Select Payment Method</label>
+                                            <select name="payment_method" class="form-select" aria-label="Select Payment Method">
+                                                <option selected>Select</option>
+                                                <option value="USDT">USDT</option>
+                                                <option value="BTC">BTC</option>
+                                                <option value="ETH">ETH</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card text-center bg-theme-1-subtle theme-purple h-100 selectable">
-                                    <div class="card-body"><img src="assets/img/investment/tax-saving.jpg" alt=""
-                                                                class="mw-100 rounded mb-3"><h6
-                                            class="text-theme-1">Save Taxes</h6></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card text-center h-100 bg-theme-1-subtle theme-orange selectable">
-                                    <div class="card-body"><img src="assets/img/investment/retirement-saving.jpg"
-                                                                alt="" class="mw-100 rounded mb-3"><h6
-                                            class="text-theme-1">Retirement Plan</h6></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3 col-lg-3 col-xl-3 mb-4">
-                                <div class="card text-center bg-theme-1-subtle theme-red h-100 selectable">
-                                    <div class="card-body"><img src="assets/img/investment/emergency-saving.jpg"
-                                                                alt="" class="mw-100 rounded mb-3"><h6
-                                            class="text-theme-1">Emergency</h6></div>
+                            <div class="col-6 col-md-4 col-lg-4 col-xl-4 mb-4">
+                                <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
+                                    <div class="card-body">
+                                        <div class="input-group mb-3">
+                                            <label for="exampleFormControlInput1" class="form-label">Enter Deposit Amount</label>
+                                            <span class="input-group-text"><?=$user_currency?></span>
+                                            <input name="deposit_amount" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                            <span class="input-group-text">.00</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
