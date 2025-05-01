@@ -65,15 +65,15 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     </div>
                     <div id="step-2" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-2">
                         <div class="row my-2">
-                            <div class="col-12 col-md-8 col-lg-8 col-xl-8 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-blue selectable anyone">
+                            <div class="col-12 col-md-12 col-lg-12 col-xl-12 mb-4">
+                                <div class="card h-100 bg-theme-1-subtle theme-green selectable anyone">
                                     <div class="card-body">
                                         <div class="list-group">
                                             <div class="row">
-                                                <div class="col-6">
+                                                <div class="col-4">
                                                     <a href="#" class="list-group-item list-group-item-action list-group-item-light">Wallet Address</a>
                                                 </div>
-                                                <div class="col-6">
+                                                <div class="col-8">
                                                         <input type="text" id="wallet_address" name="wallet_address" class="form-control" readonly>
                                                 </div>
                                             </div>
