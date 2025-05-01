@@ -1,3 +1,9 @@
+investment-settings-contact.html
+
+deposit process
+investment-add-goal.html#step-1
+
+
 Building a crypto investment and staking script is a complex project that requires careful consideration of various features and user flows. Let's evaluate the pages you've listed and consider whether additional pages might be necessary to ensure a comprehensive and user-friendly platform.
 
 ### **Current Pages:**
