@@ -16,20 +16,20 @@ function selectAllTransactions($conn_back) {
 }
 
 // Function to select transactions by user_id
-function selectTransactionsByUserId($conn_back,$user_id) {
-    $sql = "SELECT * FROM transactions WHERE user_id = '$user_id'";
-    $result = $conn_back->query($sql);
-
-    $transactions = array();
-
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $transactions[] = $row;
-        }
-    }
-
-    return $transactions;
-}
+//function selectTransactionsByUserId($conn_back,$user_id) {
+//    $sql = "SELECT * FROM transactions WHERE user_id = '$user_id'";
+//    $result = $conn_back->query($sql);
+//
+//    $transactions = array();
+//
+//    if ($result->num_rows > 0) {
+//        while ($row = $result->fetch_assoc()) {
+//            $transactions[] = $row;
+//        }
+//    }
+//
+//    return $transactions;
+//}
 
 // Function to update a transaction
 function updateTransaction($conn_back,$transaction_id, $new_status) {
