@@ -14,8 +14,9 @@
 
 //Cards
 
+<?php
 function TransactionsCard($conn_back) {
-    // Utility functions
+    // Helper functions inside the main function
     function selectTransactionsByUserIdPaginated($conn_back, $user_id, $offset, $per_page) {
         $stmt = $conn_back->prepare("SELECT * FROM transactions WHERE user_id = ? ORDER BY date_time DESC LIMIT ? OFFSET ?");
         $stmt->bind_param("iii", $user_id, $per_page, $offset);
@@ -30,50 +31,47 @@ function TransactionsCard($conn_back) {
         return $stmt->get_result()->fetch_assoc()['total'];
     }
 
-    // AJAX Request Handler
+    // Handle AJAX request
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         header('Content-Type: application/json');
 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
         $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
         $per_page = 10;
-
         $offset = ($page - 1) * $per_page;
+
         $transactions = selectTransactionsByUserIdPaginated($conn_back, $user_id, $offset, $per_page);
         $totalTransactions = countTransactionsByUserId($conn_back, $user_id);
 
+        $currencies = [
+            'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'JPY' => '¥',
+            'CAD' => 'C$', 'AUD' => 'A$', 'NGN' => '₦', 'CHF' => 'CHF',
+            'CNY' => '¥', 'INR' => '₹', 'ZAR' => 'R', 'NZD' => 'NZ$'
+        ];
+        $types = [
+            'withdraw' => 'text-danger',
+            'deposit' => 'text-primary',
+            'investment' => 'text-secondary',
+            'stake' => 'text-warning'
+        ];
+        $statuses = [
+            'pending' => 'btn-outline-warning',
+            'approved' => 'btn-outline-success',
+            'running' => 'btn-outline-primary',
+            'declined' => 'btn-outline-danger'
+        ];
+
         $rows = [];
         foreach ($transactions as $transaction) {
-            $currencies = [
-                'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'JPY' => '¥',
-                'CAD' => 'C$', 'AUD' => 'A$', 'NGN' => '₦', 'CHF' => 'CHF',
-                'CNY' => '¥', 'INR' => '₹', 'ZAR' => 'R', 'NZD' => 'NZ$'
-            ];
             $trans_currency = $currencies[$transaction['currency']] ?? '$';
-
-            $types = [
-                'withdraw' => 'text-danger',
-                'deposit' => 'text-primary',
-                'investment' => 'text-secondary',
-                'stake' => 'text-warning'
-            ];
             $trans_type_class = $types[$transaction['transaction_type']] ?? 'text-primary';
-            $trans_type_text = ucfirst($transaction['transaction_type']);
-
-            $statuses = [
-                'pending' => 'btn-outline-warning',
-                'approved' => 'btn-outline-success',
-                'running' => 'btn-outline-primary',
-                'declined' => 'btn-outline-danger'
-            ];
             $status_class = $statuses[$transaction['status']] ?? 'btn-outline-warning';
-            $status_text = ucfirst($transaction['status']);
 
             $rows[] = [
                 'reference_id' => $transaction['reference_id'],
                 'amount' => $trans_currency . number_format($transaction['amount'], 2),
-                'type' => "<span class='$trans_type_class'>$trans_type_text</span>",
-                'status' => "<button class='btn btn-sm $status_class'>$status_text</button>",
+                'type' => "<span class='$trans_type_class'>" . ucfirst($transaction['transaction_type']) . "</span>",
+                'status' => "<button class='btn btn-sm $status_class'>" . ucfirst($transaction['status']) . "</button>",
                 'date' => date('M d, Y H:i', strtotime($transaction['date_time']))
             ];
         }
@@ -85,10 +83,10 @@ function TransactionsCard($conn_back) {
         exit;
     }
 
-    // Normal Page Request
-    $user_id = 1; // Replace with session value if available
-    $initial_page = 1;
-    $initial_transactions = selectTransactionsByUserIdPaginated($conn_back, $user_id, 0, 10);
+    // Main display
+    $user_id = 1; // Replace with dynamic user ID
+    $per_page = 10;
+    $transactions = selectTransactionsByUserIdPaginated($conn_back, $user_id, 0, $per_page);
     $totalTransactions = countTransactionsByUserId($conn_back, $user_id);
 
     $currencies = [
@@ -96,14 +94,12 @@ function TransactionsCard($conn_back) {
         'CAD' => 'C$', 'AUD' => 'A$', 'NGN' => '₦', 'CHF' => 'CHF',
         'CNY' => '¥', 'INR' => '₹', 'ZAR' => 'R', 'NZD' => 'NZ$'
     ];
-
     $types = [
         'withdraw' => 'text-danger',
         'deposit' => 'text-primary',
         'investment' => 'text-secondary',
         'stake' => 'text-warning'
     ];
-
     $statuses = [
         'pending' => 'btn-outline-warning',
         'approved' => 'btn-outline-success',
@@ -111,6 +107,7 @@ function TransactionsCard($conn_back) {
         'declined' => 'btn-outline-danger'
     ];
     ?>
+
     <div class="card-body">
         <table class="table mb-0">
             <thead>
@@ -122,8 +119,8 @@ function TransactionsCard($conn_back) {
                 <th>Date/Time</th>
             </tr>
             </thead>
-            <tbody>
-            <?php foreach ($initial_transactions as $transaction): ?>
+            <tbody id="transactionRows">
+            <?php foreach ($transactions as $transaction): ?>
                 <tr>
                     <td><?= $transaction['reference_id'] ?></td>
                     <td><?= $currencies[$transaction['currency']] ?? '$' ?><?= number_format($transaction['amount'], 2) ?></td>
@@ -135,15 +132,13 @@ function TransactionsCard($conn_back) {
                             <?= ucfirst($transaction['status']) ?>
                         </button>
                     </td>
-                    <td>
-                        <i class="bi bi-calendar-check-fill"></i>
-                        <?= date('M d, Y H:i', strtotime($transaction['date_time'])) ?>
-                    </td>
+                    <td><i class="bi bi-calendar-check-fill"></i> <?= date('M d, Y H:i', strtotime($transaction['date_time'])) ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
-        <?php if ($totalTransactions > 10): ?>
+
+        <?php if ($totalTransactions > $per_page): ?>
             <button id="loadMore" class="btn btn-primary mt-3"
                     data-page="2"
                     data-user-id="<?= $user_id ?>">
@@ -153,47 +148,56 @@ function TransactionsCard($conn_back) {
     </div>
 
     <script>
-        document.getElementById('loadMore')?.addEventListener('click', function() {
-            const button = this;
-            const page = button.dataset.page;
-            const userId = button.dataset.userId;
+        document.addEventListener("DOMContentLoaded", function () {
+            const button = document.getElementById('loadMore');
+            if (!button) return;
 
-            button.disabled = true;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+            button.addEventListener('click', function () {
+                const page = this.dataset.page;
+                const userId = this.dataset.userId;
+                const button = this;
 
-            fetch(`?page=${page}&user_id=${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.querySelector('tbody');
-                    data.rows.forEach(row => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${row.reference_id}</td>
-                                <td>${row.amount}</td>
-                                <td>${row.type}</td>
-                                <td>${row.status}</td>
-                                <td><i class="bi bi-calendar-check-fill"></i> ${row.date}</td>
-                            </tr>
-                        `;
-                    });
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
 
-                    if (data.hasMore) {
-                        button.dataset.page = parseInt(page) + 1;
-                        button.disabled = false;
-                        button.innerHTML = 'Load More';
-                    } else {
-                        button.remove();
+                fetch(`?page=${page}&user_id=${userId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    button.disabled = false;
-                    button.innerHTML = 'Error - Try Again';
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        const tbody = document.getElementById('transactionRows');
+                        data.rows.forEach(row => {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${row.reference_id}</td>
+                                    <td>${row.amount}</td>
+                                    <td>${row.type}</td>
+                                    <td>${row.status}</td>
+                                    <td><i class="bi bi-calendar-check-fill"></i> ${row.date}</td>
+                                </tr>
+                            `;
+                        });
+
+                        if (data.hasMore) {
+                            button.dataset.page = parseInt(page) + 1;
+                            button.disabled = false;
+                            button.innerHTML = 'Load More';
+                        } else {
+                            button.remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        button.disabled = false;
+                        button.innerHTML = 'Error - Try Again';
+                    });
+            });
         });
     </script>
-<?php
-} // end of TransactionsCard
+
+<?php } ?>
 
 
 //Avatar/Profile Picture
