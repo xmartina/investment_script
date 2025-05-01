@@ -71,13 +71,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                         <div class="list-group">
                                             <div class="alert alert-warning" role="alert">Use the wallet address below to make payment</div>
                                             <div class="row">
-                                                <div class="col-4">
+                                                <div class="col-3">
                                                     <span class="list-group-item list-group-item-action list-group-item-light">Wallet Address</span>
                                                 </div>
                                                 <div class="col-6">
                                                     <input type="text" id="wallet_address" class="form-control" readonly>
                                                 </div>
-                                                <div class="col-4">
+                                                <div class="col-3">
                                                     <span id="walletType" class="list-group-item list-group-item-action list-group-item-light">Wallet Type</span>
                                                 </div>
                                             </div>
