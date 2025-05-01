@@ -72,13 +72,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                             <div class="alert alert-warning" role="alert">Use the wallet address below to make payment</div>
                                             <div class="row">
                                                 <div class="col-4">
-                                                    <a href="#" class="list-group-item list-group-item-action list-group-item-light">Wallet Address</a>
+                                                    <span class="list-group-item list-group-item-action list-group-item-light">Wallet Address</span>
                                                 </div>
                                                 <div class="col-6">
                                                     <input type="text" id="wallet_address" class="form-control" readonly>
                                                 </div>
                                                 <div class="col-4">
-                                                    <a href="#" id="walletType" class="list-group-item list-group-item-action list-group-item-light">Wallet Address</a>
+                                                    <span id="walletType" class="list-group-item list-group-item-action list-group-item-light">Wallet Type</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -259,7 +259,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
         </div>
     </div>
     <script>
-  // Define wallet addresses
+  // Define wallet addresses and types
   const walletAddresses = {
     USDT: "TXX123USDTWalletExample",
     BTC: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
@@ -267,34 +267,27 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
   };
 
   const walletTypes = {
-    USDT: "USDT",
-    BTC: "BTC",
-    ETH: "ETH"
+    USDT: "USDT TRC20",
+    BTC: "Bitcoin",
+    ETH: "Ethereum"
   };
 
-  // Handle payment method change
+  // Single event listener
   document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
     const selectedMethod = this.value;
     const walletInput = document.getElementById('wallet_address');
+    const walletTypeText = document.getElementById('walletType');
 
     if (walletAddresses[selectedMethod]) {
       walletInput.value = walletAddresses[selectedMethod];
+      walletTypeText.textContent = walletTypes[selectedMethod] || '';
     } else {
       walletInput.value = "";
-    }
-  });
-
-  document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
-    const selectedMethod = this.value;
-    const walletInput = document.getElementById('walletType');
-
-    if (walletTypes[selectedMethod]) {
-      walletInput.value = walletTypes[selectedMethod];
-    } else {
-      walletInput.value = "";
+      walletTypeText.textContent = "";
     }
   });
 </script>
+
 
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php';
