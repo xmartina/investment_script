@@ -101,6 +101,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="alert alert-warning" role="alert">make exactly the amount above to the address provided</div>
                                         </div>
                                     </div>
                                 </div>
