@@ -55,7 +55,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                         <label for="exampleFormControlInput1" class="form-label">Enter Deposit Amount</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><?=$user_currency?></span>
-                                            <input name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                            <input id="deposit_amount_input" name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
                                             <span class="input-group-text">.00</span>
                                         </div>
                                     </div>
@@ -287,21 +287,19 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
     ETH: "Ethereum"
   };
 
-  // Update wallet info on payment method change
+  // Update wallet info
   document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
     const selectedMethod = this.value;
-    const walletInput = document.getElementById('wallet_address');
-    const walletTypeText = document.getElementById('walletType');
-
-    walletInput.value = walletAddresses[selectedMethod] || "";
-    walletTypeText.textContent = walletTypes[selectedMethod] || "";
+    document.getElementById('wallet_address').value = walletAddresses[selectedMethod] || "";
+    document.getElementById('walletType').textContent = walletTypes[selectedMethod] || "";
   });
 
-  // Mirror deposit amount from Step 1 to Step 2
+  // Sync deposit amount from Step 1 to Step 2
   document.getElementById('deposit_amount_input').addEventListener('input', function () {
     document.getElementById('deposit_amount').value = this.value;
   });
 </script>
+
 
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php';
