@@ -85,8 +85,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-4 col-lg-4 col-xl-4 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle selectable anyone">
+                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
+                                <div class="card h-100 selectable anyone">
                                     <div class="card-body">
                                         <div class="list-group">
                                             <div class="row">
