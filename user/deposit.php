@@ -55,8 +55,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                         <div class="input-group mb-3">
                                             <label for="exampleFormControlInput1" class="form-label">Enter Deposit Amount</label>
                                             <span class="input-group-text"><?=$user_currency?></span>
-                                            <input name="deposit_amount" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                            <span class="input-group-text">.00</span>
+                                            <input name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                            <span class="input-group-text"><input name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)"></span>
                                         </div>
                                     </div>
                                 </div>
