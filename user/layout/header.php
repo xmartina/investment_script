@@ -21,7 +21,7 @@
     <?php
     if ($page_name = 'Deposit'){
     ?>
-        <link href="./../css2?family=Lexend:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        <link href="../../css2?family=Lexend:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
               rel="stylesheet">
     <link href="<?= $site_link ?>/back_assets/css/app-2.css?family=Lexend:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <?php } ?>

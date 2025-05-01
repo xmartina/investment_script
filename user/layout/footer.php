@@ -184,3 +184,8 @@
     </div>
 </div>
 <script src="<?= $site_link ?>/back_assets/js/investment/investment-dashboard.js"></script>
+<?php
+if ($page_name = 'Deposit'){
+    ?>
+    <script src="<?= $site_link ?>/back_assets/js/investment/investment-add-goal.js"></script>
+<?php } ?>
