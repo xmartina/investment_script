@@ -230,7 +230,21 @@ if (isset($user_id)) {
     $total_profit = abbreviate_number($returns_amount + $returns_stakes_amount);
     $total_investments = abbreviate_number($amount_invested + $amount_stakes_invested);
 
+    function generateUniqueStrings($count):array {
+        $uniqueStrings = [];
+        for ($i = 0; $i < $count; $i++) {
+            // Generate a unique ID using uniqid
+            $uniqueString = uniqid("", true);
 
+            // Ensure the string is alphanumeric (remove special characters)
+            $uniqueString = preg_replace("/[^A-Za-z0-9]/", "", $uniqueString);
+
+            // Store the unique string
+            $uniqueStrings[] = substr($uniqueString, 0, 8); // Adjust length as needed
+        }
+
+        return $uniqueStrings;
+    }
 }
 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers.php';
