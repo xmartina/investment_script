@@ -47,3 +47,8 @@ document.querySelector('.save-deposit').addEventListener('click', function(e) {
   document.querySelector('#yourFormId').submit();
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll(
+    '.btn-outline-accent.float-start, .btn-theme.finish-btn'
+  ).forEach(el => el.style.display = 'none');
+});
