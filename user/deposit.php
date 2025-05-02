@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
         $trx_id = uniqid('trx_');
         $now    = date('Y-m-d H:i:s');
         mysqli_query($conn_back,"INSERT INTO transactions
-            (transaction_id,transaction_type,reference_id,reference_id,amount,currency,status,date_time,description,from_address,to_address,fee,user_id)
+            (transaction_id,transaction_type,reference_id,transaction_proof_id,amount,currency,status,date_time,description,from_address,to_address,fee,user_id)
             VALUES
             ('$trx_id','deposit','$txid','$txProofId',$amt,'$curr','pending','$now',
              'User deposit via $pm','$addr','Platform Wallet',0,$user_id)"); ?>
