@@ -290,12 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const link = document.querySelector('a[href="#step-3"]');
   if (link) link.addEventListener('click', () => setTimeout(fillConfirm, 10));
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll(
-    '.btn-outline-accent.float-start, .btn-theme.finish-btn'
-  ).forEach(el => el.style.display = 'none');
-});
 </script>
 
 
