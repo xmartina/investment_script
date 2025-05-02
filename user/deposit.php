@@ -41,11 +41,18 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             (transaction_id,transaction_type,reference_id,amount,currency,status,date_time,description,from_address,to_address,fee,user_id)
             VALUES
             ('$trx_id','deposit','$txid',$amt,'$curr','pending','$now',
-             'User deposit via $pm','$addr','Platform Wallet',0,$user_id)");
-
-        header('Location: success.php?msg=deposit_pending'); exit;
-    }
-    header('Location: error.php?msg=deposit_failed'); exit;
+             'User deposit via $pm','$addr','Platform Wallet',0,$user_id)"); ?>
+        <script>
+            window.location.href = "<?=$siteLink?>/user/deposit?msg=deposit_pending";
+        </script>
+        <?php
+        exit;
+    } ?>
+    <script>
+            window.location.href = "<?=$siteLink?>/user/deposit?msg=deposit_failed";
+        </script>
+    <?php
+    exit;
 }
 ?>
 
