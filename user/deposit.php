@@ -11,35 +11,26 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 ?>
 
 
-    <div class="container mt-4" id="main-content">
-        <div class="card adminuiux-card overflow-hidden mb-4" id="smartwizard">
-            <ul class="nav">
-                <li class="nav-item"><a class="nav-link" href="#step-1">
-                        <div class="num">1</div>
-                        <div><p class="h5 mb-0">Deposit Setup</p>
-                            <p class="small">Deposit Information</p></div>
-                    </a></li>
-                <li class="nav-item"><a class="nav-link" href="#step-2">
-                        <div class="num">2</div>
-                        <div><p class="h5 mb-0">Payment Instructions</p>
-                            <p class="small">Make Payment</p></div>
-                    </a></li>
-                <li class="nav-item"><a class="nav-link" href="#step-3">
-                        <div class="num">3</div>
-                        <div><p class="h5 mb-0">Confirmation</p>
-                            <p class="small">Confirm Deposit</p></div>
-                    </a></li>
-            </ul>
-            <div class="card-body pb-0">
-                <div class="tab-content">
-                    <div id="step-1" class="tab-pane px-0" role="tabpanel" aria-labelledby="step-1">
-                        <div class="row my-2">
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label for="exampleFormControlInput1" class="form-label">Select Payment Method</label>
-                                            <select name="payment_method" class="form-select" aria-label="Select Payment Method">
+    <form id="depositForm" action="deposit_submit.php" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="currency" value="<?php echo htmlspecialchars($user_currency); ?>">
+        <div class="container mt-4" id="main-content">
+            <div class="card overflow-hidden mb-4" id="smartwizard">
+                <ul class="nav">
+                    <li class="nav-item"><a class="nav-link" href="#step-1"><div class="num">1</div><div><p class="h5 mb-0">Deposit Setup</p><p class="small">Deposit Information</p></div></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#step-2"><div class="num">2</div><div><p class="h5 mb-0">Payment Instructions</p><p class="small">Make Payment</p></div></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#step-3"><div class="num">3</div><div><p class="h5 mb-0">Confirmation</p><p class="small">Confirm Deposit</p></div></a></li>
+                </ul>
+                <div class="card-body pb-0">
+                    <div class="tab-content">
+
+                        <!-- STEP 1 -->
+                        <div id="step-1" class="tab-pane px-0" role="tabpanel">
+                            <div class="row my-2">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card text-center bg-light h-100 selectable">
+                                        <div class="card-body">
+                                            <label class="form-label">Select Payment Method</label>
+                                            <select name="payment_method" class="form-select">
                                                 <option selected>Select</option>
                                                 <option value="USDT">USDT</option>
                                                 <option value="BTC">BTC</option>
@@ -48,283 +39,141 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
-                                    <div class="card-body">
-                                        <label for="exampleFormControlInput1" class="form-label">Enter Deposit Amount</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><?=$user_currency?></span>
-                                            <input id="deposit_amount_input" name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                            <span class="input-group-text">.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="step-2" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-2">
-                        <div class="row my-2">
-                            <div class="col-12 col-md-12 col-lg-12 col-xl-12 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-green selectable anyone">
-                                    <div class="card-body">
-                                        <div class="list-group">
-                                            <div class="alert alert-warning" role="alert">Use the wallet address below to make payment</div>
-                                            <div class="row">
-                                                <div class="col-12 col-md-3">
-                                                    <span class="list-group-item list-group-item-action list-group-item-light">Wallet Address</span>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <input type="text" id="wallet_address" class="form-control" readonly>
-                                                </div>
-                                                <div class="col-12 col-md-3">
-                                                    <span id="walletType" class="list-group-item list-group-item-action list-group-item-light">Wallet Type</span>
-                                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card text-center bg-light h-100 selectable">
+                                        <div class="card-body">
+                                            <label class="form-label">Enter Deposit Amount</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><?php echo htmlspecialchars($user_currency); ?></span>
+                                                <input id="deposit_amount_input" name="deposit_amount" type="number" class="form-control">
+                                                <span class="input-group-text">.00</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card h-100 selectable anyone">
-                                    <div class="card-body">
-                                        <div class="list-group">
+                        </div>
+
+                        <!-- STEP 2 -->
+                        <div id="step-2" class="tab-pane px-0 pb-0" role="tabpanel">
+                            <div class="row my-2">
+                                <div class="col-12 mb-4">
+                                    <div class="card bg-light h-100 selectable">
+                                        <div class="card-body">
+                                            <div class="alert alert-warning">Use the wallet address below to make payment</div>
                                             <div class="row">
-                                                <div class="col-12 col-md-5">
-                                                    <span class="list-group-item list-group-item-action list-group-item-light">Deposit Amount</span>
-                                                </div>
-                                                <div class="col-12 col-md-7">
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><?=$user_currency?></span>
-                                                        <input id="deposit_amount"  type="number" class="form-control" aria-label="Amount (to the nearest dollar)" readonly>
-                                                        <span class="input-group-text">.00</span>
+                                                <div class="col-md-3"><span class="list-group-item-light">Wallet Address</span></div>
+                                                <div class="col-md-6"><input type="text" id="wallet_address" name="wallet_address" class="form-control" readonly></div>
+                                                <div class="col-md-3"><span id="walletType" class="list-group-item-light">Wallet Type</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100 selectable">
+                                        <div class="card-body">
+                                            <div class="list-group">
+                                                <div class="row">
+                                                    <div class="col-md-5"><span class="list-group-item-light">Deposit Amount</span></div>
+                                                    <div class="col-md-7">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><?php echo htmlspecialchars($user_currency); ?></span>
+                                                            <input id="deposit_amount" class="form-control" readonly>
+                                                            <span class="input-group-text">.00</span>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div class="alert alert-warning mt-2">Make exactly the amount above to the address provided</div>
                                             </div>
-                                            <div class="alert alert-warning" role="alert">make exactly the amount above to the address provided</div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card h-100 selectable anyone">
-                                    <div class="card-body">
-                                        <div class="list-group">
-                                            <div class="row">
-                                                <div class="col-12 col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="exampleFormControlInput1" class="form-label">Enter Transaction ID/Reference</label>
-                                                        <input type="text" class="form-control" name="transactionId" id="exampleFormControlInput1" placeholder="ID/REF1235">
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="formFile" class="form-label">Upload Proof of Payment</label>
-                                                        <input class="form-control" type="file" name="paymentProof" id="formFile">
-                                                    </div>
-                                                </div>
-                                            </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100 selectable">
+                                        <div class="card-body">
+                                            <label class="form-label">Enter Transaction ID/Reference</label>
+                                            <input type="text" class="form-control" name="transactionId" placeholder="ID/REF1235">
+                                            <label class="form-label mt-3">Upload Proof of Payment</label>
+                                            <input class="form-control" type="file" name="paymentProof">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="step-3" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-3">
-                        <div class="row">
-                            <div class="col-12 col-md-6">
-                                <div class="card text-center mb-4">
-                                    <div class="card-header"><h5>Goal: Sweet Home</h5>
-                                        <p class="text-secondary">Choose your investment plan</p></div>
-                                    <div class="card-body"><h4>$ 22500.00</h4>
-                                        <p class="text-secondary mb-4">Targeted Goal Amount</p>
-                                        <div class="card adminuiux-card bg-theme-1-subtle theme-green">
-                                            <div class="card-body"><h4>$ 750.00</h4>
-                                                <p class="opacity-75">You will need to save per month</p></div>
-                                        </div>
+
+                        <!-- STEP 3 -->
+                        <div id="step-3" class="tab-pane px-0 pb-0" role="tabpanel">
+                            <div class="row my-2">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card text-center">
+                                        <div class="card-header"><h5>Payment Method</h5></div>
+                                        <div class="card-body"><p class="fw-bold" id="confirm_payment_method"></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card text-center">
+                                        <div class="card-header"><h5>Deposit Amount</h5></div>
+                                        <div class="card-body"><p class="fw-bold"><?php echo htmlspecialchars($user_currency); ?> <span id="confirm_deposit_amount"></span></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card text-center">
+                                        <div class="card-header"><h5>Transaction Reference</h5></div>
+                                        <div class="card-body"><p class="fw-bold" id="confirm_reference_id"></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card text-center">
+                                        <div class="card-header"><h5>Proof of Payment</h5></div>
+                                        <div class="card-body"><p class="fw-bold" id="confirm_proof_filename"></p></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6">
-                                <div class="card adminuiux-card mb-4">
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-sm mb-3"><p>Targeted Amount</p></div>
-                                                <div class="col-12 col-sm-5 mb-3">
-                                                    <div class="input-group"><span class="input-group-text bg-none">$</span>
-                                                        <input class="form-control text-end rangevalues"
-                                                               value="22500.00" id="value1"></div>
-                                                </div>
-                                            </div>
-                                            <input type="range" id="range1" class="range1 rangevalue" min="100"
-                                                   max="150000" value="22500.00" data-value="value1"></div>
-                                        <div class="mb-3">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-sm mb-3"><p>Expected goal duration</p></div>
-                                                <div class="col-12 col-sm-5 mb-3">
-                                                    <div class="input-group"><span class="input-group-text bg-none">Months</span>
-                                                        <input class="form-control text-end rangevalues" value="24"
-                                                               id="value2"></div>
-                                                </div>
-                                            </div>
-                                            <input type="range" id="range2" class="range1 rangevalue" min="1"
-                                                   max="60" step="1" value="24" data-value="value2"></div>
-                                        <div>
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-sm mb-3"><p>Time period in Year</p></div>
-                                                <div class="col-12 col-sm-5 mb-3">
-                                                    <div class="input-group"><span class="input-group-text bg-none">$</span>
-                                                        <input class="form-control text-end rangevalues"
-                                                               value="1000" id="value3"></div>
-                                                </div>
-                                            </div>
-                                            <input type="range" id="range3" class="range1 rangevalue" min="500"
-                                                   max="20000" step="500" value="1000" data-value="value3"></div>
-                                    </div>
-                                </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success">Confirm Deposit</button>
                             </div>
                         </div>
-                        <br><h5 class="text-center">Choose funds for your plan from suggestion</h5>
-                        <p class="text-secondary text-center mb-4">You can select any one or multiple and in each
-                            total amount should be of $ 750.00/month.</p>
-                        <div class="row">
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card selectable active mb-4">
-                                    <div class="card-body"><h5 class="fw-medium mb-1">JACKY New age EV and
-                                            automotive Fund</h5>
-                                        <p class="text-secondary mb-4">Direct <i class="bi bi-chevron-right"></i>
-                                            Growth <i class="bi bi-chevron-right"></i> Thematic</p>
-                                        <div class="row align-items-center mb-4">
-                                            <div class="col-6 text-start mb-3"><h6 class="fw-medium">$150.1250</h6>
-                                                <p class="text-secondary small">Current NAV <span>10 Aug 2025</span>
-                                                </p></div>
-                                            <div class="col-6 text-end mb-3"><h6 class="fw-medium">$2426.50 cr</h6>
-                                                <p class="text-secondary small">AUM</p></div>
-                                            <div class="col-6 text-start"><h6 class="fw-medium text-success">
-                                                    +32.5%</h6>
-                                                <p class="text-secondary small">CAGR <span>5 Years</span></p></div>
-                                            <div class="col-6 text-end"><h6 class="fw-medium">0.79%</h6>
-                                                <p class="text-secondary small">Expanse Ratio</p></div>
-                                        </div>
-                                        <hr>
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <div class="input-group"><span class="input-group-text bg-none">Invest <b
-                                                            class="mx-1">$</b></span> <input
-                                                        class="form-control text-end rangevalues" value="375.00">
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button class="btn btn-square btn-outline-theme theme-red"><i
-                                                        class="bi bi-heart"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card selectable active mb-4">
-                                    <div class="card-body"><h5 class="fw-medium mb-1">OrganicX Agriculture and
-                                            innovation Fund</h5>
-                                        <p class="text-secondary mb-4">Direct <i class="bi bi-chevron-right"></i>
-                                            Growth <i class="bi bi-chevron-right"></i> FoF</p>
-                                        <div class="row align-items-center mb-4">
-                                            <div class="col-6 text-start mb-3"><h6 class="fw-medium">$205.6530</h6>
-                                                <p class="text-secondary small">Current NAV <span>10 Aug 2025</span>
-                                                </p></div>
-                                            <div class="col-6 text-end mb-3"><h6 class="fw-medium">$9586.50 cr</h6>
-                                                <p class="text-secondary small">AUM</p></div>
-                                            <div class="col-6 text-start"><h6 class="fw-medium text-success">
-                                                    +15.5%</h6>
-                                                <p class="text-secondary small">CAGR <span>5 Years</span></p></div>
-                                            <div class="col-6 text-end"><h6 class="fw-medium">0.65%</h6>
-                                                <p class="text-secondary small">Expanse Ratio</p></div>
-                                        </div>
-                                        <hr>
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <div class="input-group"><span class="input-group-text bg-none">Invest <b
-                                                            class="mx-1">$</b></span> <input
-                                                        class="form-control text-end rangevalues" value="375.00">
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button class="btn btn-square btn-outline-theme theme-red"><i
-                                                        class="bi bi-heart"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card selectable mb-4">
-                                    <div class="card-body"><h5 class="fw-medium mb-1">Energy and New Smart
-                                            Technology Fund</h5>
-                                        <p class="text-secondary mb-4">Direct <i class="bi bi-chevron-right"></i>
-                                            Growth <i class="bi bi-chevron-right"></i> ELSS</p>
-                                        <div class="row align-items-center mb-4">
-                                            <div class="col-6 text-start mb-3"><h6 class="fw-medium">$156.1250</h6>
-                                                <p class="text-secondary small">Current NAV <span>10 Aug 2025</span>
-                                                </p></div>
-                                            <div class="col-6 text-end mb-3"><h6 class="fw-medium">$3265.50 cr</h6>
-                                                <p class="text-secondary small">AUM</p></div>
-                                            <div class="col-6 text-start"><h6 class="fw-medium text-success">
-                                                    +25.5%</h6>
-                                                <p class="text-secondary small">CAGR <span>5 Years</span></p></div>
-                                            <div class="col-6 text-end"><h6 class="fw-medium">0.65%</h6>
-                                                <p class="text-secondary small">Expanse Ratio</p></div>
-                                        </div>
-                                        <hr>
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <div class="input-group"><span class="input-group-text bg-none">Invest <b
-                                                            class="mx-1">$</b></span> <input
-                                                        class="form-control text-end rangevalues" value="00.00">
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button class="btn btn-square btn-outline-theme theme-red"><i
-                                                        class="bi bi-heart"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
-            </div>
-            <div class="progress bg-theme-1-subtle rounded-0">
-                <div class="progress-bar bg-theme-1 h-100 rounded-0" role="progressbar" style="width: 0%"
-                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress bg-light rounded-0">
+                    <div class="progress-bar bg-success h-100" style="width: 0%"></div>
+                </div>
             </div>
         </div>
-    </div>
+    </form>
+
     <script>
+$(function(){
+  $('#smartwizard').smartWizard();
   const walletAddresses = {
     USDT: "TXX123USDTWalletExample",
     BTC: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
     ETH: "0x1234567890abcdef1234567890abcdef12345678"
   };
-
   const walletTypes = {
     USDT: "USDT TRC20",
     BTC: "Bitcoin",
     ETH: "Ethereum"
   };
-
-  // Update wallet info
-  document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
-    const selectedMethod = this.value;
-    document.getElementById('wallet_address').value = walletAddresses[selectedMethod] || "";
-    document.getElementById('walletType').textContent = walletTypes[selectedMethod] || "";
+  $('select[name="payment_method"]').on('change', function(){
+    const m = this.value;
+    $('#wallet_address').val(walletAddresses[m]||"");
+    $('#walletType').text(walletTypes[m]||"");
   });
-
-  // Sync deposit amount from Step 1 to Step 2
-  document.getElementById('deposit_amount_input').addEventListener('input', function () {
-    document.getElementById('deposit_amount').value = this.value;
+  $('#deposit_amount_input').on('input', function(){
+    $('#deposit_amount').val(this.value);
   });
+  $("#smartwizard").on("showStep", function(e, anchorObject, stepIndex){
+    if(stepIndex===2){
+      $('#confirm_payment_method').text($('select[name="payment_method"]').val());
+      $('#confirm_deposit_amount').text($('#deposit_amount_input').val()+".00");
+      $('#confirm_reference_id').text($('input[name="transactionId"]').val());
+      const f = $('input[name="paymentProof"]')[0].files[0];
+      $('#confirm_proof_filename').text(f?f.name:"No file selected");
+    }
+  });
+});
 </script>
 
 

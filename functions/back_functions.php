@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/transactions.fn.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/transactions.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/deposit.php';
 
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
