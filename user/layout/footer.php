@@ -179,7 +179,7 @@
                             class="bi bi-bounding-box h5"></i></span></div>
             </div>
         </div>
-        <div class="text-center mb-4"><a href="investment-personalization.html" class="btn btn-sm btn-outline-theme">More
+        <div class="text-center mb-4"><a href="javascript:void(0);" class="btn btn-sm btn-outline-theme">More
                 options <i class="bi bi-arrow-right-short"></i></a></div>
     </div>
 </div>
