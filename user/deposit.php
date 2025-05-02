@@ -8,9 +8,48 @@ $page_name = 'Deposit';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
+
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+
+    $pm   = mysqli_real_escape_string($conn_back,$_POST['payment_method']??'');
+    $amt  = floatval($_POST['deposit_amount']??0);
+    $addr = mysqli_real_escape_string($conn_back,$_POST['wallet_address']??'');
+    $txid = mysqli_real_escape_string($conn_back,$_POST['tx_id']??'');
+    $curr = mysqli_real_escape_string($conn_back,$user_currency);
+
+    /* upload proof */
+    $proof_path='';
+    if(!empty($_FILES['paymentProof']['name'])){
+        $dir='uploads/proofs/';
+        if(!is_dir($dir)) mkdir($dir,0777,true);
+        $fname=uniqid('proof_').basename($_FILES['paymentProof']['name']);
+        move_uploaded_file($_FILES['paymentProof']['tmp_name'],$dir.$fname);
+        $proof_path=$dir.$fname;
+    }
+
+    /* insert deposit_requests ― ID column MUST be AUTO_INCREMENT */
+    mysqli_query($conn_back,"INSERT INTO deposit_requests
+        (user_id,payment_method,amount,currency,reference_id,payment_proof,status,created_at)
+        VALUES
+        ($user_id,'$pm',$amt,'$curr','$txid','$proof_path','pending',NOW())");
+
+    if(mysqli_affected_rows($conn_back)){
+        /* mirror into transactions */
+        $trx_id = uniqid('trx_');
+        $now    = date('Y-m-d H:i:s');
+        mysqli_query($conn_back,"INSERT INTO transactions
+            (transaction_id,transaction_type,reference_id,amount,currency,status,date_time,description,from_address,to_address,fee,user_id)
+            VALUES
+            ('$trx_id','deposit','$txid',$amt,'$curr','pending','$now',
+             'User deposit via $pm','$addr','Platform Wallet',0,$user_id)");
+
+        header('Location: success.php?msg=deposit_pending'); exit;
+    }
+    header('Location: error.php?msg=deposit_failed'); exit;
+}
 ?>
 
-
+    <form id="depositForm" action="" method="post" enctype="multipart/form-data">
     <div class="container mt-4" id="main-content">
         <div class="card adminuiux-card overflow-hidden mb-4" id="smartwizard">
             <ul class="nav">
@@ -131,168 +170,51 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                         </div>
                     </div>
                     <div id="step-3" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-3">
-                        <div class="row">
-                            <div class="col-12 col-md-6">
-                                <div class="card text-center mb-4">
-                                    <div class="card-header"><h5>Goal: Sweet Home</h5>
-                                        <p class="text-secondary">Choose your investment plan</p></div>
-                                    <div class="card-body"><h4>$ 22500.00</h4>
-                                        <p class="text-secondary mb-4">Targeted Goal Amount</p>
-                                        <div class="card adminuiux-card bg-theme-1-subtle theme-green">
-                                            <div class="card-body"><h4>$ 750.00</h4>
-                                                <p class="opacity-75">You will need to save per month</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <div class="card adminuiux-card mb-4">
+                        <div class="row my-2">
+
+                            <!-- summary -->
+                            <div class="col-12 col-md-6 mb-4">
+                                <div class="card bg-theme-1-subtle theme-green h-100 selectable">
                                     <div class="card-body">
-                                        <div class="mb-3">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-sm mb-3"><p>Targeted Amount</p></div>
-                                                <div class="col-12 col-sm-5 mb-3">
-                                                    <div class="input-group"><span class="input-group-text bg-none">$</span>
-                                                        <input class="form-control text-end rangevalues"
-                                                               value="22500.00" id="value1"></div>
-                                                </div>
-                                            </div>
-                                            <input type="range" id="range1" class="range1 rangevalue" min="100"
-                                                   max="150000" value="22500.00" data-value="value1"></div>
-                                        <div class="mb-3">
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-sm mb-3"><p>Expected goal duration</p></div>
-                                                <div class="col-12 col-sm-5 mb-3">
-                                                    <div class="input-group"><span class="input-group-text bg-none">Months</span>
-                                                        <input class="form-control text-end rangevalues" value="24"
-                                                               id="value2"></div>
-                                                </div>
-                                            </div>
-                                            <input type="range" id="range2" class="range1 rangevalue" min="1"
-                                                   max="60" step="1" value="24" data-value="value2"></div>
-                                        <div>
-                                            <div class="row align-items-center">
-                                                <div class="col-12 col-sm mb-3"><p>Time period in Year</p></div>
-                                                <div class="col-12 col-sm-5 mb-3">
-                                                    <div class="input-group"><span class="input-group-text bg-none">$</span>
-                                                        <input class="form-control text-end rangevalues"
-                                                               value="1000" id="value3"></div>
-                                                </div>
-                                            </div>
-                                            <input type="range" id="range3" class="range1 rangevalue" min="500"
-                                                   max="20000" step="500" value="1000" data-value="value3"></div>
+                                        <h5 class="mb-4">Confirm Deposit Details</h5>
+                                        <ul class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Payment&nbsp;Method</span><span id="c_pm"></span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Amount</span><span id="c_amt"></span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Wallet&nbsp;Address</span><span id="c_addr" class="text-break"></span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Tx&nbsp;ID/Ref</span><span id="c_tx"></span>
+                                            </li>
+                                        </ul>
+
+                                        <!-- hidden fields posted to PHP -->
+                                        <input type="hidden" name="payment_method"  id="h_pm">
+                                        <input type="hidden" name="deposit_amount"  id="h_amt">
+                                        <input type="hidden" name="wallet_address"  id="h_addr">
+                                        <input type="hidden" name="tx_id"           id="h_tx">
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <br><h5 class="text-center">Choose funds for your plan from suggestion</h5>
-                        <p class="text-secondary text-center mb-4">You can select any one or multiple and in each
-                            total amount should be of $ 750.00/month.</p>
-                        <div class="row">
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card selectable active mb-4">
-                                    <div class="card-body"><h5 class="fw-medium mb-1">JACKY New age EV and
-                                            automotive Fund</h5>
-                                        <p class="text-secondary mb-4">Direct <i class="bi bi-chevron-right"></i>
-                                            Growth <i class="bi bi-chevron-right"></i> Thematic</p>
-                                        <div class="row align-items-center mb-4">
-                                            <div class="col-6 text-start mb-3"><h6 class="fw-medium">$150.1250</h6>
-                                                <p class="text-secondary small">Current NAV <span>10 Aug 2025</span>
-                                                </p></div>
-                                            <div class="col-6 text-end mb-3"><h6 class="fw-medium">$2426.50 cr</h6>
-                                                <p class="text-secondary small">AUM</p></div>
-                                            <div class="col-6 text-start"><h6 class="fw-medium text-success">
-                                                    +32.5%</h6>
-                                                <p class="text-secondary small">CAGR <span>5 Years</span></p></div>
-                                            <div class="col-6 text-end"><h6 class="fw-medium">0.79%</h6>
-                                                <p class="text-secondary small">Expanse Ratio</p></div>
-                                        </div>
-                                        <hr>
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <div class="input-group"><span class="input-group-text bg-none">Invest <b
-                                                            class="mx-1">$</b></span> <input
-                                                        class="form-control text-end rangevalues" value="375.00">
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button class="btn btn-square btn-outline-theme theme-red"><i
-                                                        class="bi bi-heart"></i></button>
-                                            </div>
-                                        </div>
+
+                            <!-- proof + submit -->
+                            <div class="col-12 col-md-6 mb-4">
+                                <div class="card h-100 selectable">
+                                    <div class="card-body text-center">
+                                        <h5 class="mb-4">Proof of Payment</h5>
+                                        <img id="proof_preview" class="img-fluid border mb-3" style="max-height:240px" alt="">
+                                        <button type="submit" class="btn btn-theme-1 w-100">Submit Deposit</button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card selectable active mb-4">
-                                    <div class="card-body"><h5 class="fw-medium mb-1">OrganicX Agriculture and
-                                            innovation Fund</h5>
-                                        <p class="text-secondary mb-4">Direct <i class="bi bi-chevron-right"></i>
-                                            Growth <i class="bi bi-chevron-right"></i> FoF</p>
-                                        <div class="row align-items-center mb-4">
-                                            <div class="col-6 text-start mb-3"><h6 class="fw-medium">$205.6530</h6>
-                                                <p class="text-secondary small">Current NAV <span>10 Aug 2025</span>
-                                                </p></div>
-                                            <div class="col-6 text-end mb-3"><h6 class="fw-medium">$9586.50 cr</h6>
-                                                <p class="text-secondary small">AUM</p></div>
-                                            <div class="col-6 text-start"><h6 class="fw-medium text-success">
-                                                    +15.5%</h6>
-                                                <p class="text-secondary small">CAGR <span>5 Years</span></p></div>
-                                            <div class="col-6 text-end"><h6 class="fw-medium">0.65%</h6>
-                                                <p class="text-secondary small">Expanse Ratio</p></div>
-                                        </div>
-                                        <hr>
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <div class="input-group"><span class="input-group-text bg-none">Invest <b
-                                                            class="mx-1">$</b></span> <input
-                                                        class="form-control text-end rangevalues" value="375.00">
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button class="btn btn-square btn-outline-theme theme-red"><i
-                                                        class="bi bi-heart"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card selectable mb-4">
-                                    <div class="card-body"><h5 class="fw-medium mb-1">Energy and New Smart
-                                            Technology Fund</h5>
-                                        <p class="text-secondary mb-4">Direct <i class="bi bi-chevron-right"></i>
-                                            Growth <i class="bi bi-chevron-right"></i> ELSS</p>
-                                        <div class="row align-items-center mb-4">
-                                            <div class="col-6 text-start mb-3"><h6 class="fw-medium">$156.1250</h6>
-                                                <p class="text-secondary small">Current NAV <span>10 Aug 2025</span>
-                                                </p></div>
-                                            <div class="col-6 text-end mb-3"><h6 class="fw-medium">$3265.50 cr</h6>
-                                                <p class="text-secondary small">AUM</p></div>
-                                            <div class="col-6 text-start"><h6 class="fw-medium text-success">
-                                                    +25.5%</h6>
-                                                <p class="text-secondary small">CAGR <span>5 Years</span></p></div>
-                                            <div class="col-6 text-end"><h6 class="fw-medium">0.65%</h6>
-                                                <p class="text-secondary small">Expanse Ratio</p></div>
-                                        </div>
-                                        <hr>
-                                        <div class="row align-items-center">
-                                            <div class="col">
-                                                <div class="input-group"><span class="input-group-text bg-none">Invest <b
-                                                            class="mx-1">$</b></span> <input
-                                                        class="form-control text-end rangevalues" value="00.00">
-                                                </div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <button class="btn btn-square btn-outline-theme theme-red"><i
-                                                        class="bi bi-heart"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                     </div>
+                    <!-- /STEP-3 -->
                 </div>
             </div>
             <div class="progress bg-theme-1-subtle rounded-0">
@@ -301,30 +223,56 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
             </div>
         </div>
     </div>
+    </form>
+
+    <!-- ───────────────  SCRIPT  ─────────────── -->
     <script>
-  const walletAddresses = {
-    USDT: "TXX123USDTWalletExample",
-    BTC: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-    ETH: "0x1234567890abcdef1234567890abcdef12345678"
-  };
+/* wallet lookup used in step-1 & 2 (already present in your page) */
+const walletAddresses={USDT:"TXX123USDTWalletExample",BTC:"1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",ETH:"0x1234567890abcdef1234567890abcdef12345678"};
+const walletTypes={USDT:"USDT TRC20",BTC:"Bitcoin",ETH:"Ethereum"};
 
-  const walletTypes = {
-    USDT: "USDT TRC20",
-    BTC: "Bitcoin",
-    ETH: "Ethereum"
-  };
+document.querySelector('select[name="payment_method"]').addEventListener('change',e=>{
+  const v=e.target.value;
+  document.getElementById('wallet_address').value=walletAddresses[v]||"";
+  document.getElementById('walletType').textContent=walletTypes[v]||"";
+});
 
-  // Update wallet info
-  document.querySelector('select[name="payment_method"]').addEventListener('change', function () {
-    const selectedMethod = this.value;
-    document.getElementById('wallet_address').value = walletAddresses[selectedMethod] || "";
-    document.getElementById('walletType').textContent = walletTypes[selectedMethod] || "";
-  });
+/* sync amount (step-1 ➜ step-2) */
+document.getElementById('deposit_amount_input').addEventListener('input',e=>{
+  document.getElementById('deposit_amount').value=e.target.value;
+});
 
-  // Sync deposit amount from Step 1 to Step 2
-  document.getElementById('deposit_amount_input').addEventListener('input', function () {
-    document.getElementById('deposit_amount').value = this.value;
-  });
+/* preview proof */
+document.querySelector('[name="paymentProof"]').addEventListener('change',e=>{
+  const f=e.target.files[0];
+  if(f) document.getElementById('proof_preview').src=URL.createObjectURL(f);
+});
+
+/* ── PUSH DATA INTO STEP-3 WHEN IT IS SHOWN ────────── */
+function fillConfirm(){
+  const pm  = document.querySelector('select[name="payment_method"]').value;
+  const amt = document.getElementById('deposit_amount_input').value;
+  const addr= document.getElementById('wallet_address').value;
+  const tx  = document.querySelector('[name="transactionId"]').value;
+
+  /* text */
+  document.getElementById('c_pm').textContent  = pm;
+  document.getElementById('c_amt').textContent = amt;
+  document.getElementById('c_addr').textContent= addr;
+  document.getElementById('c_tx').textContent  = tx;
+
+  /* hidden */
+  document.getElementById('h_pm').value  = pm;
+  document.getElementById('h_amt').value = amt;
+  document.getElementById('h_addr').value= addr;
+  document.getElementById('h_tx').value  = tx;
+}
+
+/*  SmartWizard: call fillConfirm when step-3 opens  */
+document.addEventListener('DOMContentLoaded',()=>{
+  const step3Link=document.querySelector('a[href="#step-3"]');
+  step3Link.addEventListener('shown.bs.tab',fillConfirm);   /* bootstrap tab event */
+});
 </script>
 
 
