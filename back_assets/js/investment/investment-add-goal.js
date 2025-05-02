@@ -42,26 +42,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // when the "Start Investment" link is clicked, submit the form
 /* run after DOM is ready */
-document.addEventListener('DOMContentLoaded', () => {
-  const saveBtn    = document.querySelector('.save-deposit');      // the proxy button
-  const submitBtn  = document.querySelector('#submitDepositBtn');  // the hidden/real submit
-  const form       = document.getElementById('depositForm');       // your form
-
-  if (!saveBtn || !submitBtn || !form) return;   // silent fail if markup is missing
-
-  saveBtn.addEventListener('click', e => {
-    e.preventDefault();
-
-    /* 1️⃣ preferred: ask the form itself to submit (works even if the button is hidden) */
-    if (form.requestSubmit) {
-      form.requestSubmit(submitBtn);     // modern browsers
-    } else {
-      /* 2️⃣ fallback for very old browsers */
-      submitBtn.click();                 // triggers the button’s native click
-    }
-  });
-});
-
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll(
