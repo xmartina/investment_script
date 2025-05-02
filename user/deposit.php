@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Handle file upload (proof of payment)
     $payment_proof = '';
     if (isset($_FILES['paymentProof']) && $_FILES['paymentProof']['error'] == 0) {
-        $payment_proof = __DIR__ . '/payment_proof/' . basename($_FILES['paymentProof']['name']);
+        $payment_proof = $_SERVER['DOCUMENT_ROOT'] . '/payment_proof/' . basename($_FILES['paymentProof']['name']);
         move_uploaded_file($_FILES['paymentProof']['tmp_name'], $payment_proof);
     }
 
