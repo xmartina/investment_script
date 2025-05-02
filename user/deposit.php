@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     /* upload proof */
     $proof_path='';
     if(!empty($_FILES['paymentProof']['name'])){
-        $dir= $_SERVER['DOCUMENT_ROOT'] . '/back_assets/img/users/payment_proof/';
+        $dir= '/back_assets/img/users/payment_proof/';
         if(!is_dir($dir)) mkdir($dir,0777,true);
         $fname=uniqid('proof_').basename($_FILES['paymentProof']['name']);
         move_uploaded_file($_FILES['paymentProof']['tmp_name'],$dir.$fname);

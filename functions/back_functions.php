@@ -230,14 +230,17 @@ if (isset($user_id)) {
     $total_profit = abbreviate_number($returns_amount + $returns_stakes_amount);
     $total_investments = abbreviate_number($amount_invested + $amount_stakes_invested);
 
-function generateUniqueString($length) {
-    // Generate a unique ID and clean it to be alphanumeric
-    $uniqueString = uniqid("", true);
-    $uniqueString = preg_replace("/[^A-Za-z0-9]/", "", $uniqueString);
+    function generateUniqueString($length) {
+        // Generate a unique ID and clean it to be alphanumeric
+        $uniqueString = uniqid("", true);
+        $uniqueString = preg_replace("/[^A-Za-z0-9]/", "", $uniqueString);
 
-    // Return the string with the desired length
-    return substr($uniqueString, 0, $length);
-}
+        // Shuffle the string to randomize the order of characters
+        $shuffledString = str_shuffle($uniqueString);
+
+        // Return the string with the desired length
+        return substr($shuffledString, 0, $length);
+    }
 
 // Generate a random alphanumeric string with 9 characters
 $randomString = generateUniqueString(9);
