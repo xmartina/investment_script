@@ -77,6 +77,9 @@ post('/register', function() {
 post('/user/dashboard', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/dashboard.php';
 });
+post('/user/deposit', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/deposit.php';
+});
 post('/user/settings', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/settings.php';
 });
