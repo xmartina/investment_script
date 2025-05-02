@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-include_once 'db.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/db.php';
 
 //frontend config
 $sql_front = "SELECT * FROM general_settings";
