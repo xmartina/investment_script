@@ -29,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $deposit_request_id = mysqli_insert_id($conn_back);
 
         // Insert into transactions table
-        $insert_transaction_query = "INSERT INTO transactions (transaction_id, transaction_type, reference_id, transaction_proof_id, amount, currency, status, date_time, from_address, to_address, user_id, deposit_request_id) 
-                                      VALUES ('$transaction_id', 'deposit', '$transaction_id', '$payment_proof', '$deposit_amount', 'USD', 'pending', NOW(), NULL, '$wallet_address', '$user_id', '$deposit_request_id')";
+        $insert_transaction_query = "INSERT INTO transactions (transaction_type, reference_id, transaction_proof_id, amount, currency, status, date_time, from_address, to_address, user_id, deposit_request_id) 
+                                      VALUES ('deposit', '$transaction_id', '$payment_proof', '$deposit_amount', 'USD', 'pending', NOW(), NULL, '$wallet_address', '$user_id', '$deposit_request_id')";
 
         if (mysqli_query($conn_back, $insert_transaction_query)) {
             echo "Deposit submitted successfully!";
