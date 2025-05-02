@@ -4,7 +4,8 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
     exit;
 }
-
+$page_name = 'Deposit';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 if ($_SERVER['REQUEST_METHOD']==='POST') {
 
     $pm   = mysqli_real_escape_string($conn_back,$_POST['payment_method']??'');
@@ -54,9 +55,6 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     <?php
     exit;
 }
-
-$page_name = 'Deposit';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 
