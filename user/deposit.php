@@ -8,15 +8,15 @@ $page_name = 'Deposit';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Retrieve the form data
-    $payment_method = mysqli_real_escape_string($conn_front, $_POST['payment_method']);
-    $deposit_amount = mysqli_real_escape_string($conn_front, $_POST['deposit_amount']);
-    $transaction_id = mysqli_real_escape_string($conn_front, $_POST['transactionId']);
-    $wallet_address = mysqli_real_escape_string($conn_front, $_POST['wallet_address']);
+    $payment_method = mysqli_real_escape_string($conn_back, $_POST['payment_method']);
+    $deposit_amount = mysqli_real_escape_string($conn_back, $_POST['deposit_amount']);
+    $transaction_id = mysqli_real_escape_string($conn_back, $_POST['transactionId']);
+    $wallet_address = mysqli_real_escape_string($conn_back, $_POST['wallet_address']);
 
     // Handle file upload (proof of payment)
     $payment_proof = '';
     if (isset($_FILES['paymentProof']) && $_FILES['paymentProof']['error'] == 0) {
-        $payment_proof = '/payment_proof/' . basename($_FILES['paymentProof']['name']);
+        $payment_proof = '../payment_proof/' . basename($_FILES['paymentProof']['name']);
         move_uploaded_file($_FILES['paymentProof']['tmp_name'], $payment_proof);
     }
 
@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $insert_deposit_query = "INSERT INTO deposit_requests (user_id, payment_method, amount, currency, reference_id, transaction_proof_id, payment_proof, status) 
                              VALUES ('$user_id', '$payment_method', '$deposit_amount', 'USD', '$transaction_id', '$payment_proof', '$payment_proof', 'pending')";
 
-    if (mysqli_query($conn_front, $insert_deposit_query)) {
+    if (mysqli_query($conn_back, $insert_deposit_query)) {
         // Get the last insert ID from deposit_requests table to link in transactions table
-        $deposit_request_id = mysqli_insert_id($conn_front);
+        $deposit_request_id = mysqli_insert_id($conn_back);
 
         // Insert into transactions table
         $insert_transaction_query = "INSERT INTO transactions (transaction_id, transaction_type, reference_id, transaction_proof_id, amount, currency, status, date_time, from_address, to_address, user_id, deposit_request_id) 
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "Error inserting transaction: " . mysqli_error($conn_back);
         }
     } else {
-        echo "Error inserting deposit request: " . mysqli_error($conn_front);
+        echo "Error inserting deposit request: " . mysqli_error($conn_back);
     }
 }
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
