@@ -189,3 +189,10 @@ if ($page_name = 'Deposit'){
     ?>
     <script src="<?= $site_link ?>/back_assets/js/investment/investment-add-goal.js"></script>
 <?php } ?>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll(
+    '.btn-outline-accent.float-start, .btn-theme.finish-btn'
+  ).forEach(el => el.style.display = 'none');
+});
+</script>
