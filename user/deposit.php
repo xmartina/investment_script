@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
                                     <div class="card-body text-center">
                                         <h5 class="mb-4">Proof of Payment</h5>
                                         <img id="proof_preview" class="img-fluid border mb-3" style="max-height:240px" alt="">
-                                        <button id="submitDepositBtn" type="submit" class="btn btn-theme-1 w-100 finish-btn">Submit Deposit</button>
+                                        <button id="submitDepositBtn" type="submit" class="btn btn-theme w-100 finish-btn">Submit Deposit</button>
                                     </div>
                                 </div>
                             </div>
