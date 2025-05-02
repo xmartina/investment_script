@@ -247,7 +247,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
                         </div>
                     </div>
                 </div>
-                <?php TransactionsCard($conn_back) ?>
+                <?php TransactionsCard($conn_back, $user_id) ?>
             </div>
         </div>
 

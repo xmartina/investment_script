@@ -14,7 +14,7 @@
 
 //Cards
 
-function TransactionsCard($conn_back) {
+function TransactionsCard($conn_back, $user_id) {
     // Utility functions
     function selectTransactionsByUserIdPaginated($conn_back, $user_id, $offset, $per_page) {
         $stmt = $conn_back->prepare("
