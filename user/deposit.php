@@ -17,14 +17,14 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $txid = mysqli_real_escape_string($conn_back,$_POST['tx_id']??'');
     $curr = mysqli_real_escape_string($conn_back,$user_currency);
 
-    $txid = generateUniqueStrings(9);
+    $txid = generateUniqueString(9);
 
 // Output the generated strings
 
     /* upload proof */
     $proof_path='';
     if(!empty($_FILES['paymentProof']['name'])){
-        $dir= $siteLink . '/back_assets/img/users/payment_proof/';
+        $dir= '/back_assets/img/users/payment_proof/';
         if(!is_dir($dir)) mkdir($dir,0777,true);
         $fname=uniqid('proof_').basename($_FILES['paymentProof']['name']);
         move_uploaded_file($_FILES['paymentProof']['tmp_name'],$dir.$fname);
