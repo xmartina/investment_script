@@ -14,7 +14,6 @@
 
 //Cards
 
-<?php
 function TransactionsCard($conn_back) {
     // Utility functions
     function selectTransactionsByUserIdPaginated($conn_back, $user_id, $offset, $per_page) {
