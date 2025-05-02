@@ -8,12 +8,66 @@ $page_name = 'Deposit';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id      = intval($_SESSION['user_id']);
+    $method       = mysqli_real_escape_string($conn_back, $_POST['payment_method'] ?? '');
+    $amount       = floatval($_POST['deposit_amount'] ?? 0);
+    $currency     = mysqli_real_escape_string($conn_back, $_POST['currency'] ?? '');
+    $reference_id = mysqli_real_escape_string($conn_back, $_POST['transactionId'] ?? '');
+    $wallet_addr  = mysqli_real_escape_string($conn_back, $_POST['wallet_address'] ?? '');
+
+    // upload proof if provided
+    $proof_path = '';
+    if (!empty($_FILES['paymentProof']['name']) && $_FILES['paymentProof']['error'] === UPLOAD_ERR_OK) {
+        $ext       = pathinfo($_FILES['paymentProof']['name'], PATHINFO_EXTENSION);
+        $name      = uniqid('proof_') . ".$ext";
+        $uploadDir = __DIR__ . '/uploads/payment_proofs/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        move_uploaded_file($_FILES['paymentProof']['tmp_name'], $uploadDir . $name);
+        $proof_path = 'uploads/payment_proofs/' . $name;
+    }
+
+    mysqli_begin_transaction($conn_back);
+
+    $sql1 = "
+      INSERT INTO deposit_requests
+        (user_id, payment_method, amount, currency, reference_id, payment_proof, status)
+      VALUES
+        ($user_id, '$method', $amount, '$currency', '$reference_id', '$proof_path', 'pending')
+    ";
+    if (!mysqli_query($conn_back, $sql1)) {
+        mysqli_rollback($conn_back);
+        die("Error inserting deposit request: " . mysqli_error($conn_back));
+    }
+    $deposit_id = mysqli_insert_id($conn_back);
+
+    $txn_id      = 'txn_' . uniqid();
+    $description = 'User deposit request';
+    $sql2 = "
+      INSERT INTO transactions
+        (transaction_id, transaction_type, reference_id, amount, currency,
+         status, date_time, description, to_address, user_id, deposit_request_id)
+      VALUES
+        ('$txn_id', 'deposit', '$reference_id', $amount, '$currency',
+         'pending', NOW(), '$description', '$wallet_addr', $user_id, $deposit_id)
+    ";
+    if (!mysqli_query($conn_back, $sql2)) {
+        mysqli_rollback($conn_back);
+        die("Error inserting transaction: " . mysqli_error($conn_back));
+    }
+
+    mysqli_commit($conn_back);
+
+    header("Location: success.php?msg=deposit_pending");
+    exit;
+}
 ?>
 
 
-    <form id="depositForm" action="deposit_submit.php" method="post" enctype="multipart/form-data">
+    <form id="depositForm" method="post" enctype="multipart/form-data">
         <input type="hidden" name="currency" value="<?php echo htmlspecialchars($user_currency); ?>">
-        <div class="container mt-4" id="main-content">
+        <div class="container mt-4">
             <div class="card overflow-hidden mb-4" id="smartwizard">
                 <ul class="nav">
                     <li class="nav-item"><a class="nav-link" href="#step-1"><div class="num">1</div><div><p class="h5 mb-0">Deposit Setup</p><p class="small">Deposit Information</p></div></a></li>
@@ -27,7 +81,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                         <div id="step-1" class="tab-pane px-0" role="tabpanel">
                             <div class="row my-2">
                                 <div class="col-md-6 mb-4">
-                                    <div class="card text-center bg-light h-100 selectable">
+                                    <div class="card text-center bg-light h-100">
                                         <div class="card-body">
                                             <label class="form-label">Select Payment Method</label>
                                             <select name="payment_method" class="form-select">
@@ -40,7 +94,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    <div class="card text-center bg-light h-100 selectable">
+                                    <div class="card text-center bg-light h-100">
                                         <div class="card-body">
                                             <label class="form-label">Enter Deposit Amount</label>
                                             <div class="input-group">
@@ -58,7 +112,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                         <div id="step-2" class="tab-pane px-0 pb-0" role="tabpanel">
                             <div class="row my-2">
                                 <div class="col-12 mb-4">
-                                    <div class="card bg-light h-100 selectable">
+                                    <div class="card bg-light h-100">
                                         <div class="card-body">
                                             <div class="alert alert-warning">Use the wallet address below to make payment</div>
                                             <div class="row">
@@ -70,30 +124,28 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    <div class="card h-100 selectable">
+                                    <div class="card h-100">
                                         <div class="card-body">
-                                            <div class="list-group">
-                                                <div class="row">
-                                                    <div class="col-md-5"><span class="list-group-item-light">Deposit Amount</span></div>
-                                                    <div class="col-md-7">
-                                                        <div class="input-group">
-                                                            <span class="input-group-text"><?php echo htmlspecialchars($user_currency); ?></span>
-                                                            <input id="deposit_amount" class="form-control" readonly>
-                                                            <span class="input-group-text">.00</span>
-                                                        </div>
+                                            <div class="row">
+                                                <div class="col-md-5"><span class="list-group-item-light">Deposit Amount</span></div>
+                                                <div class="col-md-7">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><?php echo htmlspecialchars($user_currency); ?></span>
+                                                        <input id="deposit_amount" class="form-control" readonly>
+                                                        <span class="input-group-text">.00</span>
                                                     </div>
                                                 </div>
-                                                <div class="alert alert-warning mt-2">Make exactly the amount above to the address provided</div>
                                             </div>
+                                            <div class="alert alert-warning mt-2">Make exactly the amount above to the address provided</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    <div class="card h-100 selectable">
+                                    <div class="card h-100">
                                         <div class="card-body">
                                             <label class="form-label">Enter Transaction ID/Reference</label>
-                                            <input type="text" class="form-control" name="transactionId" placeholder="ID/REF1235">
-                                            <label class="form-label mt-3">Upload Proof of Payment</label>
+                                            <input type="text" class="form-control mb-3" name="transactionId" placeholder="ID/REF1235">
+                                            <label class="form-label">Upload Proof of Payment</label>
                                             <input class="form-control" type="file" name="paymentProof">
                                         </div>
                                     </div>
@@ -129,7 +181,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                     </div>
                                 </div>
                             </div>
-                            <div class="text-center">
+                            <div class="text-center mb-4">
                                 <button type="submit" class="btn btn-success">Confirm Deposit</button>
                             </div>
                         </div>
