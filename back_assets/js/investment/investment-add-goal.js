@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
           Dashboard
         </a>
        <a
-         class="btn btn-theme finish-btn"
+         class="btn btn-theme save-deposit finish-btn"
          style="display: none"
        >
          Save Deposit
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // when the "Start Investment" link is clicked, submit the form
-document.querySelector('.finish-btn').addEventListener('click', function(e) {
+document.querySelector('.save-deposit').addEventListener('click', function(e) {
   e.preventDefault();
   // replace '#yourFormId' with the actual ID of your form
   document.querySelector('#yourFormId').submit();
