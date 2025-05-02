@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function() {
   ) {
     if (stepPosition === "last") {
       // if we're on the last step, reveal the "Start Investment" button
-      $(".finish-btn").show();
+      $(".finish-btn").hide();
     } else {
       // otherwise, hide it
       $(".finish-btn").hide();
