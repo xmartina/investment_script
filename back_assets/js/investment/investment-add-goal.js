@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
 document.querySelector('.save-deposit').addEventListener('click', function(e) {
   e.preventDefault();
   // replace '#yourFormId' with the actual ID of your form
-  document.querySelector('#depositForm').submit();
+  document.querySelector('#submitDepositBtn').click();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
