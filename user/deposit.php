@@ -227,52 +227,68 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 
     <!-- ───────────────  SCRIPT  ─────────────── -->
     <script>
-/* wallet lookup used in step-1 & 2 (already present in your page) */
-const walletAddresses={USDT:"TXX123USDTWalletExample",BTC:"1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",ETH:"0x1234567890abcdef1234567890abcdef12345678"};
-const walletTypes={USDT:"USDT TRC20",BTC:"Bitcoin",ETH:"Ethereum"};
+/* ---------------- CONSTANT MAPS ---------------- */
+const walletAddresses = {
+    USDT: "TXX123USDTWalletExample",
+    BTC : "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    ETH : "0x1234567890abcdef1234567890abcdef12345678"
+};
+const walletTypes = {
+    USDT: "USDT TRC-20",
+    BTC : "Bitcoin",
+    ETH : "Ethereum"
+};
 
-document.querySelector('select[name="payment_method"]').addEventListener('change',e=>{
-  const v=e.target.value;
-  document.getElementById('wallet_address').value=walletAddresses[v]||"";
-  document.getElementById('walletType').textContent=walletTypes[v]||"";
+/* ---------------- STEP-1 → STEP-2 SYNC ---------------- */
+document.querySelector('select[name="payment_method"]').addEventListener('change', e => {
+    const v = e.target.value;
+    document.getElementById('wallet_address').value  = walletAddresses[v] || '';
+    document.getElementById('walletType').textContent = walletTypes[v]   || '';
 });
 
-/* sync amount (step-1 ➜ step-2) */
-document.getElementById('deposit_amount_input').addEventListener('input',e=>{
-  document.getElementById('deposit_amount').value=e.target.value;
+document.getElementById('deposit_amount_input').addEventListener('input', e => {
+    document.getElementById('deposit_amount').value = e.target.value;
 });
 
-/* preview proof */
-document.querySelector('[name="paymentProof"]').addEventListener('change',e=>{
-  const f=e.target.files[0];
-  if(f) document.getElementById('proof_preview').src=URL.createObjectURL(f);
+/* ---------------- PROOF PREVIEW ---------------- */
+document.querySelector('[name="paymentProof"]').addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (f) document.getElementById('proof_preview').src = URL.createObjectURL(f);
 });
 
-/* ── PUSH DATA INTO STEP-3 WHEN IT IS SHOWN ────────── */
-function fillConfirm(){
-  const pm  = document.querySelector('select[name="payment_method"]').value;
-  const amt = document.getElementById('deposit_amount_input').value;
-  const addr= document.getElementById('wallet_address').value;
-  const tx  = document.querySelector('[name="transactionId"]').value;
+/* ---------------- STEP-3 POPULATION ---------------- */
+function fillConfirm() {
+    const pm   = document.querySelector('select[name="payment_method"]').value.trim();
+    const amt  = document.getElementById('deposit_amount_input').value.trim();
+    const addr = document.getElementById('wallet_address').value.trim();
+    const tx   = document.querySelector('[name="transactionId"]').value.trim();
 
-  /* text */
-  document.getElementById('c_pm').textContent  = pm;
-  document.getElementById('c_amt').textContent = amt;
-  document.getElementById('c_addr').textContent= addr;
-  document.getElementById('c_tx').textContent  = tx;
+    /* visible labels */
+    document.getElementById('c_pm').textContent   = pm   || '—';
+    document.getElementById('c_amt').textContent  = amt  || '—';
+    document.getElementById('c_addr').textContent = addr || '—';
+    document.getElementById('c_tx').textContent   = tx   || '—';
 
-  /* hidden */
-  document.getElementById('h_pm').value  = pm;
-  document.getElementById('h_amt').value = amt;
-  document.getElementById('h_addr').value= addr;
-  document.getElementById('h_tx').value  = tx;
+    /* hidden inputs posted to PHP */
+    document.getElementById('h_pm').value   = pm;
+    document.getElementById('h_amt').value  = amt;
+    document.getElementById('h_addr').value = addr;
+    document.getElementById('h_tx').value   = tx;
 }
 
-/*  SmartWizard: call fillConfirm when step-3 opens  */
-document.addEventListener('DOMContentLoaded',()=>{
-  const step3Link=document.querySelector('a[href="#step-3"]');
-  step3Link.addEventListener('shown.bs.tab',fillConfirm);   /* bootstrap tab event */
+/* ---------- TRIGGERS FOR STEP-3 ---------- */
+/* 1. Bootstrap/Simple nav link */
+const step3Link = document.querySelector('a[href="#step-3"]');
+if (step3Link) step3Link.addEventListener('click', fillConfirm);
+
+/* 2. SmartWizard event (if you use it) */
+document.getElementById('smartwizard')?.addEventListener('leaveStep', e => {
+    if (e.detail?.fromStep === 2 && e.detail.toStep === 3) fillConfirm();
 });
+
+/* 3. Final safety net: refresh just before submit */
+document.getElementById('depositForm').addEventListener('submit', fillConfirm);
+
 </script>
 
 
