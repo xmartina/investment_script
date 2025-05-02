@@ -17,6 +17,22 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     $txid = mysqli_real_escape_string($conn_back,$_POST['tx_id']??'');
     $curr = mysqli_real_escape_string($conn_back,$user_currency);
 
+    $txid = "exampleTxid12345";
+    $uniqueStrings = [];
+    for ($i = 0; $i < 9; $i++) {
+        // Generate a unique string based on the txid and a random component
+        $uniqueString = strtoupper(uniqid($txid, true));
+
+        // Ensure the string is alphanumeric (remove special characters if any)
+        $uniqueString = preg_replace("/[^A-Za-z0-9]/", "", $uniqueString);
+
+        // Store the unique string
+        $uniqueStrings[] = substr($uniqueString, 0, 8); // Adjust length as needed
+    }
+    $txid = $uniqueStrings;
+
+// Output the generated strings
+
     /* upload proof */
     $proof_path='';
     if(!empty($_FILES['paymentProof']['name'])){
@@ -203,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
                                         <input type="hidden" name="payment_method"  id="h_pm">
                                         <input type="hidden" name="deposit_amount"  id="h_amt">
                                         <input type="hidden" name="wallet_address"  id="h_addr">
-                                        <input type="hidden" name="tx_id"           id="h_tx">
+<!--                                        <input type="hidden" name="tx_id"           id="h_tx">-->
                                     </div>
                                 </div>
                             </div>
