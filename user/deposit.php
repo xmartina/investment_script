@@ -4,17 +4,13 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
     exit;
 }
-$page_name = 'Deposit';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
 
     $pm   = mysqli_real_escape_string($conn_back,$_POST['payment_method']??'');
     $amt  = floatval($_POST['deposit_amount']??0);
     $addr = mysqli_real_escape_string($conn_back,$_POST['wallet_address']??'');
-    $txid = mysqli_real_escape_string($conn_back,$_POST['tx_id']??'');
+    $txProofId = mysqli_real_escape_string($conn_back,$_POST['transactionId']??'');
     $curr = mysqli_real_escape_string($conn_back,$user_currency);
 
     $txid = generateUniqueString(9);
@@ -33,18 +29,18 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 
     /* insert deposit_requests ― ID column MUST be AUTO_INCREMENT */
     mysqli_query($conn_back,"INSERT INTO deposit_requests
-        (user_id,payment_method,amount,currency,reference_id,payment_proof,status,created_at)
+        (user_id,payment_method,amount,currency,reference_id,transaction_proof_id,payment_proof,status,created_at)
         VALUES
-        ($user_id,'$pm',$amt,'$curr','$txid','$proof_path','pending',NOW())");
+        ($user_id,'$pm',$amt,'$curr','$txid','$txProofId','$proof_path','pending',NOW())");
 
     if(mysqli_affected_rows($conn_back)){
         /* mirror into transactions */
         $trx_id = uniqid('trx_');
         $now    = date('Y-m-d H:i:s');
         mysqli_query($conn_back,"INSERT INTO transactions
-            (transaction_id,transaction_type,reference_id,amount,currency,status,date_time,description,from_address,to_address,fee,user_id)
+            (transaction_id,transaction_type,reference_id,reference_id,amount,currency,status,date_time,description,from_address,to_address,fee,user_id)
             VALUES
-            ('$trx_id','deposit','$txid',$amt,'$curr','pending','$now',
+            ('$trx_id','deposit','$txid','$txProofId',$amt,'$curr','pending','$now',
              'User deposit via $pm','$addr','Platform Wallet',0,$user_id)"); ?>
         <script>
             window.location.href = "<?=$siteLink?>/user/deposit?msg=deposit_pending";
@@ -58,6 +54,12 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     <?php
     exit;
 }
+
+$page_name = 'Deposit';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
+include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
+
 ?>
 
     <form id="depositForm" action="" method="post" enctype="multipart/form-data">
