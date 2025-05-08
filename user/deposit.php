@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES['paymentProof']['tmp_name'], $payment_proof);
     }
 
-    $reference_id = generateCode(10);
+    $reference_id = 'TRX_' . generateCode(3).'-'.generateCode(4).'-'.generateCode(3);
     // Insert into the deposit_requests table
     $insert_deposit_query = "INSERT INTO deposit_requests (
         user_id, 
