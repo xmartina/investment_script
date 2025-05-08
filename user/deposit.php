@@ -88,14 +88,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             '$deposit_request_id',
             'Deposit request'
         )";
-
         if (mysqli_query($conn_back, $insert_transaction_query)) {
-            echo "Deposit submitted successfully!";
+            header("Location: deposit.php?msg=Deposit_submitted_successfully!");
+            exit();
         } else {
-            echo "Error inserting transaction: " . mysqli_error($conn_back);
+            header("Location: deposit.php?msg=Error_inserting_transaction:" . mysqli_error($conn_back));
+            exit();
         }
     } else {
-        echo "Error inserting deposit request: " . mysqli_error($conn_back);
+        header("Location: deposit.php?msg=Error_inserting_deposit_request:" . mysqli_error($conn_back));
+        exit();
     }
 }
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
@@ -103,6 +105,31 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 
 ?>
 
+    <?php
+    session_start();
+    if(isset($_GET['msg']) && isset($_SESSION['form_submitted'])) { 
+        $msg = str_replace('_', ' ', $_GET['msg']);
+        $alert_class = "alert-success";
+        
+        if(strpos($msg, 'Error') !== false) {
+            $alert_class = "alert-danger";
+        }
+        unset($_SESSION['form_submitted']);
+    ?>
+    <div id="alert-message" class="alert <?php echo $alert_class; ?>" role="alert"><?php echo $msg; ?></div>
+    <script>
+        setTimeout(function() {
+            var alert = document.getElementById('alert-message');
+            if(alert) {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }
+        }, 3000);
+    </script>
+    <?php } ?>
     <form id="depositForm" action="" method="post" enctype="multipart/form-data">
     <div class="container mt-4" id="main-content">
         <div class="card adminuiux-card overflow-hidden mb-4" id="smartwizard">
