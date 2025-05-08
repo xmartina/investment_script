@@ -21,16 +21,60 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Insert into the deposit_requests table
-    $insert_deposit_query = "INSERT INTO deposit_requests (user_id, payment_method, amount, currency, reference_id, transaction_proof_id, payment_proof, status) 
-                             VALUES ('$user_id', '$payment_method', '$deposit_amount', 'USD', '$transaction_id', '$payment_proof', '$payment_proof', 'pending')";
+    $insert_deposit_query = "INSERT INTO deposit_requests (
+        user_id, 
+        payment_method, 
+        amount, 
+        currency, 
+        reference_id, 
+        transaction_proof_id, 
+        payment_proof, 
+        status,
+        created_at
+    ) VALUES (
+        '$user_id',
+        '$payment_method',
+        '$deposit_amount',
+        'USD',
+        '$transaction_id',
+        '$transaction_id',
+        '$payment_proof',
+        'pending',
+        NOW()
+    )";
 
     if (mysqli_query($conn_back, $insert_deposit_query)) {
         // Get the last insert ID from deposit_requests table to link in transactions table
         $deposit_request_id = mysqli_insert_id($conn_back);
 
         // Insert into transactions table
-        $insert_transaction_query = "INSERT INTO transactions (transaction_type, reference_id, transaction_proof_id, amount, currency, status, date_time, from_address, to_address, user_id, deposit_request_id) 
-                                      VALUES ('deposit', '$transaction_id', '$payment_proof', '$deposit_amount', 'USD', 'pending', NOW(), NULL, '$wallet_address', '$user_id', '$deposit_request_id')";
+        $insert_transaction_query = "INSERT INTO transactions (
+            transaction_type,
+            reference_id,
+            transaction_proof_id,
+            amount,
+            currency,
+            status,
+            date_time,
+            from_address,
+            to_address,
+            user_id,
+            deposit_request_id,
+            description
+        ) VALUES (
+            'deposit',
+            '$transaction_id',
+            '$transaction_id',
+            '$deposit_amount',
+            'USD',
+            'pending',
+            NOW(),
+            '$wallet_address',
+            NULL,
+            '$user_id',
+            '$deposit_request_id',
+            'Deposit request'
+        )";
 
         if (mysqli_query($conn_back, $insert_transaction_query)) {
             echo "Deposit submitted successfully!";
