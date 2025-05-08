@@ -6,6 +6,18 @@ if (!isset($_SESSION['user_id'])) {
 }
 $page_name = 'Deposit';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
+
+// Function to generate alphanumeric code of specified length
+function generateCode($length) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $code = '';
+    $max = strlen($characters) - 1;
+    for ($i = 0; $i < $length; $i++) {
+        $code .= $characters[mt_rand(0, $max)];
+    }
+    return $code;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Retrieve the form data
     $payment_method = mysqli_real_escape_string($conn_back, $_POST['payment_method']);
@@ -20,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES['paymentProof']['tmp_name'], $payment_proof);
     }
 
+    $reference_id = generateCode(10);
     // Insert into the deposit_requests table
     $insert_deposit_query = "INSERT INTO deposit_requests (
         user_id, 
@@ -35,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         '$user_id',
         '$payment_method',
         '$deposit_amount',
-        'USD',
-        '$transaction_id',
+        '$user_currency',
+        '$reference_id',
         '$transaction_id',
         '$payment_proof',
         'pending',
@@ -63,10 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             description
         ) VALUES (
             'deposit',
-            '$transaction_id',
+            '$reference_id',
             '$transaction_id',
             '$deposit_amount',
-            'USD',
+            '$user_currency',
             'pending',
             NOW(),
             '$wallet_address',
@@ -320,7 +333,7 @@ function fillConfirm() {
 /* ====== TRIGGER fillConfirm WHEN STEP-3 OPENS ====== */
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* 1) SmartWizard users — ‘showStep’ fires AFTER pane is visible */
+  /* 1) SmartWizard users — 'showStep' fires AFTER pane is visible */
   if (window.$ && $('#smartwizard').length) {
     $('#smartwizard').on('showStep', (e, anchorObj, stepNumber) => {
       if (stepNumber === 2) fillConfirm();      // 0-based index → step-3
