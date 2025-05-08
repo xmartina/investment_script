@@ -52,13 +52,13 @@ get('/user/transactions', function() {
 get('/user/withdraw', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/withdraw.php';
 });
-get('/user/investment', function() {
+get('/user/investment_plans', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
 });
 get('/user/investment/create_investment_plans_table', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/create_investment_plans_table.php';
 });
-get('/user/investment/investments', function() {
+get('/user/investment/my_investments', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/investments.php';
 });
 // Add these to your index.php
@@ -92,13 +92,13 @@ post('/user/deposit', function() {
 post('/user/settings', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/settings.php';
 });
-post('/user/investment', function() {
+post('/user/investment_plans', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
 });
 post('/user/investment/create_investment_plans_table', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/create_investment_plans_table.php';
 });
-post('/user/investment/investments', function() {
+post('/user/investment/my_investments', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/investments.php';
 });
 
