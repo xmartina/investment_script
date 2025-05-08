@@ -52,6 +52,15 @@ get('/user/transactions', function() {
 get('/user/withdraw', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/withdraw.php';
 });
+get('/user/investment', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
+});
+get('/user/investment/create_investment_plans_table', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/create_investment_plans_table.php';
+});
+get('/user/investment/investments', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/investments.php';
+});
 // Add these to your index.php
 post('/user/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
@@ -83,4 +92,15 @@ post('/user/deposit', function() {
 post('/user/settings', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/settings.php';
 });
+post('/user/investment', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
+});
+post('/user/investment/create_investment_plans_table', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/create_investment_plans_table.php';
+});
+post('/user/investment/investments', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/investments.php';
+});
+
+
 dispatch();
