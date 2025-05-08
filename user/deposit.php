@@ -114,9 +114,17 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
             $alert_class = "alert-danger";
         }
         unset($_SESSION['form_submitted']);
+        
+        // Remove hash fragment from URL to ensure message shows
+        $current_url = strtok($_SERVER["REQUEST_URI"], '#');
     ?>
     <div id="alert-message" class="alert <?php echo $alert_class; ?>" role="alert"><?php echo $msg; ?></div>
     <script>
+        // Remove hash from URL without affecting navigation
+        if(window.location.hash) {
+            history.replaceState('', document.title, window.location.pathname + window.location.search);
+        }
+        
         setTimeout(function() {
             var alert = document.getElementById('alert-message');
             if(alert) {
