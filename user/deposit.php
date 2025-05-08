@@ -106,7 +106,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 ?>
 
     <?php
-    session_start();
     if(isset($_GET['msg']) && isset($_SESSION['form_submitted'])) { 
         $msg = str_replace('_', ' ', $_GET['msg']);
         $alert_class = "alert-success";
