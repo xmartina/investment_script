@@ -106,17 +106,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 ?>
 
     <?php
-    if(isset($_GET['msg']) && isset($_SESSION['form_submitted'])) { 
+    if(isset($_GET['msg'])) { // Removed check for form_submitted
         $msg = str_replace('_', ' ', $_GET['msg']);
         $alert_class = "alert-success";
         
         if(strpos($msg, 'Error') !== false) {
             $alert_class = "alert-danger";
         }
-        unset($_SESSION['form_submitted']);
-        
-        // Remove hash fragment from URL to ensure message shows
-        $current_url = strtok($_SERVER["REQUEST_URI"], '#');
     ?>
     <div id="alert-message" class="alert <?php echo $alert_class; ?>" role="alert"><?php echo $msg; ?></div>
     <script>
