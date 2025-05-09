@@ -14,24 +14,24 @@ echo "<h1>Investment Plans Table Update</h1>";
 echo "<p>This script will organize the investment_plans table structure.</p>";
 
 // Function to execute SQL queries safely
-function executeSql($conn, $sql, $description) {
+function executeSql($conn_back, $sql, $description) {
     echo "<hr><h3>$description</h3>";
     echo "<pre>$sql</pre>";
     
     try {
-        if ($conn->multi_query($sql)) {
+        if ($conn_back->multi_query($sql)) {
             do {
                 // Store result of first query
-                if ($result = $conn->store_result()) {
+                if ($result = $conn_back->store_result()) {
                     $result->free();
                 }
                 // Check if there are more results
-            } while ($conn->more_results() && $conn->next_result());
+            } while ($conn_back->more_results() && $conn_back->next_result());
             
             echo "<p style='color:green'>✅ Success</p>";
             return true;
         } else {
-            echo "<p style='color:red'>❌ Error: " . $conn->error . "</p>";
+            echo "<p style='color:red'>❌ Error: " . $conn_back->error . "</p>";
             return false;
         }
     } catch (Exception $e) {
