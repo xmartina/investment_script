@@ -35,20 +35,36 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                         <div class="col-12 col-sm-6 col-md-6 col-lg-4">
                             <div class="card adminuiux-card mb-3">
                                 <div class="card-body">
-                                    <p><span class="badge badge-light text-bg-theme-1"><?php echo $plan['name']; ?></span></p>
+                                    <p><span class="badge badge-light text-bg-theme-1"><?php echo $plan['name']; ?></span>
+                                    </p>
                                     <h5 class="fw-medium mb-1">ROI: <?php echo $plan['roi_percent']; ?>%</h5>
-                                    <p class="text-secondary mb-4">Duration: <?php echo $plan['duration_days']; ?> days</p>
-                                    <h6 class="fw-medium"><?=$user_currency?><?php echo number_format($plan['min_amount'], 2); ?></h6>
-                                    <p class="text-secondary small mb-4">Min. Investment</p>
+                                    <p class="text-secondary mb-4">Duration: <?php echo $plan['duration_days']; ?> days
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h6 class="fw-medium">
+                                                <?=$user_currency?><?php echo number_format($plan['min_amount'], 2); ?>
+                                            </h6>
+                                            <p class="text-secondary small mb-4">Min. Investment</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <h6 class="fw-medium">
+                                                <?=$user_currency?><?php echo number_format($plan['max_amount'], 2); ?>
+                                            </h6>
+                                            <p class="text-secondary small mb-4">Max. Investment</p>
+                                        </div>
+                                    </div>
                                     <div class="row align-items-center">
                                         <div class="col-auto">
-                                            <button class="btn btn-theme invest-btn" data-plan-id="<?php echo $plan['id']; ?>" 
+                                            <button class="btn btn-theme invest-btn"
+                                                data-plan-id="<?php echo $plan['id']; ?>"
                                                 data-plan-name="<?php echo $plan['name']; ?>"
                                                 data-min-amount="<?php echo $plan['min_amount']; ?>"
                                                 data-max-amount="<?php echo $plan['max_amount']; ?>">Apply</button>
                                         </div>
                                         <div class="col-auto">
-                                            <p class="text-success"><?php echo $plan['duration_days']; ?> days duration</p>
+                                            <p class="text-success"><?php echo $plan['duration_days']; ?> days duration
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -82,24 +98,31 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     <input type="hidden" name="plan_id" id="planId">
                     <div class="mb-3">
                         <label for="investmentAmount" class="form-label">Investment Amount</label>
-                        <input type="number" class="form-control" id="investmentAmount" name="amount" min="" max="" required>
-                        <small class="text-muted">Min: <?=$user_currency?><span id="minAmount"></span> | Max: <?=$user_currency?><span id="maxAmount"></span></small>
+                        <input type="number" class="form-control" id="investmentAmount" name="amount" min="" max=""
+                            required>
+                        <small class="text-muted">Min: <?=$user_currency?><span id="minAmount"></span> | Max:
+                            <?=$user_currency?><span id="maxAmount"></span></small>
                     </div>
                     <div class="mb-3">
                         <label for="balanceSource" class="form-label">Select Balance Source</label>
                         <select class="form-select" id="balanceSource" name="balance_source" required>
-                            <option value="main_balance">Main Balance (<?=$user_currency?><?=number_format($main_balance, 2)?>)</option>
-                            <option value="investment_balance">Investment Balance (<?=$user_currency?><?=number_format($investment_balance, 2)?>)</option>
-                            <option value="staking_balance">Staking Balance (<?=$user_currency?><?=number_format($staking_balance, 2)?>)</option>
+                            <option value="main_balance">Main Balance
+                                (<?=$user_currency?><?=number_format($main_balance, 2)?>)</option>
+                            <option value="investment_balance">Investment Balance
+                                (<?=$user_currency?><?=number_format($investment_balance, 2)?>)</option>
+                            <option value="staking_balance">Staking Balance
+                                (<?=$user_currency?><?=number_format($staking_balance, 2)?>)</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="userPin" class="form-label">Enter Your PIN</label>
-                        <input type="password" class="w-75 form-control" id="userPin" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
+                        <input type="password" class="w-75 form-control" id="userPin" name="pin" inputmode="numeric"
+                            pattern="[0-9]*" maxlength="6" required>
                         <small class="text-muted">Please enter your account PIN to confirm this investment</small>
                     </div>
                     <div class="alert alert-info">
-                        <small>You will be investing from your selected balance. Make sure you have enough funds.</small>
+                        <small>You will be investing from your selected balance. Make sure you have enough
+                            funds.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -254,17 +277,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const planName = this.getAttribute('data-plan-name');
             const minAmount = this.getAttribute('data-min-amount');
             const maxAmount = this.getAttribute('data-max-amount');
-            
+
             document.getElementById('planId').value = planId;
             document.getElementById('planName').textContent = planName;
             document.getElementById('minAmount').textContent = minAmount;
             document.getElementById('maxAmount').textContent = maxAmount;
-            
+
             document.getElementById('investmentAmount').min = minAmount;
             document.getElementById('investmentAmount').max = maxAmount;
-            
+
             // Show modal
-            const investmentModal = new bootstrap.Modal(document.getElementById('investmentModal'));
+            const investmentModal = new bootstrap.Modal(document.getElementById(
+                'investmentModal'));
             investmentModal.show();
         });
     });
