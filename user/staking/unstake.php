@@ -2,7 +2,7 @@
 // Staking unstake page
 session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/auth.php';
+// require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/auth.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
@@ -144,7 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
 
 ?>
 
-<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
+?>
 
 <!-- Unstake Page -->
 <div class="container-xl px-4 mt-4">

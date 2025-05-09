@@ -2,7 +2,7 @@
 // Toggle compounding for staking positions
 session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/auth.php';
+// require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/auth.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {

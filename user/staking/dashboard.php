@@ -2,7 +2,7 @@
 // Staking dashboard page
 session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/auth.php';
+// require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/auth.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {
@@ -89,7 +89,9 @@ $stmt->close();
 
 ?>
 
-<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; 
+include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
+?>
 
 <!-- Staking Dashboard -->
 <div class="container-xl px-4 mt-4">
