@@ -27,18 +27,18 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
         <div class="col-12 mb-4">
             <div class="card adminuiux-card bg-theme-1-subtle">
                 <div class="card-body pb-0">
-                    <div class="row">
+                    <div class="row justify-content-center gy-4 gx-4">
                         <?php 
                         if (!empty($investment_plans)) {
                             foreach ($investment_plans as $plan) {
                         ?>
-                        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4">
                             <div class="card adminuiux-card mb-3">
                                 <div class="card-body">
                                     <p><span class="badge badge-light text-bg-theme-1"><?php echo $plan['name']; ?></span></p>
                                     <h5 class="fw-medium mb-1">ROI: <?php echo $plan['roi_percent']; ?>%</h5>
                                     <p class="text-secondary mb-4">Duration: <?php echo $plan['duration_days']; ?> days</p>
-                                    <h6 class="fw-medium">$<?php echo number_format($plan['min_amount'], 2); ?></h6>
+                                    <h6 class="fw-medium"><?=$user_currency?><?php echo number_format($plan['min_amount'], 2); ?></h6>
                                     <p class="text-secondary small mb-4">Min. Investment</p>
                                     <div class="row align-items-center">
                                         <div class="col-auto">
@@ -83,7 +83,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     <div class="mb-3">
                         <label for="investmentAmount" class="form-label">Investment Amount</label>
                         <input type="number" class="form-control" id="investmentAmount" name="amount" min="" max="" required>
-                        <small class="text-muted">Min: $<span id="minAmount"></span> | Max: $<span id="maxAmount"></span></small>
+                        <small class="text-muted">Min: <?=$user_currency?><span id="minAmount"></span> | Max: <?=$user_currency?><span id="maxAmount"></span></small>
                     </div>
                 </div>
                 <div class="modal-footer">
