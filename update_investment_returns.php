@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS investment_returns (
     investment_id INT NOT NULL,
     user_id INT NOT NULL,
     return_amount DECIMAL(20, 8) NOT NULL,
+    roi_percentage DECIMAL(10, 2) NOT NULL,
     expected_date DATETIME NOT NULL,
     status ENUM('pending', 'paid', 'failed') DEFAULT 'pending',
     transaction_id INT DEFAULT NULL,
@@ -102,23 +103,53 @@ CREATE TRIGGER after_investment_insert
 AFTER INSERT ON investments
 FOR EACH ROW
 BEGIN
+    -- Get ROI percentage from investment_plans
+    DECLARE plan_roi_percent DECIMAL(10, 2);
+    
+    SELECT roi_percent INTO plan_roi_percent
+    FROM investment_plans
+    WHERE id = NEW.plan_id
+    LIMIT 1;
+    
     -- Insert a record in investment_returns table
     INSERT INTO investment_returns 
-    (investment_id, user_id, return_amount, expected_date, status, created_at)
+    (investment_id, user_id, return_amount, roi_percentage, expected_date, status, created_at)
     VALUES
-    (NEW.id, NEW.user_id, NEW.roi_expected, NEW.ends_at, 'pending', NOW());
+    (NEW.id, NEW.user_id, NEW.roi_expected, plan_roi_percent, NEW.ends_at, 'pending', NOW());
 END;
 ";
 executeSql($conn_back, $createTriggerSql, "Creating trigger for automatic return record creation");
 
+// First, check if investments table already has ROI percentage column
+$checkRoiColumnSql = "SHOW COLUMNS FROM investments LIKE 'roi_percentage'";
+$roiColumnExists = $conn_back->query($checkRoiColumnSql)->num_rows > 0;
+
+// If roi_percentage column doesn't exist in investments table, add it
+if (!$roiColumnExists) {
+    $addRoiColumnSql = "
+    ALTER TABLE investments 
+    ADD COLUMN roi_percentage DECIMAL(10, 2) AFTER roi_expected;
+    
+    -- Update existing records to set roi_percentage from investment_plans
+    UPDATE investments i
+    JOIN investment_plans p ON i.plan_id = p.id
+    SET i.roi_percentage = p.roi_percent;
+    ";
+    executeSql($conn_back, $addRoiColumnSql, "Adding roi_percentage column to investments table");
+}
+
 // Step 3: Populate returns for existing investments
 $populateReturnsSQL = "
 INSERT INTO investment_returns 
-(investment_id, user_id, return_amount, expected_date, status, created_at)
+(investment_id, user_id, return_amount, roi_percentage, expected_date, status, created_at)
 SELECT 
     i.id, 
     i.user_id, 
-    i.roi_expected, 
+    i.roi_expected,
+    CASE
+        WHEN i.roi_percentage IS NOT NULL THEN i.roi_percentage
+        ELSE (SELECT p.roi_percent FROM investment_plans p WHERE p.id = i.plan_id LIMIT 1)
+    END as roi_percentage,
     i.ends_at, 
     'pending', 
     NOW()
@@ -131,10 +162,28 @@ WHERE
 ";
 executeSql($conn_back, $populateReturnsSQL, "Populating returns for existing investments");
 
+// Check if the transactions table exists
+$checkTransactionsTable = $conn_back->query("SHOW TABLES LIKE 'transactions'");
+if ($checkTransactionsTable->num_rows > 0) {
+    // Check if roi_percentage column exists in transactions table
+    $checkTransRoiColumnSql = "SHOW COLUMNS FROM transactions LIKE 'roi_percentage'";
+    $transRoiColumnExists = $conn_back->query($checkTransRoiColumnSql)->num_rows > 0;
+    
+    // If roi_percentage column doesn't exist in transactions table, add it
+    if (!$transRoiColumnExists) {
+        $addTransRoiColumnSql = "
+        ALTER TABLE transactions 
+        ADD COLUMN roi_percentage DECIMAL(10, 2) AFTER amount;
+        ";
+        executeSql($conn_back, $addTransRoiColumnSql, "Adding roi_percentage column to transactions table");
+    }
+}
+
 // Step 4: Update the investments page to display returns
 echo "<hr><h2>Setup completed</h2>";
 echo "<p>The investment_returns table has been created and populated with data from existing investments.</p>";
 echo "<p>A trigger has been set up to automatically create return records when new investments are made.</p>";
+echo "<p>ROI percentage field has been added to the relevant tables.</p>";
 echo "<h3>Next Steps:</h3>";
 echo "<ul>";
 echo "<li>Update the investments.php page to display returns information</li>";
