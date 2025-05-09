@@ -134,13 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
                 if ($penalty_amount > 0) {
                     $description .= " (Early unstake with " . number_format($staking['early_unstake_penalty'], 2) . "% penalty)";
                 }
+                $transaction_proof_id = 'UNSTAKEPROOF' . time();
                 
                 $stmt = $conn_back->prepare("
                     INSERT INTO transactions (
-                        user_id, type, amount, status, reference, description, created_at
-                    ) VALUES (?, 'staking', ?, 'successful', ?, ?, ?)
+                        user_id, transaction_type, reference_id, transaction_proof_id, amount, currency, 
+                        status, date_time, description
+                    ) VALUES (?, 'unstaking', ?, ?, ?, 'USD', 'successful', ?, ?)
                 ");
-                $stmt->bind_param("idsss", $user_id, $return_amount, $reference, $description, $now);
+                $stmt->bind_param("issdss", $user_id, $reference, $transaction_proof_id, $return_amount, $now, $description);
                 $stmt->execute();
                 $stmt->close();
                 
@@ -148,13 +150,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
                 if ($penalty_amount > 0) {
                     $penalty_reference = 'PENALTY' . time() . $user_id;
                     $penalty_description = "Early unstaking penalty for {$staking['plan_name']} plan";
+                    $penalty_proof_id = 'PENALTYPROOF' . time();
                     
                     $stmt = $conn_back->prepare("
                         INSERT INTO transactions (
-                            user_id, type, amount, status, reference, description, created_at
-                        ) VALUES (?, 'staking', ?, 'successful', ?, ?, ?)
+                            user_id, transaction_type, reference_id, transaction_proof_id, amount, currency, 
+                            status, date_time, description
+                        ) VALUES (?, 'penalty', ?, ?, ?, 'USD', 'successful', ?, ?)
                     ");
-                    $stmt->bind_param("idsss", $user_id, $penalty_amount, $penalty_reference, $penalty_description, $now);
+                    $stmt->bind_param("issdss", $user_id, $penalty_reference, $penalty_proof_id, $penalty_amount, $now, $penalty_description);
                     $stmt->execute();
                     $stmt->close();
                 }
