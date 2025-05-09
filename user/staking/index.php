@@ -438,7 +438,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                     <ul class="mb-0">
                                                         <li>Lock period: <?= $plan['lock_period_days'] ?> days</li>
                                                         <li>Early unstaking penalty: <?= number_format($plan['early_unstake_penalty'], 2) ?>%</li>
-                                                        <li>Your current balance: $<?= number_format($user['balance'], 2) ?></li>
+                                                        <li>Your current balances:
+                                                            <ul>
+                                                                <li>Main: <?= $user_currency . number_format($main_balance, 2) ?></li>
+                                                                <li>Investment: <?= $user_currency . number_format($investment_balance, 2) ?></li>
+                                                                <li>Staking: <?= $user_currency . number_format($staking_balance, 2) ?></li>
+                                                            </ul>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>
