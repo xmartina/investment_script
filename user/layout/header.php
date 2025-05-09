@@ -54,7 +54,7 @@
                 <ul class="navbar-nav mx-lg-3 mb-2 mb-md-0">
                     <li class="nav-item"><a class="nav-link" href="<?= $dashboard['link'] ?>">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= $profile['link'] ?>">Portfolio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= $transactions['link'] ?>">Transaction</a></li>
+                    <!-- <li class="nav-item"><a class="nav-link" href="<?= // $transactions['link'] ?>">Transaction</a></li> -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Staking
