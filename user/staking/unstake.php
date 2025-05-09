@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$page_title = "Unstake Funds";
+$page_name = "Unstake Funds";
 
 // Check if staking ID is provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
