@@ -40,7 +40,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                     <h5 class="fw-medium mb-1">ROI: <?php echo $plan['roi_percent']; ?>%</h5>
                                     <p class="text-secondary mb-4">Duration: <?php echo $plan['duration_days']; ?> days
                                     </p>
-                                    <div class="row">
+                                    <div class="row justify-content-end">
                                         <div class="col-6">
                                             <h6 class="fw-medium">
                                                 <?=$user_currency?><?php echo number_format($plan['min_amount'], 2); ?>
