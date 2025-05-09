@@ -18,13 +18,11 @@
         }</style>
     <script defer="defer" src="<?= $site_link ?>/back_assets/js/app.js?ff1e8ee7ca91d18f44ea"></script>
     <link href="<?= $site_link ?>/back_assets/css/app.css?ff1e8ee7ca91d18f44ea" rel="stylesheet">
-    <?php
-    if ($page_name = 'Deposit'){
-    ?>
+    
         <link href="../../css2?family=Lexend:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
               rel="stylesheet">
     <link href="<?= $site_link ?>/back_assets/css/app-2.css?family=Lexend:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-    <?php } ?>
+
 </head>
 <body
     class="main-bg main-bg-opac main-bg-blur adminuiux-sidebar-fill-white adminuiux-sidebar-boxed theme-blue roundedui"
