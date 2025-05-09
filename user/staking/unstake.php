@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
 
 ?>
 
-<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; 
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php'; 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 ?>
 

@@ -89,7 +89,7 @@ $stmt->close();
 
 ?>
 
-<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; 
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php'; 
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 ?>
 
