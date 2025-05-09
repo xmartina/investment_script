@@ -189,6 +189,16 @@ if ($page_name = 'Deposit'){
     ?>
     <script src="<?= $site_link ?>/back_assets/js/investment/investment-add-goal.js"></script>
 <?php } ?>
-<script>
-
+    <script>
+  let count = 0;
+  const interval = setInterval(() => {
+    const backdrops = document.querySelectorAll('.modal-backdrop.fade.show');
+    backdrops.forEach(el => el.remove());
+    
+    count++;
+    if (count >= 30) {
+      clearInterval(interval);
+    }
+  }, 5000);
 </script>
+
