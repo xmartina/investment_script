@@ -229,8 +229,8 @@ if (isset($_POST['invest'])) {
             }
             
             // Insert into investments table
-            $invest_query = "INSERT INTO investments (user_id, plan_id, amount, roi_expected, status, started_at, ends_at, created_at) 
-                            VALUES ('$user_id', '$plan_id', '$amount', '$roi_expected', 'active', '$start_date', '$end_date', NOW())";
+            $invest_query = "INSERT INTO investments (user_id, plan_id, amount, roi_expected, roi_percent, status, started_at, ends_at, created_at) 
+                            VALUES ('$user_id', '$plan_id', '$amount', '$roi_expected', '$roi_percent', 'active', '$start_date', '$end_date', NOW())";
             $invest_result = $conn_back->query($invest_query);
             
             if (!$invest_result) {
