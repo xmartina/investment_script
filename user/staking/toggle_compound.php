@@ -14,7 +14,7 @@ $user_id = $_SESSION['user_id'];
 
 // Check if required parameters are provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id']) || !isset($_GET['enable'])) {
-    header("Location: /user/staking/dashboard.php");
+    header("Location: /user/staking/dashboard");
     exit();
 }
 
@@ -33,7 +33,7 @@ $stmt->close();
 
 // If staking not found, doesn't belong to user, or is not active, redirect
 if (!$staking) {
-    header("Location: /user/staking/dashboard.php");
+    header("Location: /user/staking/dashboard");
     exit();
 }
 
@@ -49,9 +49,9 @@ $stmt->close();
 
 // Redirect back to details page or dashboard
 if (isset($_GET['redirect']) && $_GET['redirect'] == 'dashboard') {
-    header("Location: /user/staking/dashboard.php");
+    header("Location: /user/staking/dashboard");
 } else {
-    header("Location: /user/staking/details.php?id=" . $staking_id);
+    header("Location: /user/staking/details?id=" . $staking_id);
 }
 exit();
 ?> 

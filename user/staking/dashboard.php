@@ -95,8 +95,8 @@ $stmt->close();
 <div class="container-xl px-4 mt-4">
     <nav class="nav nav-borders">
         <a class="nav-link" href="/user/staking">Staking Dashboard</a>
-        <a class="nav-link active ms-0" href="/user/staking/dashboard.php">My Staking</a>
-        <a class="nav-link" href="/user/staking/rewards.php">Rewards</a>
+        <a class="nav-link active ms-0" href="/user/staking/dashboard">My Staking</a>
+        <a class="nav-link" href="/user/staking/rewards">Rewards</a>
     </nav>
     
     <hr class="mt-0 mb-4">
@@ -276,12 +276,12 @@ $stmt->close();
                                                 </small>
                                             </td>
                                             <td>
-                                                <a href="/user/staking/details.php?id=<?= $staking['id'] ?>" 
+                                                <a href="/user/staking/details?id=<?= $staking['id'] ?>" 
                                                    class="btn btn-sm btn-info mb-1">
                                                     <i class="fas fa-eye"></i> Details
                                                 </a>
                                                 <?php if ($can_unstake): ?>
-                                                    <a href="/user/staking/unstake.php?id=<?= $staking['id'] ?>" 
+                                                    <a href="/user/staking/unstake?id=<?= $staking['id'] ?>" 
                                                        class="btn btn-sm btn-warning mb-1">
                                                         <i class="fas fa-undo"></i> Unstake
                                                     </a>
@@ -292,12 +292,12 @@ $stmt->close();
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php if ($staking['is_compounding']): ?>
-                                                    <a href="/user/staking/toggle_compound.php?id=<?= $staking['id'] ?>&enable=0" 
+                                                    <a href="/user/staking/toggle_compound?id=<?= $staking['id'] ?>&enable=0" 
                                                        class="btn btn-sm btn-danger mb-1">
                                                         <i class="fas fa-toggle-off"></i> Disable Compounding
                                                     </a>
                                                 <?php else: ?>
-                                                    <a href="/user/staking/toggle_compound.php?id=<?= $staking['id'] ?>&enable=1" 
+                                                    <a href="/user/staking/toggle_compound?id=<?= $staking['id'] ?>&enable=1" 
                                                        class="btn btn-sm btn-success mb-1">
                                                         <i class="fas fa-toggle-on"></i> Enable Compounding
                                                     </a>

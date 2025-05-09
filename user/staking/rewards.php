@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['claim_reward'])) {
             $conn_back->commit();
             
             // Redirect to prevent form resubmission
-            header("Location: /user/staking/rewards.php?success=claim");
+            header("Location: /user/staking/rewards?success=claim");
             exit();
         } catch (Exception $e) {
             // Rollback if an error occurs
@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reinvest_reward'])) {
                 $conn_back->commit();
                 
                 // Redirect to prevent form resubmission
-                header("Location: /user/staking/rewards.php?success=reinvest");
+                header("Location: /user/staking/rewards?success=reinvest");
                 exit();
             } catch (Exception $e) {
                 // Rollback if an error occurs
@@ -269,8 +269,8 @@ foreach ($historical_rewards as $reward) {
 <div class="container-xl px-4 mt-4">
     <nav class="nav nav-borders">
         <a class="nav-link" href="/user/staking">Staking Dashboard</a>
-        <a class="nav-link" href="/user/staking/dashboard.php">My Staking</a>
-        <a class="nav-link active ms-0" href="/user/staking/rewards.php">Rewards</a>
+        <a class="nav-link" href="/user/staking/dashboard">My Staking</a>
+        <a class="nav-link active ms-0" href="/user/staking/rewards">Rewards</a>
     </nav>
     
     <hr class="mt-0 mb-4">

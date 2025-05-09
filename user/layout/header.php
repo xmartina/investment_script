@@ -57,6 +57,16 @@
                     <li class="nav-item"><a class="nav-link" href="<?= $dashboard['link'] ?>">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= $profile['link'] ?>">Portfolio</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= $transactions['link'] ?>">Transaction</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Staking
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/staking">Staking Plans</a></li>
+                            <li><a class="dropdown-item" href="/user/staking/dashboard">My Staking</a></li>
+                            <li><a class="dropdown-item" href="/user/staking/rewards">Rewards</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
             <div class="ms-auto">

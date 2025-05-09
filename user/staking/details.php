@@ -15,7 +15,7 @@ $page_title = "Staking Details";
 
 // Check if staking ID is provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header("Location: /user/staking/dashboard.php");
+    header("Location: /user/staking/dashboard");
     exit();
 }
 
@@ -36,7 +36,7 @@ $stmt->close();
 
 // If staking not found or doesn't belong to user, redirect
 if (!$staking) {
-    header("Location: /user/staking/dashboard.php");
+    header("Location: /user/staking/dashboard");
     exit();
 }
 
@@ -92,15 +92,15 @@ $stmt->close();
 <div class="container-xl px-4 mt-4">
     <nav class="nav nav-borders">
         <a class="nav-link" href="/user/staking">Staking Dashboard</a>
-        <a class="nav-link" href="/user/staking/dashboard.php">My Staking</a>
-        <a class="nav-link" href="/user/staking/rewards.php">Rewards</a>
+        <a class="nav-link" href="/user/staking/dashboard">My Staking</a>
+        <a class="nav-link" href="/user/staking/rewards">Rewards</a>
     </nav>
     
     <hr class="mt-0 mb-4">
     
     <div class="row mb-4">
         <div class="col-12 mb-3">
-            <a href="/user/staking/dashboard.php" class="btn btn-sm btn-outline-primary">
+            <a href="/user/staking/dashboard" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
@@ -211,12 +211,12 @@ $stmt->close();
                             <div class="col-12 d-flex justify-content-between">
                                 <div>
                                     <?php if ($staking['is_compounding']): ?>
-                                        <a href="/user/staking/toggle_compound.php?id=<?= $staking['id'] ?>&enable=0" 
+                                        <a href="/user/staking/toggle_compound?id=<?= $staking['id'] ?>&enable=0" 
                                             class="btn btn-danger">
                                                 <i class="fas fa-toggle-off"></i> Disable Compounding
                                         </a>
                                     <?php else: ?>
-                                        <a href="/user/staking/toggle_compound.php?id=<?= $staking['id'] ?>&enable=1" 
+                                        <a href="/user/staking/toggle_compound?id=<?= $staking['id'] ?>&enable=1" 
                                             class="btn btn-success">
                                                 <i class="fas fa-toggle-on"></i> Enable Compounding
                                         </a>
@@ -224,12 +224,12 @@ $stmt->close();
                                 </div>
                                 <div>
                                     <?php if ($can_unstake): ?>
-                                        <a href="/user/staking/unstake.php?id=<?= $staking['id'] ?>" 
+                                        <a href="/user/staking/unstake?id=<?= $staking['id'] ?>" 
                                             class="btn btn-warning">
                                                 <i class="fas fa-undo"></i> Unstake Now
                                         </a>
                                     <?php else: ?>
-                                        <a href="/user/staking/unstake.php?id=<?= $staking['id'] ?>&early=1" 
+                                        <a href="/user/staking/unstake?id=<?= $staking['id'] ?>&early=1" 
                                             class="btn btn-outline-danger" 
                                             onclick="return confirm('Are you sure you want to unstake early? This will incur a penalty of <?= number_format($staking['early_unstake_penalty'], 2) ?>%.')">
                                                 <i class="fas fa-exclamation-triangle"></i> Unstake Early (With Penalty)
@@ -304,7 +304,7 @@ $stmt->close();
                                             </td>
                                             <td>
                                                 <?php if ($is_available): ?>
-                                                    <a href="/user/staking/rewards.php" class="btn btn-sm btn-success">
+                                                    <a href="/user/staking/rewards" class="btn btn-sm btn-success">
                                                         <i class="fas fa-money-bill-wave"></i> Claim
                                                     </a>
                                                 <?php elseif ($reward['status'] === 'pending'): ?>

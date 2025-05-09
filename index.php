@@ -37,19 +37,19 @@ get('/user/dashboard', function() {
 get('/user/staking', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/index.php';
 });
-get('/user/staking/dashboard.php', function() {
+get('/user/staking/dashboard', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/dashboard.php';
 });
-get('/user/staking/rewards.php', function() {
+get('/user/staking/rewards', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/rewards.php';
 });
-get('/user/staking/details.php', function() {
+get('/user/staking/details', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/details.php';
 });
-get('/user/staking/unstake.php', function() {
+get('/user/staking/unstake', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/unstake.php';
 });
-get('/user/staking/toggle_compound.php', function() {
+get('/user/staking/toggle_compound', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/toggle_compound.php';
 });
 get('/user/profile', function() {
@@ -105,16 +105,16 @@ post('/login', function() {
 post('/user/staking', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/index.php';
 });
-post('/user/staking/dashboard.php', function() {
+post('/user/staking/dashboard', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/dashboard.php';
 });
-post('/user/staking/rewards.php', function() {
+post('/user/staking/rewards', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/rewards.php';
 });
-post('/user/staking/details.php', function() {
+post('/user/staking/details', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/details.php';
 });
-post('/user/staking/unstake.php', function() {
+post('/user/staking/unstake', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/unstake.php';
 });
 post('/user/register', function() {

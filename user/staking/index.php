@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             $conn_back->commit();
             
             // Redirect to prevent form resubmission
-            header("Location: /user/staking/dashboard.php?success=1");
+            header("Location: /user/staking/dashboard?success=1");
             exit();
         } catch (Exception $e) {
             // Rollback if an error occurs
@@ -162,8 +162,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
 <div class="container-xl px-4 mt-4">
     <nav class="nav nav-borders">
         <a class="nav-link active ms-0" href="/user/staking">Staking Dashboard</a>
-        <a class="nav-link" href="/user/staking/dashboard.php">My Staking</a>
-        <a class="nav-link" href="/user/staking/rewards.php">Rewards</a>
+        <a class="nav-link" href="/user/staking/dashboard">My Staking</a>
+        <a class="nav-link" href="/user/staking/rewards">Rewards</a>
     </nav>
     
     <hr class="mt-0 mb-4">
@@ -406,7 +406,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             <div class="card shadow">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Your Active Staking Positions</h6>
-                    <a href="/user/staking/dashboard.php" class="btn btn-sm btn-primary">View All</a>
+                    <a href="/user/staking/dashboard" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-body">
                     <?php if (empty($active_stakings)): ?>
@@ -443,11 +443,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
                                                 <span class="badge bg-success">Active</span>
                                             </td>
                                             <td>
-                                                <a href="/user/staking/details.php?id=<?= $staking['id'] ?>" class="btn btn-sm btn-info">
+                                                <a href="/user/staking/details?id=<?= $staking['id'] ?>" class="btn btn-sm btn-info">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 <?php if (strtotime($staking['unstake_available_at']) <= time()): ?>
-                                                    <a href="/user/staking/unstake.php?id=<?= $staking['id'] ?>" class="btn btn-sm btn-warning">
+                                                    <a href="/user/staking/unstake?id=<?= $staking['id'] ?>" class="btn btn-sm btn-warning">
                                                         <i class="fas fa-undo"></i> Unstake
                                                     </a>
                                                 <?php else: ?>

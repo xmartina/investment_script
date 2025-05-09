@@ -15,7 +15,7 @@ $page_title = "Unstake Funds";
 
 // Check if staking ID is provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header("Location: /user/staking/dashboard.php");
+    header("Location: /user/staking/dashboard");
     exit();
 }
 
@@ -36,7 +36,7 @@ $stmt->close();
 
 // If staking not found, doesn't belong to user, or is not active, redirect
 if (!$staking) {
-    header("Location: /user/staking/dashboard.php");
+    header("Location: /user/staking/dashboard");
     exit();
 }
 
@@ -45,7 +45,7 @@ $can_unstake = strtotime($staking['unstake_available_at']) <= time();
 
 // If early unstake is not explicitly requested and staking is still locked, redirect
 if (!$early_unstake && !$can_unstake) {
-    header("Location: /user/staking/details.php?id=" . $staking_id);
+    header("Location: /user/staking/details?id=" . $staking_id);
     exit();
 }
 
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
         $conn_back->commit();
         
         // Redirect to dashboard with success message
-        header("Location: /user/staking/dashboard.php?success=unstake");
+        header("Location: /user/staking/dashboard?success=unstake");
         exit();
     } catch (Exception $e) {
         // Rollback if an error occurs
@@ -150,8 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
 <div class="container-xl px-4 mt-4">
     <nav class="nav nav-borders">
         <a class="nav-link" href="/user/staking">Staking Dashboard</a>
-        <a class="nav-link" href="/user/staking/dashboard.php">My Staking</a>
-        <a class="nav-link" href="/user/staking/rewards.php">Rewards</a>
+        <a class="nav-link" href="/user/staking/dashboard">My Staking</a>
+        <a class="nav-link" href="/user/staking/rewards">Rewards</a>
     </nav>
     
     <hr class="mt-0 mb-4">
@@ -267,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
                     
                     <form method="post" class="text-center">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                            <a href="/user/staking/details.php?id=<?= $staking_id ?>" class="btn btn-secondary">
+                            <a href="/user/staking/details?id=<?= $staking_id ?>" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancel
                             </a>
                             <button type="submit" name="confirm_unstake" class="btn btn-primary">
