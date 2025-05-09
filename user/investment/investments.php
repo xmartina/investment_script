@@ -59,7 +59,7 @@ if ($investments_result && $investments_result->num_rows > 0) {
             <div class="card adminuiux-card h-100">
                 <div class="card-body">
                     <h6 class="card-title text-secondary">Expected Returns</h6>
-                    <h3 class="fw-bold"><?=$user_currency?><?=number_format($total_roi, 2)?></h3>
+                    <h3 class="fw-bold"><?=$user_currency?><?=number_format($total_roi * $total_invested, 2)?></h3>
                     <p class="small text-muted">Total ROI from investments</p>
                 </div>
             </div>
