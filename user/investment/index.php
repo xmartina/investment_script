@@ -95,7 +95,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     </div>
                     <div class="mb-3">
                         <label for="userPin" class="form-label">Enter Your PIN</label>
-                        <input type="password" class="form-control" id="userPin" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
+                        <input type="password" class="w-75 form-control" id="userPin" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
                         <small class="text-muted">Please enter your account PIN to confirm this investment</small>
                     </div>
                     <div class="alert alert-info">
