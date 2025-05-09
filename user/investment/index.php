@@ -4,11 +4,11 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: /login');
     exit;
 }
-$page_name = 'Deposit';
+$page_name = 'Investment Plans';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 
 // Fetch investment plans from database
-$query = "SELECT * FROM investment_plans WHERE status = 'active'";
+$query = "SELECT * FROM investment_plans WHERE is_active = 1";
 $result = $conn_back->query($query);
 $investment_plans = [];
 if ($result && $result->num_rows > 0) {
@@ -35,20 +35,20 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                         <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                             <div class="card adminuiux-card mb-3">
                                 <div class="card-body">
-                                    <p><span class="badge badge-light text-bg-theme-1"><?php echo $plan['plan_type']; ?></span></p>
-                                    <h5 class="fw-medium mb-1"><?php echo $plan['name']; ?></h5>
-                                    <p class="text-secondary mb-4"><?php echo $plan['category']; ?> <i class="bi bi-chevron-right"></i>
-                                        <?php echo $plan['duration']; ?> <i class="bi bi-chevron-right"></i> <?php echo $plan['risk_level']; ?></p>
-                                    <h6 class="fw-medium">$<?php echo number_format($plan['min_investment'], 2); ?></h6>
+                                    <p><span class="badge badge-light text-bg-theme-1"><?php echo $plan['name']; ?></span></p>
+                                    <h5 class="fw-medium mb-1">ROI: <?php echo $plan['roi_percent']; ?>%</h5>
+                                    <p class="text-secondary mb-4">Duration: <?php echo $plan['duration_days']; ?> days</p>
+                                    <h6 class="fw-medium">$<?php echo number_format($plan['min_amount'], 2); ?></h6>
                                     <p class="text-secondary small mb-4">Min. Investment</p>
                                     <div class="row align-items-center">
                                         <div class="col-auto">
                                             <button class="btn btn-theme invest-btn" data-plan-id="<?php echo $plan['id']; ?>" 
                                                 data-plan-name="<?php echo $plan['name']; ?>"
-                                                data-min-amount="<?php echo $plan['min_investment']; ?>">Apply</button>
+                                                data-min-amount="<?php echo $plan['min_amount']; ?>"
+                                                data-max-amount="<?php echo $plan['max_amount']; ?>">Apply</button>
                                         </div>
                                         <div class="col-auto">
-                                            <p class="text-success"><?php echo $plan['availability']; ?> days available</p>
+                                            <p class="text-success"><?php echo $plan['duration_days']; ?> days duration</p>
                                         </div>
                                     </div>
                                 </div>
@@ -82,8 +82,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     <input type="hidden" name="plan_id" id="planId">
                     <div class="mb-3">
                         <label for="investmentAmount" class="form-label">Investment Amount</label>
-                        <input type="number" class="form-control" id="investmentAmount" name="amount" min="" required>
-                        <small class="text-muted">Minimum investment: $<span id="minAmount"></span></small>
+                        <input type="number" class="form-control" id="investmentAmount" name="amount" min="" max="" required>
+                        <small class="text-muted">Min: $<span id="minAmount"></span> | Max: $<span id="maxAmount"></span></small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -102,32 +102,41 @@ if (isset($_POST['invest'])) {
     $amount = $_POST['amount'];
     $user_id = $_SESSION['user_id'];
     
-    // Insert into investments table
-    $invest_query = "INSERT INTO investments (user_id, plan_id, trans_type, amount_invested, returns_amount, created_at) 
-                     VALUES ('$user_id', '$plan_id', 'investment', '$amount', '0', NOW())";
+    // Get plan details for ROI calculation
+    $plan_query = "SELECT * FROM investment_plans WHERE id = '$plan_id'";
+    $plan_result = $conn_back->query($plan_query);
     
-    if ($conn_back->query($invest_query)) {
-        $transaction_proof_id = 'INV-' . time() . '-' . $user_id;
-        $reference_id = 'REF-' . time() . '-' . $user_id;
+    if ($plan_result && $plan_result->num_rows > 0) {
+        $plan = $plan_result->fetch_assoc();
         
-        // Insert into transactions table
-        $trans_query = "INSERT INTO transactions (transaction_type, reference_id, transaction_proof_id, 
-                        amount, currency, status, date_time, description, user_id) 
-                        VALUES ('investment', '$reference_id', '$transaction_proof_id', 
-                        '$amount', 'USD', 'completed', NOW(), 'Investment Purchase', '$user_id')";
+        // Calculate expected ROI and end date
+        $roi_expected = $amount * ($plan['roi_percent'] / 100);
+        $start_date = date('Y-m-d H:i:s');
+        $end_date = date('Y-m-d H:i:s', strtotime($start_date . ' + ' . $plan['duration_days'] . ' days'));
         
-        if ($conn_back->query($trans_query)) {
-            // Update investment record with transaction ID
-            $trans_id = $conn_back->insert_id;
-            $update_query = "UPDATE investments SET trans_id = '$trans_id' WHERE id = '" . $conn_back->insert_id . "'";
-            $conn_back->query($update_query);
+        // Insert into investments table
+        $invest_query = "INSERT INTO investments (user_id, plan_id, amount, roi_expected, status, started_at, ends_at, created_at) 
+                        VALUES ('$user_id', '$plan_id', '$amount', '$roi_expected', 'active', '$start_date', '$end_date', NOW())";
+        
+        if ($conn_back->query($invest_query)) {
+            // Generate unique reference
+            $reference = 'INV-' . time() . '-' . $user_id;
             
-            echo '<script>alert("Investment successful!"); window.location.href="/user/investment";</script>';
+            // Insert into transactions table
+            $trans_query = "INSERT INTO transactions (user_id, type, amount, status, reference, description, created_at) 
+                            VALUES ('$user_id', 'investment', '$amount', 'successful', '$reference', 
+                            'Investment in " . $plan['name'] . "', NOW())";
+            
+            if ($conn_back->query($trans_query)) {
+                echo '<script>alert("Investment successful!"); window.location.href="/user/investment";</script>';
+            } else {
+                echo '<script>alert("Error recording transaction. Please contact support.");</script>';
+            }
         } else {
-            echo '<script>alert("Error processing transaction. Please try again.");</script>';
+            echo '<script>alert("Error processing investment. Please try again.");</script>';
         }
     } else {
-        echo '<script>alert("Error processing investment. Please try again.");</script>';
+        echo '<script>alert("Invalid investment plan selected.");</script>';
     }
 }
 ?>
@@ -141,11 +150,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const planId = this.getAttribute('data-plan-id');
             const planName = this.getAttribute('data-plan-name');
             const minAmount = this.getAttribute('data-min-amount');
+            const maxAmount = this.getAttribute('data-max-amount');
             
             document.getElementById('planId').value = planId;
             document.getElementById('planName').textContent = planName;
             document.getElementById('minAmount').textContent = minAmount;
+            document.getElementById('maxAmount').textContent = maxAmount;
+            
             document.getElementById('investmentAmount').min = minAmount;
+            document.getElementById('investmentAmount').max = maxAmount;
             
             // Show modal
             const investmentModal = new bootstrap.Modal(document.getElementById('investmentModal'));
