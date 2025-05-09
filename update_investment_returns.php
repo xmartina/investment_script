@@ -40,47 +40,19 @@ function executeSql($conn, $sql, $description) {
     }
 }
 
-// Check if investment_plans table exists, create it if it doesn't
-$checkPlansTable = $conn_back->query("SHOW TABLES LIKE 'investment_plans'");
-if ($checkPlansTable->num_rows == 0) {
-    $createPlansSql = "
-    CREATE TABLE investment_plans (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100),
-        min_amount DECIMAL(20, 8),
-        max_amount DECIMAL(20, 8),
-        roi_percent DECIMAL(5, 2),
-        duration_days INT,
-        is_active BOOLEAN DEFAULT TRUE,
-        status VARCHAR(20) DEFAULT 'active',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );";
-    executeSql($conn_back, $createPlansSql, "Creating investment_plans table");
-}
+// Check if investment_plans table has roi_percent column
+$checkRoiPercentColumnSql = "SHOW COLUMNS FROM investment_plans LIKE 'roi_percent'";
+$roiPercentColumnExists = $conn_back->query($checkRoiPercentColumnSql)->num_rows > 0;
 
-// Check if investments table exists, create it if it doesn't
-$checkInvestmentsTable = $conn_back->query("SHOW TABLES LIKE 'investments'");
-if ($checkInvestmentsTable->num_rows == 0) {
-    $createInvestmentsSql = "
-    CREATE TABLE investments (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT,
-        plan_id INT,
-        amount DECIMAL(20, 8),
-        roi_expected DECIMAL(20, 8),
-        status ENUM('active', 'completed', 'cancelled') DEFAULT 'active',
-        started_at DATETIME,
-        ends_at DATETIME,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (plan_id) REFERENCES investment_plans(id)
-    );";
-    executeSql($conn_back, $createInvestmentsSql, "Creating investments table");
+if (!$roiPercentColumnExists) {
+    echo "<p style='color:red'>❌ Warning: The investment_plans table does not have a roi_percent column. Please add this column first.</p>";
 }
 
 // Step 1: Create investment_returns table (without foreign key constraints since investments table is MyISAM)
 $createTableSql = "
-CREATE TABLE IF NOT EXISTS investment_returns (
+DROP TABLE IF EXISTS investment_returns;
+
+CREATE TABLE investment_returns (
     id INT AUTO_INCREMENT PRIMARY KEY,
     investment_id INT NOT NULL,
     user_id INT NOT NULL,
@@ -93,7 +65,7 @@ CREATE TABLE IF NOT EXISTS investment_returns (
     paid_at DATETIME DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ";
-executeSql($conn_back, $createTableSql, "Creating investment_returns table");
+executeSql($conn_back, $createTableSql, "Recreating investment_returns table");
 
 // Step 2: Add a trigger to automatically create return records when an investment is created
 $createTriggerSql = "
@@ -115,7 +87,7 @@ BEGIN
     INSERT INTO investment_returns 
     (investment_id, user_id, return_amount, roi_percentage, expected_date, status, created_at)
     VALUES
-    (NEW.id, NEW.user_id, NEW.roi_expected, plan_roi_percent, NEW.ends_at, 'pending', NOW());
+    (NEW.id, NEW.user_id, NEW.roi_expected, IFNULL(plan_roi_percent, 0), NEW.ends_at, 'pending', NOW());
 END;
 ";
 executeSql($conn_back, $createTriggerSql, "Creating trigger for automatic return record creation");
@@ -129,35 +101,65 @@ if (!$roiColumnExists) {
     $addRoiColumnSql = "
     ALTER TABLE investments 
     ADD COLUMN roi_percentage DECIMAL(10, 2) AFTER roi_expected;
-    
-    -- Update existing records to set roi_percentage from investment_plans
-    UPDATE investments i
-    JOIN investment_plans p ON i.plan_id = p.id
-    SET i.roi_percentage = p.roi_percent;
     ";
+    
+    if ($roiPercentColumnExists) {
+        $addRoiColumnSql .= "
+        -- Update existing records to set roi_percentage from investment_plans
+        UPDATE investments i
+        JOIN investment_plans p ON i.plan_id = p.id
+        SET i.roi_percentage = p.roi_percent;
+        ";
+    }
+    
     executeSql($conn_back, $addRoiColumnSql, "Adding roi_percentage column to investments table");
 }
 
 // Step 3: Populate returns for existing investments
-// Use a different approach that doesn't depend on the roi_percentage column
-$populateReturnsSQL = "
-INSERT INTO investment_returns 
-(investment_id, user_id, return_amount, roi_percentage, expected_date, status, created_at)
-SELECT 
-    i.id, 
-    i.user_id, 
-    i.roi_expected,
-    (SELECT p.roi_percent FROM investment_plans p WHERE p.id = i.plan_id LIMIT 1) AS roi_percentage,
-    i.ends_at, 
-    'pending', 
-    NOW()
-FROM 
-    investments i
-LEFT JOIN 
-    investment_returns ir ON i.id = ir.investment_id
-WHERE 
-    ir.id IS NULL AND i.status = 'active';
-";
+// Check if we have investment_plans table with roi_percent column
+if ($roiPercentColumnExists) {
+    // Populate with roi_percent from investment_plans
+    $populateReturnsSQL = "
+    INSERT INTO investment_returns 
+    (investment_id, user_id, return_amount, roi_percentage, expected_date, status, created_at)
+    SELECT 
+        i.id, 
+        i.user_id, 
+        i.roi_expected,
+        p.roi_percent,
+        i.ends_at, 
+        'pending', 
+        NOW()
+    FROM 
+        investments i
+    LEFT JOIN 
+        investment_returns ir ON i.id = ir.investment_id
+    JOIN
+        investment_plans p ON i.plan_id = p.id
+    WHERE 
+        ir.id IS NULL AND i.status = 'active';
+    ";
+} else {
+    // Populate with default value for roi_percentage
+    $populateReturnsSQL = "
+    INSERT INTO investment_returns 
+    (investment_id, user_id, return_amount, roi_percentage, expected_date, status, created_at)
+    SELECT 
+        i.id, 
+        i.user_id, 
+        i.roi_expected,
+        0,
+        i.ends_at, 
+        'pending', 
+        NOW()
+    FROM 
+        investments i
+    LEFT JOIN 
+        investment_returns ir ON i.id = ir.investment_id
+    WHERE 
+        ir.id IS NULL AND i.status = 'active';
+    ";
+}
 executeSql($conn_back, $populateReturnsSQL, "Populating returns for existing investments");
 
 // Check if the transactions table exists
