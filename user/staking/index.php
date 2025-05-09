@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$page_title = "Staking Dashboard";
+$page_name = "Staking Dashboard";
 
 // Get user data
 $stmt = $conn_back->prepare("SELECT * FROM users WHERE id = ?");

@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$page_title = "Staking Rewards";
+$page_name = "Staking Rewards";
 
 // Get user data
 $stmt = $conn_back->prepare("SELECT * FROM users WHERE id = ?");
@@ -225,12 +225,10 @@ $stmt->close();
 
 // Get historical rewards
 $stmt = $conn_back->prepare("
-    SELECT sr.*, s.amount as staking_amount, sp.name as plan_name, 
-           t.reference as transaction_reference
+    SELECT sr.*, s.amount as staking_amount, sp.name as plan_name
     FROM staking_rewards sr
     JOIN staking s ON sr.staking_id = s.id
     JOIN staking_plans sp ON s.plan_id = sp.id
-    LEFT JOIN transactions t ON sr.transaction_id = t.id
     WHERE sr.user_id = ? AND sr.status != 'pending'
     ORDER BY sr.claimed_at DESC, sr.created_at DESC
     LIMIT 20
@@ -530,7 +528,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                         <th>Amount</th>
                                         <th>Date</th>
                                         <th>Status</th>
-                                        <th>Transaction</th>
+                                        <th>Transaction ID</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -551,8 +549,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <?php if ($reward['transaction_reference']): ?>
-                                                    <small class="text-muted"><?= $reward['transaction_reference'] ?></small>
+                                                <?php if (isset($reward['transaction_id']) && $reward['transaction_id']): ?>
+                                                    <small class="text-muted">ID: <?= $reward['transaction_id'] ?></small>
                                                 <?php else: ?>
                                                     -
                                                 <?php endif; ?>
