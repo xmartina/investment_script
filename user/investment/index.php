@@ -110,30 +110,37 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 <?php
 if (isset($_POST['invest'])) {
     $plan_id = $_POST['plan_id'];
-    $amount = $_POST['amount'];
+    $amount = (float)$_POST['amount'];  // Cast to float to ensure proper calculation
     $balance_source = $_POST['balance_source'];
     $user_id = $_SESSION['user_id'];
     
     // Get current user balances
     $user_query = "SELECT main_balance, investment_balance, staking_balance FROM users WHERE id = '$user_id'";
     $user_result = $conn_back->query($user_query);
+    
+    if (!$user_result) {
+        error_log("User query failed: " . $conn_back->error);
+        echo '<script>alert("Error retrieving user data. Please try again."); window.location.href="/user/investment";</script>';
+        exit;
+    }
+    
     $user_data = $user_result->fetch_assoc();
     
     // Check if selected balance has enough funds
     $sufficient_funds = false;
     switch ($balance_source) {
         case 'main_balance':
-            $sufficient_funds = $user_data['main_balance'] >= $amount;
+            $sufficient_funds = (float)$user_data['main_balance'] >= $amount;
             $balance_field = 'main_balance';
             $balance_name = 'Main Balance';
             break;
         case 'investment_balance':
-            $sufficient_funds = $user_data['investment_balance'] >= $amount;
+            $sufficient_funds = (float)$user_data['investment_balance'] >= $amount;
             $balance_field = 'investment_balance';
             $balance_name = 'Investment Balance';
             break;
         case 'staking_balance':
-            $sufficient_funds = $user_data['staking_balance'] >= $amount;
+            $sufficient_funds = (float)$user_data['staking_balance'] >= $amount;
             $balance_field = 'staking_balance';
             $balance_name = 'Staking Balance';
             break;
@@ -148,11 +155,19 @@ if (isset($_POST['invest'])) {
     $plan_query = "SELECT * FROM investment_plans WHERE id = '$plan_id'";
     $plan_result = $conn_back->query($plan_query);
     
+    if (!$plan_result) {
+        error_log("Plan query failed: " . $conn_back->error);
+        echo '<script>alert("Error retrieving plan data. Please try again."); window.location.href="/user/investment";</script>';
+        exit;
+    }
+    
     if ($plan_result && $plan_result->num_rows > 0) {
         $plan = $plan_result->fetch_assoc();
         
-        // Calculate expected ROI and end date
-        $roi_expected = $amount * ($plan['roi_percent'] / 100);
+        // Calculate expected ROI - correct calculation
+        $roi_percent = (float)$plan['roi_percent'];
+        $roi_expected = ($amount * $roi_percent) / 100;
+        
         $start_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d H:i:s', strtotime($start_date . ' + ' . $plan['duration_days'] . ' days'));
         
@@ -162,12 +177,20 @@ if (isset($_POST['invest'])) {
         try {
             // Deduct amount from the selected balance
             $update_balance = "UPDATE users SET $balance_field = $balance_field - $amount WHERE id = '$user_id'";
-            $conn_back->query($update_balance);
+            $update_result = $conn_back->query($update_balance);
+            
+            if (!$update_result) {
+                throw new Exception("Failed to update user balance: " . $conn_back->error);
+            }
             
             // Insert into investments table
             $invest_query = "INSERT INTO investments (user_id, plan_id, amount, roi_expected, status, started_at, ends_at, created_at) 
                             VALUES ('$user_id', '$plan_id', '$amount', '$roi_expected', 'active', '$start_date', '$end_date', NOW())";
-            $conn_back->query($invest_query);
+            $invest_result = $conn_back->query($invest_query);
+            
+            if (!$invest_result) {
+                throw new Exception("Failed to create investment: " . $conn_back->error);
+            }
             
             // Generate unique reference
             $reference = 'INV-' . time() . '-' . $user_id;
@@ -176,7 +199,11 @@ if (isset($_POST['invest'])) {
             $trans_query = "INSERT INTO transactions (user_id, type, amount, status, reference, description, created_at) 
                             VALUES ('$user_id', 'investment', '$amount', 'successful', '$reference', 
                             'Investment in " . $plan['name'] . " from " . $balance_name . "', NOW())";
-            $conn_back->query($trans_query);
+            $trans_result = $conn_back->query($trans_query);
+            
+            if (!$trans_result) {
+                throw new Exception("Failed to record transaction: " . $conn_back->error);
+            }
             
             // Commit transaction
             $conn_back->commit();
@@ -185,7 +212,8 @@ if (isset($_POST['invest'])) {
         } catch (Exception $e) {
             // Rollback transaction on error
             $conn_back->rollback();
-            echo '<script>alert("Error processing investment. Please try again."); window.location.href="/user/investment";</script>';
+            error_log("Investment error: " . $e->getMessage());
+            echo '<script>alert("Error processing investment: ' . addslashes($e->getMessage()) . '"); window.location.href="/user/investment";</script>';
         }
     } else {
         echo '<script>alert("Invalid investment plan selected."); window.location.href="/user/investment";</script>';
