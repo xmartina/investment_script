@@ -179,6 +179,7 @@ if ($plansCount == 0) {
 $createTriggerSql = "
 DROP TRIGGER IF EXISTS after_staking_insert;
 
+/* Trigger disabled - we now calculate APY and create reward records directly in the staking creation logic
 CREATE TRIGGER after_staking_insert
 AFTER INSERT ON staking
 FOR EACH ROW
@@ -202,8 +203,9 @@ BEGIN
     VALUES
     (NEW.id, NEW.user_id, expected_reward, NEW.ends_at, 'pending', NOW());
 END;
+*/
 ";
-executeSql($conn_back, $createTriggerSql, "Creating trigger for automatic reward calculation");
+executeSql($conn_back, $createTriggerSql, "Disabling trigger for automatic reward calculation (now handled in application code)");
 
 // Step 6: Update the current staking records to have rewards if they don't
 $populateRewardsSql = "

@@ -151,20 +151,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             $end_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $plan['duration_days'] . ' days'));
             $unstake_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $plan['lock_period_days'] . ' days'));
             
+            // Calculate APY directly
+            $calculated_apy = ($plan['reward_percent'] * 365) / $plan['duration_days'];
+            
             $stmt = $conn_back->prepare("
                 INSERT INTO staking (
                     user_id, plan_id, amount, duration_days, reward_percent, 
-                    is_compounding, status, started_at, ends_at, unstake_available_at, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
+                    apy, is_compounding, status, started_at, ends_at, unstake_available_at, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
             ");
             $stmt->bind_param(
-                "iidiisssss", 
+                "iidiidssss", 
                 $user_id, $plan_id, $amount, $plan['duration_days'], 
-                $plan['reward_percent'], $is_compounding, $start_date, $end_date, $unstake_date, $now
+                $plan['reward_percent'], $calculated_apy, $is_compounding, $start_date, $end_date, $unstake_date, $now
             );
             $stmt->execute();
             $staking_id = $conn_back->insert_id;
             $stmt->close();
+            
+            // Insert rewards record directly rather than relying on trigger
+            $expected_reward = ($amount * $plan['reward_percent']) / 100;
+            $rewardStmt = $conn_back->prepare("
+                INSERT INTO staking_rewards 
+                (staking_id, user_id, reward_amount, expected_date, status, created_at)
+                VALUES (?, ?, ?, ?, 'pending', ?)
+            ");
+            $rewardStmt->bind_param(
+                "iidss",
+                $staking_id, $user_id, $expected_reward, $end_date, $now
+            );
+            $rewardStmt->execute();
+            $rewardStmt->close();
             
             // Deduct amount from the selected balance
             $stmt = $conn_back->prepare("UPDATE users SET {$balance_field} = {$balance_field} - ? WHERE id = ?");
