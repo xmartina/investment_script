@@ -569,4 +569,4 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
     </div>
 </div>
 
-<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php'; ?> 
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php'; ?> 
