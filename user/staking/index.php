@@ -192,12 +192,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             // Add transaction record
             $reference = 'STAKE' . time() . $user_id;
             $description = "Staking {$amount} in {$plan['name']} plan from {$balance_name}";
+            $transaction_proof_id = 'STAKEPROOF' . time();
+            $current_datetime = date('Y-m-d H:i:s');
             
             $stmt = $conn_back->prepare("
-                INSERT INTO transactions (user_id, type, amount, status, reference, description, created_at)
-                VALUES (?, 'staking', ?, 'successful', ?, ?, ?)
+                INSERT INTO transactions 
+                (transaction_type, reference_id, transaction_proof_id, amount, currency, 
+                status, date_time, description, user_id)
+                VALUES 
+                ('staking', ?, ?, ?, 'USD', 'successful', ?, ?, ?)
             ");
-            $stmt->bind_param("idsss", $user_id, $amount, $reference, $description, $now);
+            $stmt->bind_param("ssdssi", $reference, $transaction_proof_id, $amount, $current_datetime, $description, $user_id);
             $stmt->execute();
             $stmt->close();
             
