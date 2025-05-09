@@ -372,21 +372,21 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                 <div class="list-group-item">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h6 class="mb-1">
-                                            <?php if ($transaction['type'] === 'staking'): ?>
+                                            <?php if (isset($transaction['transaction_type']) && $transaction['transaction_type'] === 'staking'): ?>
                                                 <i class="fas fa-arrow-right text-danger"></i> Staking
-                                            <?php elseif ($transaction['type'] === 'earning'): ?>
+                                            <?php elseif (isset($transaction['transaction_type']) && $transaction['transaction_type'] === 'earning'): ?>
                                                 <i class="fas fa-arrow-left text-success"></i> Reward
                                             <?php else: ?>
-                                                <i class="fas fa-exchange-alt"></i> <?= ucfirst($transaction['type']) ?>
+                                                <i class="fas fa-exchange-alt"></i> <?= isset($transaction['transaction_type']) ? ucfirst($transaction['transaction_type']) : 'Transaction' ?>
                                             <?php endif; ?>
                                         </h6>
                                         <small class="text-muted">
-                                            <?= date('M d, Y', strtotime($transaction['created_at'])) ?>
+                                            <?= date('M d, Y', strtotime($transaction['date_time'] ?? date('Y-m-d H:i:s'))) ?>
                                         </small>
                                     </div>
                                     <p class="mb-1">$<?= number_format($transaction['amount'], 2) ?></p>
                                     <small class="text-muted">
-                                        Ref: <?= $transaction['reference'] ?>
+                                        Ref: <?= $transaction['reference_id'] ?? 'N/A' ?>
                                     </small>
                                 </div>
                             <?php endforeach; ?>
