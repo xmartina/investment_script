@@ -93,6 +93,11 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                             <option value="staking_balance">Staking Balance (<?=$user_currency?><?=number_format($staking_balance, 2)?>)</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="userPin" class="form-label">Enter Your PIN</label>
+                        <input type="password" class="form-control" id="userPin" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
+                        <small class="text-muted">Please enter your account PIN to confirm this investment</small>
+                    </div>
                     <div class="alert alert-info">
                         <small>You will be investing from your selected balance. Make sure you have enough funds.</small>
                     </div>
@@ -112,7 +117,24 @@ if (isset($_POST['invest'])) {
     $plan_id = $_POST['plan_id'];
     $amount = (float)$_POST['amount'];
     $balance_source = $_POST['balance_source'];
+    $user_pin = $_POST['pin'];
     $user_id = $_SESSION['user_id'];
+    
+    // Verify user PIN first
+    $pin_query = "SELECT pin FROM users WHERE id = '$user_id'";
+    $pin_result = $conn_back->query($pin_query);
+    
+    if (!$pin_result) {
+        error_log("PIN verification query failed: " . $conn_back->error);
+        echo '<script>alert("Error verifying PIN. Please try again."); window.location.href="/user/investment";</script>';
+        exit;
+    }
+    
+    $pin_data = $pin_result->fetch_assoc();
+    if ($pin_data['pin'] != $user_pin) {
+        echo '<script>alert("Incorrect PIN. Please try again."); window.location.href="/user/investment";</script>';
+        exit;
+    }
     
     // Get current user balances
     $user_query = "SELECT main_balance, investment_balance, staking_balance FROM users WHERE id = '$user_id'";
