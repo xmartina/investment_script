@@ -332,7 +332,7 @@
                 ['url' => '/user/deposit', 'icon' => 'bi-cash-coin', 'name' => 'Make Deposit'],
                 ['type' => 'dropdown', 'icon' => 'bi-piggy-bank', 'name' => 'Investment', 'items' => [
                     ['url' => '/user/investment_plans', 'icon' => 'bi-bank', 'name' => 'Investment Plans'],
-                    ['url' => '/user/my_investments', 'icon' => 'bi-cash-coin', 'name' => 'My Investments'],
+                    ['url' => '/user/investment/my_investments', 'icon' => 'bi-cash-coin', 'name' => 'My Investments'],
                 ]],
                 ['type' => 'dropdown', 'icon' => 'bi-piggy-bank', 'name' => 'Staking', 'items' => [
                     ['url' => '/user/staking_plans', 'icon' => 'bi-bank', 'name' => 'Staking Plans'],
