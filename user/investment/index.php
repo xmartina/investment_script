@@ -221,7 +221,7 @@ if (isset($_POST['invest'])) {
             $trans_query = "INSERT INTO transactions (transaction_type, reference_id, transaction_proof_id, 
                            amount, currency, status, date_time, description, user_id) 
                            VALUES ('investment', '$reference', '$transaction_proof_id', 
-                           '$amount', 'USD', 'completed', NOW(), 'Investment in " . $plan['name'] . " from " . $balance_name . "', '$user_id')";
+                           '$amount', '$user_currency', 'active', NOW(), 'Investment in " . $plan['name'] . " from " . $balance_name . "', '$user_id')";
             $trans_result = $conn_back->query($trans_query);
             
             if (!$trans_result) {
