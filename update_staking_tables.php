@@ -61,6 +61,10 @@ executeSql($conn_back, $createStakingPlansSql, "Creating staking_plans table");
 // Step 2: Update staking table structure if needed
 $checkStakingTable = $conn_back->query("SHOW TABLES LIKE 'staking'");
 if ($checkStakingTable->num_rows > 0) {
+    // Check if id is already a primary key
+    $checkPrimaryKey = $conn_back->query("SHOW KEYS FROM staking WHERE Key_name = 'PRIMARY'");
+    $hasPrimaryKey = $checkPrimaryKey->num_rows > 0;
+    
     // Add missing columns to staking table if they don't exist
     $updateStakingSql = "
     ALTER TABLE staking 
@@ -80,10 +84,16 @@ if ($checkStakingTable->num_rows > 0) {
     
     ALTER TABLE staking
     ADD COLUMN unstake_available_at DATETIME AFTER ends_at;
-
-    -- Ensure ID is auto-incrementing
-    ALTER TABLE staking MODIFY id INT AUTO_INCREMENT PRIMARY KEY;
     ";
+    
+    // Only add the primary key modification if it doesn't already have one
+    if (!$hasPrimaryKey) {
+        $updateStakingSql .= "
+        -- Ensure ID is auto-incrementing
+        ALTER TABLE staking MODIFY id INT AUTO_INCREMENT PRIMARY KEY;
+        ";
+    }
+    
     executeSql($conn_back, $updateStakingSql, "Updating staking table structure");
 } else {
     // Create staking table if it doesn't exist
