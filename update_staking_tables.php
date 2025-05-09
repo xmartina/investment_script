@@ -65,36 +65,58 @@ if ($checkStakingTable->num_rows > 0) {
     $checkPrimaryKey = $conn_back->query("SHOW KEYS FROM staking WHERE Key_name = 'PRIMARY'");
     $hasPrimaryKey = $checkPrimaryKey->num_rows > 0;
     
-    // Add missing columns to staking table if they don't exist
-    $updateStakingSql = "
-    ALTER TABLE staking 
-    ADD COLUMN plan_id INT AFTER user_id;
-
-    ALTER TABLE staking
-    ADD COLUMN apy DECIMAL(10, 2) AFTER reward_percent;
+    // Get existing columns
+    $columns = array();
+    $result = $conn_back->query("SHOW COLUMNS FROM staking");
+    while($row = $result->fetch_assoc()){
+        $columns[] = $row['Field'];
+    }
     
-    ALTER TABLE staking
-    ADD COLUMN earned_reward DECIMAL(20, 8) DEFAULT 0 AFTER apy;
+    // Build the SQL dynamically based on which columns need to be added
+    $updateStakingSql = "";
     
-    ALTER TABLE staking
-    ADD COLUMN is_compounding BOOLEAN DEFAULT FALSE AFTER earned_reward;
+    // Add plan_id column if it doesn't exist
+    if (!in_array('plan_id', $columns)) {
+        $updateStakingSql .= "ALTER TABLE staking ADD COLUMN plan_id INT AFTER user_id;\n";
+    }
     
-    ALTER TABLE staking
-    ADD COLUMN last_compound_at DATETIME AFTER is_compounding;
+    // Add apy column if it doesn't exist
+    if (!in_array('apy', $columns)) {
+        $updateStakingSql .= "ALTER TABLE staking ADD COLUMN apy DECIMAL(10, 2) AFTER reward_percent;\n";
+    }
     
-    ALTER TABLE staking
-    ADD COLUMN unstake_available_at DATETIME AFTER ends_at;
-    ";
+    // Add earned_reward column if it doesn't exist
+    if (!in_array('earned_reward', $columns)) {
+        $updateStakingSql .= "ALTER TABLE staking ADD COLUMN earned_reward DECIMAL(20, 8) DEFAULT 0 AFTER apy;\n";
+    }
+    
+    // Add is_compounding column if it doesn't exist
+    if (!in_array('is_compounding', $columns)) {
+        $updateStakingSql .= "ALTER TABLE staking ADD COLUMN is_compounding BOOLEAN DEFAULT FALSE AFTER earned_reward;\n";
+    }
+    
+    // Add last_compound_at column if it doesn't exist
+    if (!in_array('last_compound_at', $columns)) {
+        $updateStakingSql .= "ALTER TABLE staking ADD COLUMN last_compound_at DATETIME AFTER is_compounding;\n";
+    }
+    
+    // Add unstake_available_at column if it doesn't exist
+    if (!in_array('unstake_available_at', $columns)) {
+        $updateStakingSql .= "ALTER TABLE staking ADD COLUMN unstake_available_at DATETIME AFTER ends_at;\n";
+    }
     
     // Only add the primary key modification if it doesn't already have one
     if (!$hasPrimaryKey) {
-        $updateStakingSql .= "
-        -- Ensure ID is auto-incrementing
-        ALTER TABLE staking MODIFY id INT AUTO_INCREMENT PRIMARY KEY;
-        ";
+        $updateStakingSql .= "ALTER TABLE staking MODIFY id INT AUTO_INCREMENT PRIMARY KEY;\n";
     }
     
-    executeSql($conn_back, $updateStakingSql, "Updating staking table structure");
+    // Only run the SQL if there are changes to make
+    if (!empty($updateStakingSql)) {
+        executeSql($conn_back, $updateStakingSql, "Updating staking table structure");
+    } else {
+        echo "<hr><h3>Updating staking table structure</h3>";
+        echo "<p style='color:green'>✅ No updates needed - all columns already exist</p>";
+    }
 } else {
     // Create staking table if it doesn't exist
     $createStakingSql = "
