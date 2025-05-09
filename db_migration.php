@@ -161,26 +161,26 @@ $result = $conn_back->query("SHOW TABLES LIKE 'investments'");
 if ($result->num_rows > 0) {
     // Table exists, update it
     $updateInvestmentsSql = "
-    ALTER TABLE investments
+    -- First add the amount column if it doesn't exist
+    ALTER TABLE investments ADD COLUMN amount DECIMAL(20, 8) AFTER plan_id;
+    
+    -- Copy data from amount_invested to amount
+    UPDATE investments SET amount = amount_invested;
+    
+    -- Now add the rest of the columns
+    ALTER TABLE investments 
     ADD COLUMN roi_expected DECIMAL(20, 8) AFTER amount,
     ADD COLUMN status ENUM('active', 'completed', 'cancelled') DEFAULT 'active',
     ADD COLUMN started_at DATETIME,
     ADD COLUMN ends_at DATETIME;
     
-    -- Rename amount_invested to amount if it exists
+    -- Drop old columns
+    ALTER TABLE investments 
+    DROP COLUMN amount_invested,
+    DROP COLUMN trans_type,
+    DROP COLUMN returns_amount,
+    DROP COLUMN trans_id;
     ";
-    
-    // Check if amount_invested column exists
-    $result = $conn_back->query("SHOW COLUMNS FROM investments LIKE 'amount_invested'");
-    if ($result->num_rows > 0) {
-        $updateInvestmentsSql .= "
-        UPDATE investments SET amount = amount_invested;
-        ALTER TABLE investments DROP COLUMN amount_invested;
-        ALTER TABLE investments DROP COLUMN trans_type;
-        ALTER TABLE investments DROP COLUMN returns_amount;
-        ALTER TABLE investments DROP COLUMN trans_id;
-        ";
-    }
     
     executeSql($conn_back, $updateInvestmentsSql, "Updating investments table");
 } else {
