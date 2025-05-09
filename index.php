@@ -35,7 +35,22 @@ get('/user/dashboard', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/dashboard.php';
 });
 get('/user/staking', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/index.php';
+});
+get('/user/staking/dashboard.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/dashboard.php';
+});
+get('/user/staking/rewards.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/rewards.php';
+});
+get('/user/staking/details.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/details.php';
+});
+get('/user/staking/unstake.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/unstake.php';
+});
+get('/user/staking/toggle_compound.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/toggle_compound.php';
 });
 get('/user/profile', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/profile.php';
@@ -70,6 +85,9 @@ get('/update_investment_plans', function() {
 get('/update_investment_returns', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_investment_returns.php';
 });
+get('/update_staking_tables', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/update_staking_tables.php';
+});
 
 // Add these to your index.php
 post('/user/login', function() {
@@ -85,7 +103,19 @@ post('/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
 });
 post('/user/staking', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/index.php';
+});
+post('/user/staking/dashboard.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/dashboard.php';
+});
+post('/user/staking/rewards.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/rewards.php';
+});
+post('/user/staking/details.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/details.php';
+});
+post('/user/staking/unstake.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/staking/unstake.php';
 });
 post('/user/register', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/register.php';
@@ -119,6 +149,9 @@ post('/update_investment_plans', function() {
 });
 post('/update_investment_returns', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_investment_returns.php';
+});
+post('/update_staking_tables', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/update_staking_tables.php';
 });
 
 
