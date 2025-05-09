@@ -75,7 +75,7 @@ $stmt = $conn_back->prepare("
     SELECT *
     FROM transactions
     WHERE user_id = ? AND description LIKE ?
-    ORDER BY created_at DESC
+    ORDER BY date_time DESC
     LIMIT 5
 ");
 $search_term = "%staking%" . $staking_id . "%";
