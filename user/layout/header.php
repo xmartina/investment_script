@@ -345,8 +345,9 @@
                     ['url' => '/user/investment/my_investments', 'icon' => 'bi-cash-coin', 'name' => 'My Investments'],
                 ]],
                 ['type' => 'dropdown', 'icon' => 'bi-piggy-bank', 'name' => 'Staking', 'items' => [
-                    ['url' => '/user/staking_plans', 'icon' => 'bi-bank', 'name' => 'Staking Plans'],
-                    ['url' => '/user/my_stakes', 'icon' => 'bi-cash-coin', 'name' => 'My Stakes'],
+                    ['url' => '/user/staking', 'icon' => 'bi-bank', 'name' => 'Staking Plans'],
+                    ['url' => '/user/staking/dashboard', 'icon' => 'bi-cash-coin', 'name' => 'My Stakes'],
+                    ['url' => '/user/staking/rewards', 'icon' => 'bi-award', 'name' => 'Staking Rewards'],
                 ]],
                 ['url' => '/user/transactions', 'icon' => 'bi-columns-gap', 'name' => 'Transactions'],
                 ['url' => '/user/withdrawal', 'icon' => 'bi-wallet', 'name' => 'Withdrawal'],

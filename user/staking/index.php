@@ -2,10 +2,9 @@
 // Main staking page
 session_start();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
-// require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/auth.php';
 
 // Check if user is logged in
-if (!isLoggedIn()) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: /user/login");
     exit();
 }
