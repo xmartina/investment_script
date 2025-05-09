@@ -11,6 +11,18 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 echo "<h1>Investment Plans Table Update</h1>";
+
+// First check if the investments table has been migrated properly
+$checkInvestmentsTable = $conn_back->query("SHOW COLUMNS FROM investments LIKE 'trans_type'");
+if ($checkInvestmentsTable->num_rows > 0) {
+    echo "<div style='background-color: #ffdddd; padding: 15px; border-radius: 5px; margin: 20px 0;'>";
+    echo "<h3 style='color: red;'>⚠️ Database Migration Required First</h3>";
+    echo "<p>The investments table still has the old structure. Please run the db_migration.php script first before proceeding with this update.</p>";
+    echo "<p><a href='db_migration.php' class='btn btn-primary'>Run Migration Script</a></p>";
+    echo "</div>";
+    exit;
+}
+
 echo "<p>This script will organize the investment_plans table structure.</p>";
 
 // Function to execute SQL queries safely

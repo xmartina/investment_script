@@ -199,13 +199,13 @@ if (isset($user_id)) {
     }
 
 // Fetch investments
-    $sql_investments = "SELECT * FROM investments WHERE user_id = '$user_id' AND trans_type = 'investment'";
+    $sql_investments = "SELECT * FROM investments WHERE user_id = '$user_id' AND status = 'active'";
     $get_investments = $conn_back->query($sql_investments);
 
     if ($get_investments && $get_investments->num_rows > 0) {
         while ($row = $get_investments->fetch_assoc()) {
-            $returns_amount += $row['returns_amount'];
-            $amount_invested += $row['amount_invested'];
+            $returns_amount += isset($row['roi_expected']) ? $row['roi_expected'] : 0;
+            $amount_invested += isset($row['amount']) ? $row['amount'] : 0;
         }
     }
 
@@ -213,13 +213,14 @@ if (isset($user_id)) {
     $total_invested = abbreviate_number($amount_invested);
 
 // Fetch stakes
-    $sql_stakes = "SELECT * FROM investments WHERE user_id = '$user_id' AND trans_type = 'staking'";
+    $sql_stakes = "SELECT * FROM staking WHERE user_id = '$user_id' AND status = 'active'";
     $get_stakes = $conn_back->query($sql_stakes);
 
     if ($get_stakes && $get_stakes->num_rows > 0) {
         while ($row = $get_stakes->fetch_assoc()) {
-            $returns_stakes_amount += $row['returns_amount'];
-            $amount_stakes_invested += $row['amount_invested'];
+            $reward_amount = ($row['amount'] * $row['reward_percent'] / 100);
+            $returns_stakes_amount += $reward_amount;
+            $amount_stakes_invested += $row['amount'];
         }
     }
 
