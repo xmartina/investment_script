@@ -209,8 +209,9 @@ if (isset($_POST['invest'])) {
     if ($plan_result && $plan_result->num_rows > 0) {
         $plan = $plan_result->fetch_assoc();
         
-        // Get the ROI value directly from the plan
-        $roi_expected = (float)$plan['roi_percent'];
+        // Calculate expected ROI amount based on investment amount and percentage
+        $roi_percent = (float)$plan['roi_percent'];
+        $roi_expected = ($amount * $roi_percent) / 100;
         
         $start_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d H:i:s', strtotime($start_date . ' + ' . $plan['duration_days'] . ' days'));
