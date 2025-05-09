@@ -40,7 +40,45 @@ function executeSql($conn, $sql, $description) {
     }
 }
 
-// Step 1: Create investment_returns table
+// Check if investment_plans table exists, create it if it doesn't
+$checkPlansTable = $conn_back->query("SHOW TABLES LIKE 'investment_plans'");
+if ($checkPlansTable->num_rows == 0) {
+    $createPlansSql = "
+    CREATE TABLE investment_plans (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100),
+        min_amount DECIMAL(20, 8),
+        max_amount DECIMAL(20, 8),
+        roi_percent DECIMAL(5, 2),
+        duration_days INT,
+        is_active BOOLEAN DEFAULT TRUE,
+        status VARCHAR(20) DEFAULT 'active',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );";
+    executeSql($conn_back, $createPlansSql, "Creating investment_plans table");
+}
+
+// Check if investments table exists, create it if it doesn't
+$checkInvestmentsTable = $conn_back->query("SHOW TABLES LIKE 'investments'");
+if ($checkInvestmentsTable->num_rows == 0) {
+    $createInvestmentsSql = "
+    CREATE TABLE investments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT,
+        plan_id INT,
+        amount DECIMAL(20, 8),
+        roi_expected DECIMAL(20, 8),
+        status ENUM('active', 'completed', 'cancelled') DEFAULT 'active',
+        started_at DATETIME,
+        ends_at DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (plan_id) REFERENCES investment_plans(id)
+    );";
+    executeSql($conn_back, $createInvestmentsSql, "Creating investments table");
+}
+
+// Step 1: Create investment_returns table (without foreign key constraints since investments table is MyISAM)
 $createTableSql = "
 CREATE TABLE IF NOT EXISTS investment_returns (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -51,10 +89,8 @@ CREATE TABLE IF NOT EXISTS investment_returns (
     status ENUM('pending', 'paid', 'failed') DEFAULT 'pending',
     transaction_id INT DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    paid_at DATETIME DEFAULT NULL,
-    FOREIGN KEY (investment_id) REFERENCES investments(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    paid_at DATETIME DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ";
 executeSql($conn_back, $createTableSql, "Creating investment_returns table");
 
