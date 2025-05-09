@@ -61,6 +61,9 @@ get('/user/investment/create_investment_plans_table', function() {
 get('/user/investment/my_investments', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/investments.php';
 });
+get('/db_migration', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/db_migration.php';
+});
 // Add these to your index.php
 post('/user/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
@@ -101,6 +104,10 @@ post('/user/investment/create_investment_plans_table', function() {
 post('/user/investment/my_investments', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/investments.php';
 });
+post('/db_migration', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/db_migration.php';
+});
+
 
 
 dispatch();
