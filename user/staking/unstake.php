@@ -61,84 +61,116 @@ if (!$can_unstake) {
 
 // Process unstaking
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
-    // Begin transaction
-    $conn_back->begin_transaction();
+    $user_pin = $_POST['pin'];
+    $return_balance = $_POST['return_balance'];
     
-    try {
-        // Update staking status
-        $now = date('Y-m-d H:i:s');
-        $status = 'cancelled';
-        
-        $stmt = $conn_back->prepare("
-            UPDATE staking 
-            SET status = ?, ends_at = ?
-            WHERE id = ?
-        ");
-        $stmt->bind_param("ssi", $status, $now, $staking_id);
-        $stmt->execute();
-        $stmt->close();
-        
-        // Cancel any pending rewards
-        $stmt = $conn_back->prepare("
-            UPDATE staking_rewards
-            SET status = 'expired'
-            WHERE staking_id = ? AND status = 'pending'
-        ");
-        $stmt->bind_param("i", $staking_id);
-        $stmt->execute();
-        $stmt->close();
-        
-        // Add funds back to user balance
-        $stmt = $conn_back->prepare("
-            UPDATE users 
-            SET balance = balance + ?
-            WHERE id = ?
-        ");
-        $stmt->bind_param("di", $return_amount, $user_id);
-        $stmt->execute();
-        $stmt->close();
-        
-        // Create transaction record
-        $reference = 'UNSTAKE' . time() . $user_id;
-        $description = "Unstaked funds from {$staking['plan_name']} plan";
-        if ($penalty_amount > 0) {
-            $description .= " (Early unstake with " . number_format($staking['early_unstake_penalty'], 2) . "% penalty)";
-        }
-        
-        $stmt = $conn_back->prepare("
-            INSERT INTO transactions (
-                user_id, type, amount, status, reference, description, created_at
-            ) VALUES (?, 'staking', ?, 'successful', ?, ?, ?)
-        ");
-        $stmt->bind_param("idsss", $user_id, $return_amount, $reference, $description, $now);
-        $stmt->execute();
-        $stmt->close();
-        
-        // If there was a penalty, record it as a separate transaction
-        if ($penalty_amount > 0) {
-            $penalty_reference = 'PENALTY' . time() . $user_id;
-            $penalty_description = "Early unstaking penalty for {$staking['plan_name']} plan";
+    // Verify PIN first
+    $pin_query = "SELECT pin FROM users WHERE id = ?";
+    $stmt = $conn_back->prepare($pin_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $pin_result = $stmt->get_result();
+    $pin_data = $pin_result->fetch_assoc();
+    $stmt->close();
+    
+    if (!$pin_data || $pin_data['pin'] != $user_pin) {
+        $error = "Incorrect PIN. Please try again.";
+    } else {
+        // Validate return balance
+        $valid_balance_fields = ['main_balance', 'investment_balance', 'staking_balance'];
+        if (!in_array($return_balance, $valid_balance_fields)) {
+            $error = "Invalid return balance selection.";
+        } else {
+            // Begin transaction
+            $conn_back->begin_transaction();
             
-            $stmt = $conn_back->prepare("
-                INSERT INTO transactions (
-                    user_id, type, amount, status, reference, description, created_at
-                ) VALUES (?, 'staking', ?, 'successful', ?, ?, ?)
-            ");
-            $stmt->bind_param("idsss", $user_id, $penalty_amount, $penalty_reference, $penalty_description, $now);
-            $stmt->execute();
-            $stmt->close();
+            try {
+                // Update staking status
+                $now = date('Y-m-d H:i:s');
+                $status = 'cancelled';
+                
+                $stmt = $conn_back->prepare("
+                    UPDATE staking 
+                    SET status = ?, ends_at = ?
+                    WHERE id = ?
+                ");
+                $stmt->bind_param("ssi", $status, $now, $staking_id);
+                $stmt->execute();
+                $stmt->close();
+                
+                // Cancel any pending rewards
+                $stmt = $conn_back->prepare("
+                    UPDATE staking_rewards
+                    SET status = 'expired'
+                    WHERE staking_id = ? AND status = 'pending'
+                ");
+                $stmt->bind_param("i", $staking_id);
+                $stmt->execute();
+                $stmt->close();
+                
+                // Add funds back to selected balance
+                $stmt = $conn_back->prepare("
+                    UPDATE users 
+                    SET $return_balance = $return_balance + ?
+                    WHERE id = ?
+                ");
+                $stmt->bind_param("di", $return_amount, $user_id);
+                $stmt->execute();
+                $stmt->close();
+                
+                // Get readable balance name
+                $balance_name = 'Balance';
+                if ($return_balance == 'main_balance') {
+                    $balance_name = 'Main Balance';
+                } else if ($return_balance == 'investment_balance') {
+                    $balance_name = 'Investment Balance';
+                } else if ($return_balance == 'staking_balance') {
+                    $balance_name = 'Staking Balance';
+                }
+                
+                // Create transaction record
+                $reference = 'UNSTAKE' . time() . $user_id;
+                $description = "Unstaked funds from {$staking['plan_name']} plan to {$balance_name}";
+                if ($penalty_amount > 0) {
+                    $description .= " (Early unstake with " . number_format($staking['early_unstake_penalty'], 2) . "% penalty)";
+                }
+                
+                $stmt = $conn_back->prepare("
+                    INSERT INTO transactions (
+                        user_id, type, amount, status, reference, description, created_at
+                    ) VALUES (?, 'staking', ?, 'successful', ?, ?, ?)
+                ");
+                $stmt->bind_param("idsss", $user_id, $return_amount, $reference, $description, $now);
+                $stmt->execute();
+                $stmt->close();
+                
+                // If there was a penalty, record it as a separate transaction
+                if ($penalty_amount > 0) {
+                    $penalty_reference = 'PENALTY' . time() . $user_id;
+                    $penalty_description = "Early unstaking penalty for {$staking['plan_name']} plan";
+                    
+                    $stmt = $conn_back->prepare("
+                        INSERT INTO transactions (
+                            user_id, type, amount, status, reference, description, created_at
+                        ) VALUES (?, 'staking', ?, 'successful', ?, ?, ?)
+                    ");
+                    $stmt->bind_param("idsss", $user_id, $penalty_amount, $penalty_reference, $penalty_description, $now);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+                
+                // Commit transaction
+                $conn_back->commit();
+                
+                // Redirect to dashboard with success message
+                header("Location: /user/staking/dashboard?success=unstake");
+                exit();
+            } catch (Exception $e) {
+                // Rollback if an error occurs
+                $conn_back->rollback();
+                $error = "An error occurred: " . $e->getMessage();
+            }
         }
-        
-        // Commit transaction
-        $conn_back->commit();
-        
-        // Redirect to dashboard with success message
-        header("Location: /user/staking/dashboard?success=unstake");
-        exit();
-    } catch (Exception $e) {
-        // Rollback if an error occurs
-        $conn_back->rollback();
-        $error = "An error occurred: " . $e->getMessage();
     }
 }
 
@@ -268,6 +300,22 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     </div>
                     
                     <form method="post" class="text-center">
+                        <div class="mb-3">
+                            <label for="userPin" class="form-label">Enter Your PIN</label>
+                            <input type="password" class="form-control w-50 mx-auto" id="userPin" name="pin" 
+                                   inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
+                            <small class="text-muted">Please enter your account PIN to confirm unstaking</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="returnBalance" class="form-label">Return Funds To</label>
+                            <select class="form-select w-50 mx-auto" id="returnBalance" name="return_balance" required>
+                                <option value="main_balance">Main Balance</option>
+                                <option value="investment_balance">Investment Balance</option>
+                                <option value="staking_balance">Staking Balance</option>
+                            </select>
+                        </div>
+                        
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             <a href="/user/staking/details?id=<?= $staking_id ?>" class="btn btn-secondary">
                                 <i class="fas fa-times"></i> Cancel

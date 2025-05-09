@@ -67,9 +67,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
     $plan_id = $_POST['plan_id'];
     $amount = $_POST['amount'];
     $is_compounding = isset($_POST['is_compounding']) ? 1 : 0;
+    $balance_source = $_POST['balance_source'];
+    $user_pin = $_POST['pin'];
     
     // Validate inputs
     $errors = [];
+    
+    // Verify PIN first
+    $pin_query = "SELECT pin FROM users WHERE id = ?";
+    $stmt = $conn_back->prepare($pin_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $pin_result = $stmt->get_result();
+    $pin_data = $pin_result->fetch_assoc();
+    $stmt->close();
+    
+    if (!$pin_data || $pin_data['pin'] != $user_pin) {
+        $errors[] = "Incorrect PIN. Please try again.";
+    }
     
     // Check if plan exists and is active
     $stmt = $conn_back->prepare("SELECT * FROM staking_plans WHERE id = ? AND is_active = 1");
@@ -89,9 +104,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             $errors[] = "Amount exceeds the maximum limit of " . $plan['max_amount'];
         }
         
-        // Check if user has enough balance
-        if ($amount > $user['balance']) {
-            $errors[] = "Insufficient balance. Your current balance is " . $user['balance'];
+        // Get user's current balances
+        $user_query = "SELECT main_balance, investment_balance, staking_balance FROM users WHERE id = ?";
+        $stmt = $conn_back->prepare($user_query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $user_balances = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        
+        // Check if selected balance has enough funds
+        $sufficient_funds = false;
+        switch ($balance_source) {
+            case 'main_balance':
+                $sufficient_funds = (float)$user_balances['main_balance'] >= $amount;
+                $balance_field = 'main_balance';
+                $balance_name = 'Main Balance';
+                break;
+            case 'investment_balance':
+                $sufficient_funds = (float)$user_balances['investment_balance'] >= $amount;
+                $balance_field = 'investment_balance';
+                $balance_name = 'Investment Balance';
+                break;
+            case 'staking_balance':
+                $sufficient_funds = (float)$user_balances['staking_balance'] >= $amount;
+                $balance_field = 'staking_balance';
+                $balance_name = 'Staking Balance';
+                break;
+            default:
+                $errors[] = "Invalid balance source selected.";
+                break;
+        }
+        
+        if (isset($balance_field) && !$sufficient_funds) {
+            $errors[] = "Insufficient funds in your {$balance_name}. Your current {$balance_name} is " . $user_balances[$balance_field];
         }
     }
     
@@ -121,15 +166,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             $staking_id = $conn_back->insert_id;
             $stmt->close();
             
-            // Deduct amount from user balance
-            $stmt = $conn_back->prepare("UPDATE users SET balance = balance - ? WHERE id = ?");
+            // Deduct amount from the selected balance
+            $stmt = $conn_back->prepare("UPDATE users SET {$balance_field} = {$balance_field} - ? WHERE id = ?");
             $stmt->bind_param("di", $amount, $user_id);
             $stmt->execute();
             $stmt->close();
             
             // Add transaction record
             $reference = 'STAKE' . time() . $user_id;
-            $description = "Staking {$amount} in {$plan['name']} plan";
+            $description = "Staking {$amount} in {$plan['name']} plan from {$balance_name}";
             
             $stmt = $conn_back->prepare("
                 INSERT INTO transactions (user_id, type, amount, status, reference, description, created_at)
@@ -361,6 +406,18 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                 </div>
                                                 
                                                 <div class="mb-3">
+                                                    <label for="balanceSource<?= $plan['id'] ?>" class="form-label">Select Balance Source</label>
+                                                    <select class="form-select" id="balanceSource<?= $plan['id'] ?>" name="balance_source" required>
+                                                        <option value="main_balance">Main Balance
+                                                            (<?=$user_currency?><?=number_format($main_balance, 2)?>)</option>
+                                                        <option value="investment_balance">Investment Balance
+                                                            (<?=$user_currency?><?=number_format($investment_balance, 2)?>)</option>
+                                                        <option value="staking_balance">Staking Balance
+                                                            (<?=$user_currency?><?=number_format($staking_balance, 2)?>)</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="mb-3">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" value="1" 
                                                                id="compounding<?= $plan['id'] ?>" name="is_compounding">
@@ -368,6 +425,13 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                             Enable Compounding (Reinvest rewards automatically)
                                                         </label>
                                                     </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="userPin<?= $plan['id'] ?>" class="form-label">Enter Your PIN</label>
+                                                    <input type="password" class="w-75 form-control" id="userPin<?= $plan['id'] ?>" name="pin" 
+                                                           inputmode="numeric" pattern="[0-9]*" maxlength="6" required>
+                                                    <small class="text-muted">Please enter your account PIN to confirm this staking operation</small>
                                                 </div>
                                                 
                                                 <div class="alert alert-info">
