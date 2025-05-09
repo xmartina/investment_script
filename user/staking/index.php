@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
             ");
             $stmt->bind_param(
-                "iidiidssss", 
+                "iidiidsssss", 
                 $user_id, $plan_id, $amount, $plan['duration_days'], 
                 $plan['reward_percent'], $calculated_apy, $is_compounding, $start_date, $end_date, $unstake_date, $now
             );
