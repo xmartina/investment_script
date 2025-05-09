@@ -139,6 +139,7 @@ if (!$roiColumnExists) {
 }
 
 // Step 3: Populate returns for existing investments
+// Use a different approach that doesn't depend on the roi_percentage column
 $populateReturnsSQL = "
 INSERT INTO investment_returns 
 (investment_id, user_id, return_amount, roi_percentage, expected_date, status, created_at)
@@ -146,10 +147,7 @@ SELECT
     i.id, 
     i.user_id, 
     i.roi_expected,
-    CASE
-        WHEN i.roi_percentage IS NOT NULL THEN i.roi_percentage
-        ELSE (SELECT p.roi_percent FROM investment_plans p WHERE p.id = i.plan_id LIMIT 1)
-    END as roi_percentage,
+    (SELECT p.roi_percent FROM investment_plans p WHERE p.id = i.plan_id LIMIT 1) AS roi_percentage,
     i.ends_at, 
     'pending', 
     NOW()
