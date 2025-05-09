@@ -64,12 +64,22 @@ if ($checkStakingTable->num_rows > 0) {
     // Add missing columns to staking table if they don't exist
     $updateStakingSql = "
     ALTER TABLE staking 
-    ADD COLUMN IF NOT EXISTS plan_id INT AFTER user_id,
-    ADD COLUMN IF NOT EXISTS apy DECIMAL(10, 2) AFTER reward_percent,
-    ADD COLUMN IF NOT EXISTS earned_reward DECIMAL(20, 8) DEFAULT 0 AFTER apy,
-    ADD COLUMN IF NOT EXISTS is_compounding BOOLEAN DEFAULT FALSE AFTER earned_reward,
-    ADD COLUMN IF NOT EXISTS last_compound_at DATETIME AFTER is_compounding,
-    ADD COLUMN IF NOT EXISTS unstake_available_at DATETIME AFTER ends_at;
+    ADD COLUMN plan_id INT AFTER user_id;
+
+    ALTER TABLE staking
+    ADD COLUMN apy DECIMAL(10, 2) AFTER reward_percent;
+    
+    ALTER TABLE staking
+    ADD COLUMN earned_reward DECIMAL(20, 8) DEFAULT 0 AFTER apy;
+    
+    ALTER TABLE staking
+    ADD COLUMN is_compounding BOOLEAN DEFAULT FALSE AFTER earned_reward;
+    
+    ALTER TABLE staking
+    ADD COLUMN last_compound_at DATETIME AFTER is_compounding;
+    
+    ALTER TABLE staking
+    ADD COLUMN unstake_available_at DATETIME AFTER ends_at;
 
     -- Ensure ID is auto-incrementing
     ALTER TABLE staking MODIFY id INT AUTO_INCREMENT PRIMARY KEY;
@@ -141,15 +151,17 @@ CREATE TRIGGER after_staking_insert
 AFTER INSERT ON staking
 FOR EACH ROW
 BEGIN
-    -- Calculate APY from reward_percent and duration_days
+    -- Declare all variables at the beginning
     DECLARE calculated_apy DECIMAL(10, 2);
+    DECLARE expected_reward DECIMAL(20, 8);
+    
+    -- Calculate APY from reward_percent and duration_days
     SET calculated_apy = (NEW.reward_percent * 365) / NEW.duration_days;
     
     -- Update the APY for this staking entry
     UPDATE staking SET apy = calculated_apy WHERE id = NEW.id;
     
     -- Calculate expected reward based on amount, reward_percent and duration
-    DECLARE expected_reward DECIMAL(20, 8);
     SET expected_reward = (NEW.amount * NEW.reward_percent) / 100;
     
     -- Insert a record in staking_rewards table
