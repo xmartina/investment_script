@@ -258,7 +258,7 @@
                                 <a class="dropdown-item" href="<?= $profile['link'] ?>"><i data-feather="user" class="avatar avatar-18 me-1"></i> My Profile</a>
                             </div>
                             <div>
-                                <a class="dropdown-item" href="<?= $transactions['link'] ?>">
+                                <a class="dropdown-item" href="/user/transactions">
                                     <i data-feather="dollar-sign" class="avatar avatar-18 me-1"></i>Earning
                                 </a>
                             </div>
