@@ -85,6 +85,17 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                         <input type="number" class="form-control" id="investmentAmount" name="amount" min="" max="" required>
                         <small class="text-muted">Min: <?=$user_currency?><span id="minAmount"></span> | Max: <?=$user_currency?><span id="maxAmount"></span></small>
                     </div>
+                    <div class="mb-3">
+                        <label for="balanceSource" class="form-label">Select Balance Source</label>
+                        <select class="form-select" id="balanceSource" name="balance_source" required>
+                            <option value="main_balance">Main Balance (<?=$user_currency?><?=number_format($main_balance, 2)?>)</option>
+                            <option value="investment_balance">Investment Balance (<?=$user_currency?><?=number_format($investment_balance, 2)?>)</option>
+                            <option value="staking_balance">Staking Balance (<?=$user_currency?><?=number_format($staking_balance, 2)?>)</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>You will be investing from your selected balance. Make sure you have enough funds.</small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -100,7 +111,38 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 if (isset($_POST['invest'])) {
     $plan_id = $_POST['plan_id'];
     $amount = $_POST['amount'];
+    $balance_source = $_POST['balance_source'];
     $user_id = $_SESSION['user_id'];
+    
+    // Get current user balances
+    $user_query = "SELECT main_balance, investment_balance, staking_balance FROM users WHERE id = '$user_id'";
+    $user_result = $conn_back->query($user_query);
+    $user_data = $user_result->fetch_assoc();
+    
+    // Check if selected balance has enough funds
+    $sufficient_funds = false;
+    switch ($balance_source) {
+        case 'main_balance':
+            $sufficient_funds = $user_data['main_balance'] >= $amount;
+            $balance_field = 'main_balance';
+            $balance_name = 'Main Balance';
+            break;
+        case 'investment_balance':
+            $sufficient_funds = $user_data['investment_balance'] >= $amount;
+            $balance_field = 'investment_balance';
+            $balance_name = 'Investment Balance';
+            break;
+        case 'staking_balance':
+            $sufficient_funds = $user_data['staking_balance'] >= $amount;
+            $balance_field = 'staking_balance';
+            $balance_name = 'Staking Balance';
+            break;
+    }
+    
+    if (!$sufficient_funds) {
+        echo '<script>alert("Insufficient funds in your ' . $balance_name . '. Please add funds or select a different balance source."); window.location.href="/user/investment";</script>';
+        exit;
+    }
     
     // Get plan details for ROI calculation
     $plan_query = "SELECT * FROM investment_plans WHERE id = '$plan_id'";
@@ -114,29 +156,39 @@ if (isset($_POST['invest'])) {
         $start_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d H:i:s', strtotime($start_date . ' + ' . $plan['duration_days'] . ' days'));
         
-        // Insert into investments table
-        $invest_query = "INSERT INTO investments (user_id, plan_id, amount, roi_expected, status, started_at, ends_at, created_at) 
-                        VALUES ('$user_id', '$plan_id', '$amount', '$roi_expected', 'active', '$start_date', '$end_date', NOW())";
+        // Begin transaction
+        $conn_back->begin_transaction();
         
-        if ($conn_back->query($invest_query)) {
+        try {
+            // Deduct amount from the selected balance
+            $update_balance = "UPDATE users SET $balance_field = $balance_field - $amount WHERE id = '$user_id'";
+            $conn_back->query($update_balance);
+            
+            // Insert into investments table
+            $invest_query = "INSERT INTO investments (user_id, plan_id, amount, roi_expected, status, started_at, ends_at, created_at) 
+                            VALUES ('$user_id', '$plan_id', '$amount', '$roi_expected', 'active', '$start_date', '$end_date', NOW())";
+            $conn_back->query($invest_query);
+            
             // Generate unique reference
             $reference = 'INV-' . time() . '-' . $user_id;
             
             // Insert into transactions table
             $trans_query = "INSERT INTO transactions (user_id, type, amount, status, reference, description, created_at) 
                             VALUES ('$user_id', 'investment', '$amount', 'successful', '$reference', 
-                            'Investment in " . $plan['name'] . "', NOW())";
+                            'Investment in " . $plan['name'] . " from " . $balance_name . "', NOW())";
+            $conn_back->query($trans_query);
             
-            if ($conn_back->query($trans_query)) {
-                echo '<script>alert("Investment successful!"); window.location.href="/user/investment";</script>';
-            } else {
-                echo '<script>alert("Error recording transaction. Please contact support.");</script>';
-            }
-        } else {
-            echo '<script>alert("Error processing investment. Please try again.");</script>';
+            // Commit transaction
+            $conn_back->commit();
+            
+            echo '<script>alert("Investment successful!"); window.location.href="/user/investment";</script>';
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            $conn_back->rollback();
+            echo '<script>alert("Error processing investment. Please try again."); window.location.href="/user/investment";</script>';
         }
     } else {
-        echo '<script>alert("Invalid investment plan selected.");</script>';
+        echo '<script>alert("Invalid investment plan selected."); window.location.href="/user/investment";</script>';
     }
 }
 ?>
