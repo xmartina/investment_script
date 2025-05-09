@@ -76,6 +76,19 @@ $stmt->execute();
 $transactions = $stmt->get_result();
 $stmt->close();
 
+// Check the column names to identify the correct ID column
+$id_column = 'id';
+if ($transactions->num_rows > 0) {
+    $temp_transaction = $transactions->fetch_assoc();
+    if (!isset($temp_transaction['id']) && isset($temp_transaction['transaction_id'])) {
+        $id_column = 'transaction_id';
+    } else if (!isset($temp_transaction['id']) && isset($temp_transaction['tid'])) {
+        $id_column = 'tid';
+    }
+    // Reset the result pointer
+    $transactions->data_seek(0);
+}
+
 // Get transaction type counts for filter
 $type_counts = [];
 $counts_sql = "SELECT transaction_type, COUNT(*) as count FROM transactions WHERE user_id = ? GROUP BY transaction_type";
@@ -356,60 +369,71 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                 </thead>
                                 <tbody>
                                     <?php if ($transactions->num_rows > 0): ?>
-                                        <?php while ($transaction = $transactions->fetch_assoc()): ?>
+                                        <?php while ($transaction = $transactions->fetch_assoc()): 
+                                            // Ensure all required fields exist with fallbacks
+                                            $transaction_id = $transaction[$id_column] ?? 'tx_'.time().'_'.mt_rand(1000, 9999);
+                                            $transaction_type = $transaction['transaction_type'] ?? 'unknown';
+                                            $reference_id = $transaction['reference_id'] ?? '-';
+                                            $amount = $transaction['amount'] ?? 0;
+                                            $status = $transaction['status'] ?? 'unknown';
+                                            $date_time = isset($transaction['date_time']) ? $transaction['date_time'] : date('Y-m-d H:i:s');
+                                            $currency = $transaction['currency'] ?? 'USD';
+                                            $description = $transaction['description'] ?? '';
+                                            $proof_id = $transaction['transaction_proof_id'] ?? '';
+                                        ?>
                                             <tr>
-                                                <td><?= $transaction['id'] ?></td>
+                                                <td><?= $transaction_id ?></td>
                                                 <td>
-                                                    <span class="badge bg-<?= str_replace('badge-', '', getTypeBadgeClass($transaction['transaction_type'])) ?>">
-                                                        <i class="bi <?= str_replace('fa-', 'bi-', getTransactionIcon($transaction['transaction_type'])) ?> me-1"></i>
-                                                        <?= ucfirst($transaction['transaction_type']) ?>
+                                                    <span class="badge bg-<?= str_replace('badge-', '', getTypeBadgeClass($transaction_type)) ?>">
+                                                        <i class="bi <?= str_replace('fa-', 'bi-', getTransactionIcon($transaction_type)) ?> me-1"></i>
+                                                        <?= ucfirst($transaction_type) ?>
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <small class="text-muted"><?= $transaction['reference_id'] ?></small>
+                                                    <small class="text-muted"><?= $reference_id ?></small>
                                                 </td>
                                                 <td>
-                                                    <span class="<?= in_array(strtolower($transaction['transaction_type']), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
-                                                        <?= in_array(strtolower($transaction['transaction_type']), ['deposit', 'reward', 'referral', 'bonus']) ? '+' : '-' ?>
-                                                        $<?= number_format($transaction['amount'], 2) ?>
+                                                    <span class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
+                                                        <?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? '+' : '-' ?>
+                                                        $<?= number_format($amount, 2) ?>
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <span class="badge bg-<?= str_replace(['badge-success', 'badge-warning', 'badge-danger', 'badge-secondary'], ['success', 'warning', 'danger', 'secondary'], getStatusBadgeClass($transaction['status'])) ?>">
-                                                        <?= ucfirst($transaction['status']) ?>
+                                                    <span class="badge bg-<?= str_replace(['badge-success', 'badge-warning', 'badge-danger', 'badge-secondary'], ['success', 'warning', 'danger', 'secondary'], getStatusBadgeClass($status)) ?>">
+                                                        <?= ucfirst($status) ?>
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <div><?= date('M d, Y', strtotime($transaction['date_time'])) ?></div>
-                                                    <small class="text-muted"><?= date('h:i A', strtotime($transaction['date_time'])) ?></small>
+                                                    <div><?= date('M d, Y', strtotime($date_time)) ?></div>
+                                                    <small class="text-muted"><?= date('h:i A', strtotime($date_time)) ?></small>
                                                 </td>
                                                 <td>
-                                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#transactionModal<?= $transaction['id'] ?>">
+                                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#transactionModal<?= $transaction_id ?>">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
                                                     
                                                     <!-- Transaction Details Modal -->
-                                                    <div class="modal fade" id="transactionModal<?= $transaction['id'] ?>" tabindex="-1" aria-labelledby="transactionModalLabel<?= $transaction['id'] ?>" aria-hidden="true">
+                                                    <div class="modal fade" id="transactionModal<?= $transaction_id ?>" tabindex="-1" aria-labelledby="transactionModalLabel<?= $transaction_id ?>" aria-hidden="true">
                                                         <div class="modal-dialog">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="transactionModalLabel<?= $transaction['id'] ?>">Transaction Details</h5>
+                                                                    <h5 class="modal-title" id="transactionModalLabel<?= $transaction_id ?>">Transaction Details</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <div class="row mb-3">
                                                                         <div class="col-12 text-center mb-3">
                                                                             <div class="d-inline-block p-3 rounded-circle 
-                                                                                bg-<?= in_array(strtolower($transaction['transaction_type']), ['deposit', 'reward', 'referral', 'bonus']) ? 'success' : 'danger' ?> text-white">
-                                                                                <i class="bi <?= str_replace('fa-', 'bi-', getTransactionIcon($transaction['transaction_type'])) ?> fs-3"></i>
+                                                                                bg-<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'success' : 'danger' ?> text-white">
+                                                                                <i class="bi <?= str_replace('fa-', 'bi-', getTransactionIcon($transaction_type)) ?> fs-3"></i>
                                                                             </div>
-                                                                            <h4 class="mt-2"><?= ucfirst($transaction['transaction_type']) ?></h4>
-                                                                            <h2 class="<?= in_array(strtolower($transaction['transaction_type']), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
-                                                                                <?= in_array(strtolower($transaction['transaction_type']), ['deposit', 'reward', 'referral', 'bonus']) ? '+' : '-' ?>
-                                                                                $<?= number_format($transaction['amount'], 2) ?>
+                                                                            <h4 class="mt-2"><?= ucfirst($transaction_type) ?></h4>
+                                                                            <h2 class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
+                                                                                <?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? '+' : '-' ?>
+                                                                                $<?= number_format($amount, 2) ?>
                                                                             </h2>
-                                                                            <span class="badge bg-<?= str_replace(['badge-success', 'badge-warning', 'badge-danger', 'badge-secondary'], ['success', 'warning', 'danger', 'secondary'], getStatusBadgeClass($transaction['status'])) ?> p-2">
-                                                                                <?= ucfirst($transaction['status']) ?>
+                                                                            <span class="badge bg-<?= str_replace(['badge-success', 'badge-warning', 'badge-danger', 'badge-secondary'], ['success', 'warning', 'danger', 'secondary'], getStatusBadgeClass($status)) ?> p-2">
+                                                                                <?= ucfirst($status) ?>
                                                                             </span>
                                                                         </div>
                                                                     </div>
@@ -417,52 +441,52 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                                     <div class="row">
                                                                         <div class="col-6">
                                                                             <p class="mb-1"><strong>Transaction ID:</strong></p>
-                                                                            <p class="text-muted"><?= $transaction['id'] ?></p>
+                                                                            <p class="text-muted"><?= $transaction_id ?></p>
                                                                         </div>
                                                                         <div class="col-6">
                                                                             <p class="mb-1"><strong>Reference ID:</strong></p>
-                                                                            <p class="text-muted"><?= $transaction['reference_id'] ?></p>
+                                                                            <p class="text-muted"><?= $reference_id ?></p>
                                                                         </div>
                                                                     </div>
                                                                     
                                                                     <div class="row">
                                                                         <div class="col-6">
                                                                             <p class="mb-1"><strong>Date:</strong></p>
-                                                                            <p class="text-muted"><?= date('M d, Y', strtotime($transaction['date_time'])) ?></p>
+                                                                            <p class="text-muted"><?= date('M d, Y', strtotime($date_time)) ?></p>
                                                                         </div>
                                                                         <div class="col-6">
                                                                             <p class="mb-1"><strong>Time:</strong></p>
-                                                                            <p class="text-muted"><?= date('h:i:s A', strtotime($transaction['date_time'])) ?></p>
+                                                                            <p class="text-muted"><?= date('h:i:s A', strtotime($date_time)) ?></p>
                                                                         </div>
                                                                     </div>
                                                                     
                                                                     <div class="row">
                                                                         <div class="col-6">
                                                                             <p class="mb-1"><strong>Amount:</strong></p>
-                                                                            <p class="<?= in_array(strtolower($transaction['transaction_type']), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
-                                                                                $<?= number_format($transaction['amount'], 2) ?>
+                                                                            <p class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
+                                                                                $<?= number_format($amount, 2) ?>
                                                                             </p>
                                                                         </div>
                                                                         <div class="col-6">
                                                                             <p class="mb-1"><strong>Currency:</strong></p>
-                                                                            <p class="text-muted"><?= strtoupper($transaction['currency']) ?></p>
+                                                                            <p class="text-muted"><?= strtoupper($currency) ?></p>
                                                                         </div>
                                                                     </div>
                                                                     
-                                                                    <?php if (!empty($transaction['description'])): ?>
+                                                                    <?php if (!empty($description)): ?>
                                                                     <div class="row">
                                                                         <div class="col-12">
                                                                             <p class="mb-1"><strong>Description:</strong></p>
-                                                                            <p class="text-muted"><?= $transaction['description'] ?></p>
+                                                                            <p class="text-muted"><?= $description ?></p>
                                                                         </div>
                                                                     </div>
                                                                     <?php endif; ?>
                                                                     
-                                                                    <?php if (!empty($transaction['transaction_proof_id'])): ?>
+                                                                    <?php if (!empty($proof_id)): ?>
                                                                     <div class="row">
                                                                         <div class="col-12">
                                                                             <p class="mb-1"><strong>Transaction Proof ID:</strong></p>
-                                                                            <p class="text-muted"><?= $transaction['transaction_proof_id'] ?></p>
+                                                                            <p class="text-muted"><?= $proof_id ?></p>
                                                                         </div>
                                                                     </div>
                                                                     <?php endif; ?>
