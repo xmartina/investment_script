@@ -110,7 +110,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
 <?php
 if (isset($_POST['invest'])) {
     $plan_id = $_POST['plan_id'];
-    $amount = (float)$_POST['amount'];  // Cast to float to ensure proper calculation
+    $amount = (float)$_POST['amount'];
     $balance_source = $_POST['balance_source'];
     $user_id = $_SESSION['user_id'];
     
@@ -164,9 +164,8 @@ if (isset($_POST['invest'])) {
     if ($plan_result && $plan_result->num_rows > 0) {
         $plan = $plan_result->fetch_assoc();
         
-        // Calculate expected ROI - correct calculation
-        $roi_percent = (float)$plan['roi_percent'];
-        $roi_expected = ($amount * $roi_percent) / 100;
+        // Get the ROI value directly from the plan
+        $roi_expected = (float)$plan['roi_percent'];
         
         $start_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d H:i:s', strtotime($start_date . ' + ' . $plan['duration_days'] . ' days'));
@@ -194,11 +193,13 @@ if (isset($_POST['invest'])) {
             
             // Generate unique reference
             $reference = 'INV-' . time() . '-' . $user_id;
+            $transaction_proof_id = 'PROOF-' . time() . '-' . $user_id;
             
-            // Insert into transactions table
-            $trans_query = "INSERT INTO transactions (user_id, type, amount, status, reference, description, created_at) 
-                            VALUES ('$user_id', 'investment', '$amount', 'successful', '$reference', 
-                            'Investment in " . $plan['name'] . " from " . $balance_name . "', NOW())";
+            // Insert into transactions table - Adapt this to match your actual table structure
+            $trans_query = "INSERT INTO transactions (transaction_type, reference_id, transaction_proof_id, 
+                           amount, currency, status, date_time, description, user_id) 
+                           VALUES ('investment', '$reference', '$transaction_proof_id', 
+                           '$amount', 'USD', 'completed', NOW(), 'Investment in " . $plan['name'] . " from " . $balance_name . "', '$user_id')";
             $trans_result = $conn_back->query($trans_query);
             
             if (!$trans_result) {
