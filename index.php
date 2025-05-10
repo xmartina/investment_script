@@ -98,6 +98,11 @@ get('/update_withdrawal_tables', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_withdrawal_tables.php';
 });
 
+// Admin routes
+get('/admin/withdrawals', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';
+});
+
 // Add these to your index.php
 post('/user/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
@@ -174,7 +179,8 @@ post('/update_staking_tables', function() {
 post('/update_withdrawal_tables', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_withdrawal_tables.php';
 });
-
-
+post('/admin/withdrawals', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';
+});
 
 dispatch();
