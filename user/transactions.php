@@ -37,7 +37,7 @@ $offset = ($page - 1) * $records_per_page;
 
 // Filter by transaction type
 $transaction_type = isset($_GET['type']) ? $_GET['type'] : '';
-$valid_types = ['deposit', 'withdrawal', 'investment', 'staking', 'unstaking', 'reward', 'penalty', 'referral', 'bonus', ''];
+$valid_types = ['deposit', 'withdrawal', 'investment', 'staking', 'unstaking', 'reward', 'penalty', 'referral', 'bonus', 'investment_return', ''];
 
 if (!in_array($transaction_type, $valid_types)) {
     $transaction_type = '';
@@ -158,6 +158,8 @@ function getTypeBadgeClass($type) {
             return 'badge-danger';
         case 'investment':
             return 'badge-info';
+        case 'investment_return':
+            return 'badge-success';
         case 'staking':
             return 'badge-success';
         case 'unstaking':
@@ -183,6 +185,8 @@ function getTransactionIcon($type) {
             return 'fa-arrow-circle-up';
         case 'investment':
             return 'fa-chart-line';
+        case 'investment_return':
+            return 'fa-dollar-sign';
         case 'staking':
             return 'fa-lock';
         case 'unstaking':
@@ -317,6 +321,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                 <li><a class="dropdown-item <?= $transaction_type === 'deposit' ? 'active' : '' ?>" href="<?= getFilterUrl('deposit') ?>">Deposits</a></li>
                                 <li><a class="dropdown-item <?= $transaction_type === 'withdrawal' ? 'active' : '' ?>" href="<?= getFilterUrl('withdrawal') ?>">Withdrawals</a></li>
                                 <li><a class="dropdown-item <?= $transaction_type === 'investment' ? 'active' : '' ?>" href="<?= getFilterUrl('investment') ?>">Investments</a></li>
+                                <li><a class="dropdown-item <?= $transaction_type === 'investment_return' ? 'active' : '' ?>" href="<?= getFilterUrl('investment_return') ?>">Investment Returns</a></li>
                                 <li><a class="dropdown-item <?= $transaction_type === 'staking' ? 'active' : '' ?>" href="<?= getFilterUrl('staking') ?>">Staking</a></li>
                                 <li><a class="dropdown-item <?= $transaction_type === 'unstaking' ? 'active' : '' ?>" href="<?= getFilterUrl('unstaking') ?>">Unstaking</a></li>
                                 <li><a class="dropdown-item <?= $transaction_type === 'reward' ? 'active' : '' ?>" href="<?= getFilterUrl('reward') ?>">Rewards</a></li>
@@ -393,8 +398,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                     <small class="text-muted"><?= $reference_id ?></small>
                                                 </td>
                                                 <td>
-                                                    <span class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
-                                                        <?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? '+' : '-' ?>
+                                                    <span class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus', 'investment_return']) ? 'text-success' : 'text-danger' ?>">
+                                                        <?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus', 'investment_return']) ? '+' : '-' ?>
                                                         $<?= number_format($amount, 2) ?>
                                                     </span>
                                                 </td>
@@ -424,12 +429,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                                     <div class="row mb-3">
                                                                         <div class="col-12 text-center mb-3">
                                                                             <div class="d-inline-block p-3 rounded-circle 
-                                                                                bg-<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'success' : 'danger' ?> text-white">
+                                                                                bg-<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus', 'investment_return']) ? 'success' : 'danger' ?> text-white">
                                                                                 <i class="bi <?= str_replace('fa-', 'bi-', getTransactionIcon($transaction_type)) ?> fs-3"></i>
                                                                             </div>
                                                                             <h4 class="mt-2"><?= ucfirst($transaction_type) ?></h4>
-                                                                            <h2 class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
-                                                                                <?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? '+' : '-' ?>
+                                                                            <h2 class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus', 'investment_return']) ? 'text-success' : 'text-danger' ?>">
+                                                                                <?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus', 'investment_return']) ? '+' : '-' ?>
                                                                                 $<?= number_format($amount, 2) ?>
                                                                             </h2>
                                                                             <span class="badge bg-<?= str_replace(['badge-success', 'badge-warning', 'badge-danger', 'badge-secondary'], ['success', 'warning', 'danger', 'secondary'], getStatusBadgeClass($status)) ?> p-2">
@@ -463,8 +468,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                                     <div class="row">
                                                                         <div class="col-6">
                                                                             <p class="mb-1"><strong>Amount:</strong></p>
-                                                                            <p class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus']) ? 'text-success' : 'text-danger' ?>">
-                                                                                $<?= number_format($amount, 2) ?>
+                                                                            <p class="<?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus', 'investment_return']) ? 'text-success' : 'text-danger' ?>">
+                                                                                <?= in_array(strtolower($transaction_type), ['deposit', 'reward', 'referral', 'bonus', 'investment_return']) ? '+' : '-' ?> $<?= number_format($amount, 2) ?>
                                                                             </p>
                                                                         </div>
                                                                         <div class="col-6">
