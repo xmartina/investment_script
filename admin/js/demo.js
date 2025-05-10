@@ -210,16 +210,17 @@ $(function () {
       + '<label class="control-sidebar-subheading mb-10">'
       + 'Light or Dark Skin'
       + '</label>'
-      + '<label>'      
+      + '<label>'
       + '<input type="radio" id="radio2" name="" />'
-      + '<img class="model_img me-10" src="/admin/images/light-layout.png"/>'
-      + '</label>'      
+      + '<img class="model_img me-10" src="' + window.location.origin + '/admin/images/light-layout.png"/>'
+      + '</label>'
       + '<label>'
       + '<input type="radio" id="radio1" name=""/>'
-      + '<img class="model_img" src="/admin/images/dark-layout.png"/>'
-      + '</label>'  
-    + '</div>'  
+      + '<img class="model_img" src="' + window.location.origin + '/admin/images/dark-layout.png"/>'
+      + '</label>'
+    + '</div>'
   )
+
   
 
   jQuery(function () {
