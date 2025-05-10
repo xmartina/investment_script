@@ -1,9 +1,12 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
+// First check if headers have been sent before starting session
+if (!headers_sent()) {
     session_start();
 }
-include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/transactions.fn.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/models/transactions.php';
+
+// Fix include paths using __DIR__ for CLI compatibility
+include_once __DIR__ . '/models/transactions.fn.php';
+include_once __DIR__ . '/models/transactions.php';
 
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
@@ -271,6 +274,6 @@ $randomString = generateUniqueString(9);
 
 }
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/components/back_components.php';
+include_once __DIR__ . '/helpers.php';
+include_once __DIR__ . '/../components/back_components.php';
 

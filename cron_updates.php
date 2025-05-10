@@ -22,12 +22,12 @@ $start_time = microtime(true);
 set_time_limit(0);
 
 // Basic security - prevent direct access via browser
-if (php_sapi_name() !== 'cli') {
-    die('This script can only be run from the command line.');
+if (php_sapi_name() !== 'cli' && !defined('CRON_RUNNING')) {
+    die('This script can only be run from the command line or through the run_cron.php wrapper.');
 }
 
-// Load configuration
-require_once __DIR__ . '/include/config.php';
+// Load configuration - use the simplified cron config
+require_once __DIR__ . '/include/cron_config.php';
 
 // Initialize logging
 $log_file = __DIR__ . '/logs/cron_' . date('Y-m-d') . '.log';

@@ -1,4 +1,12 @@
 <?php
+// First check if headers have been sent before starting session
+if (!headers_sent()) {
+    session_start();
+}
+
+// Fix any include paths using __DIR__ for CLI compatibility
+// Replace any $_SERVER['DOCUMENT_ROOT'] with __DIR__ and relative paths
+
 function list_menu($menus_result, $active_url, $page_name)
 {
     $first = true; // Flag to identify the first active menu item
