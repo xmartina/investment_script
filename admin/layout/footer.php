@@ -199,7 +199,7 @@
     let count = 0;
 
     function hideElements() {
-      const chatBox = document.querySelector('.chat-box-body');
+      const chatBox = document.getElementById('chat-box-body');
       const toolbar = document.querySelector('.sticky-toolbar');
 
       if (chatBox) chatBox.style.display = 'none';
