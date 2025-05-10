@@ -212,11 +212,11 @@ $(function () {
       + '</label>'
       + '<label>'      
       + '<input type="radio" id="radio2" name="" />'
-      + '<img class="model_img me-10" src="./admin/images/light-layout.png"/>'
+      + '<img class="model_img me-10" src="/admin/images/light-layout.png"/>'
       + '</label>'      
       + '<label>'
       + '<input type="radio" id="radio1" name=""/>'
-      + '<img class="model_img" src="./admin/images/dark-layout.png"/>'
+      + '<img class="model_img" src="/admin/images/dark-layout.png"/>'
       + '</label>'  
     + '</div>'  
   )
