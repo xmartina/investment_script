@@ -118,11 +118,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Generate unique filename
                 $filename = time() . '_' . basename($_FILES['profile_photo']['name']);
-                $target_file = $upload_dir . $filename;
+                // Sanitize the filename to avoid problematic characters
+                $sanitized_filename = preg_replace('/[^a-zA-Z0-9_.-]/', '_', $filename);
+                $target_file = $upload_dir . $sanitized_filename;
                 
                 // Attempt to upload the file
                 if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $target_file)) {
-                    $profile_photo_path = '/profile_photos/' . $filename;
+                    $profile_photo_path = '/profile_photos/' . $sanitized_filename;
                 } else {
                     $errors[] = 'Failed to upload profile photo. Please try again.';
                 }

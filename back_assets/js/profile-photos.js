@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const defaultPhoto = document.getElementById('userphotoonboarding2')?.getAttribute('onerror')?.match(/'([^']+)'/)?.[1] || '/back_assets/img/users/profile_photo/default_photo.jpg';
     
     profileImages.forEach(function(img) {
+        // Fix unencoded spaces in image URLs
+        if (img.src && img.src.includes(' ')) {
+            img.src = img.src.replace(/ /g, '%20');
+        }
+        
         // Set default onerror handler if not already set
         if (!img.hasAttribute('onerror')) {
             img.onerror = function() {

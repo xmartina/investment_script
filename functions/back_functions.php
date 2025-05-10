@@ -173,11 +173,19 @@ if (isset($user_id)) {
         
         // Check if the profile photo is a full URL (starts with http or https)
         if (preg_match('/^https?:\/\//', $photo_path)) {
-            $profile_photo = $photo_path;
+            // For external URLs, ensure they're properly encoded
+            $profile_photo = preg_replace_callback('/\s/', function($match) {
+                return rawurlencode($match[0]);
+            }, $photo_path);
         } 
         // Check if it's a local path starting with /profile_photos/
         else if (strpos($photo_path, '/profile_photos/') === 0) {
-            $profile_photo = $site_link . $photo_path;
+            // For local paths, encode the filename but keep the directory structure
+            $pathParts = explode('/', $photo_path);
+            $filename = array_pop($pathParts); // Get the filename
+            $directory = implode('/', $pathParts); // Get the directory path
+            $encodedFilename = rawurlencode($filename); // Encode the filename
+            $profile_photo = $site_link . $directory . '/' . $encodedFilename;
         }
         // Legacy path format
         else {
