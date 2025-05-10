@@ -14,6 +14,9 @@ include_once(__DIR__ . '/db.php');
 const web_url = 'exodusaipro.online';
 const link = 'https://exodusaipro.online';
 
+// Define essential variables needed by the functions
+$site_link = 'https://exodusaipro.online';
+
 // Skip the session handling, menus, social media, etc.
 // Those aren't needed for a cron job
 

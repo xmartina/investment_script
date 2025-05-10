@@ -15,6 +15,19 @@
 // Set timezone
 date_default_timezone_set('UTC');
 
+// Debug timezone information
+$original_timezone = date_default_timezone_get();
+log_message("Debug: PHP timezone set to: " . $original_timezone);
+
+// Check MySQL timezone
+function get_mysql_timezone($conn) {
+    $result = $conn->query("SELECT @@time_zone, @@system_time_zone, NOW()");
+    if ($result && $row = $result->fetch_assoc()) {
+        return $row;
+    }
+    return null;
+}
+
 // Start time measurement
 $start_time = microtime(true);
 
@@ -35,6 +48,26 @@ $log_file = __DIR__ . '/logs/cron_' . date('Y-m-d') . '.log';
 // Ensure log directory exists
 if (!file_exists(dirname($log_file))) {
     mkdir(dirname($log_file), 0755, true);
+}
+
+// Check MySQL timezone after database connection is available
+$mysql_timezone = get_mysql_timezone($conn_back);
+if ($mysql_timezone) {
+    log_message("Debug: MySQL timezone: " . $mysql_timezone['@@time_zone'] . 
+                ", System timezone: " . $mysql_timezone['@@system_time_zone'] . 
+                ", MySQL NOW(): " . $mysql_timezone['NOW()']);
+    
+    log_message("Debug: PHP time: " . date('Y-m-d H:i:s'));
+    
+    // Check if there's a timezone mismatch
+    $php_time = strtotime(date('Y-m-d H:i:s'));
+    $mysql_time = strtotime($mysql_timezone['NOW()']);
+    $time_diff = abs($php_time - $mysql_time);
+    
+    if ($time_diff > 60) { // If difference is more than a minute
+        log_message("WARNING: Timezone mismatch between PHP and MySQL: " . 
+                   floor($time_diff/60) . " minutes " . ($time_diff % 60) . " seconds");
+    }
 }
 
 /**
@@ -125,11 +158,63 @@ function process_investment_returns($conn) {
             WHERE ir.status = 'pending' 
             AND ir.expected_date <= NOW()";
     
+    // Debug logging
+    log_message("SQL Query for investment returns: " . $sql);
+    log_message("Current datetime: " . date('Y-m-d H:i:s'));
+    
     $result = $conn->query($sql);
     
     if (!$result) {
         log_message("Error fetching due investment returns: " . $conn->error, "ERROR");
         return;
+    }
+    
+    // Debug: Show total number of investment returns regardless of status/date
+    $debug_sql = "SELECT COUNT(*) as total FROM investment_returns";
+    $debug_result = $conn->query($debug_sql);
+    $debug_row = $debug_result->fetch_assoc();
+    log_message("Debug: Total investment returns in system: " . $debug_row['total']);
+    
+    // Debug: Show pending investment returns
+    $debug_sql = "SELECT COUNT(*) as total FROM investment_returns WHERE status = 'pending'";
+    $debug_result = $conn->query($debug_sql);
+    $debug_row = $debug_result->fetch_assoc();
+    log_message("Debug: Total pending investment returns: " . $debug_row['total']);
+    
+    // Debug: Show future investment returns
+    $debug_sql = "SELECT COUNT(*) as total FROM investment_returns WHERE expected_date > NOW()";
+    $debug_result = $conn->query($debug_sql);
+    $debug_row = $debug_result->fetch_assoc();
+    log_message("Debug: Investment returns with future dates: " . $debug_row['total']);
+    
+    // Debug: Check for a specific investment return that we know should be due
+    // Check the most imminent pending investment return
+    $debug_sql = "SELECT ir.id, ir.investment_id, ir.expected_date, ir.status, i.status as investment_status 
+                  FROM investment_returns ir 
+                  JOIN investments i ON ir.investment_id = i.id 
+                  WHERE ir.status = 'pending' 
+                  ORDER BY ir.expected_date ASC 
+                  LIMIT 1";
+    $debug_result = $conn->query($debug_sql);
+    
+    if ($debug_result && $debug_result->num_rows > 0) {
+        $debug_row = $debug_result->fetch_assoc();
+        log_message("Debug: Next pending investment return: ID=" . $debug_row['id'] . 
+                    ", Investment ID=" . $debug_row['investment_id'] . 
+                    ", Expected Date=" . $debug_row['expected_date'] . 
+                    ", Status=" . $debug_row['status'] . 
+                    ", Investment Status=" . $debug_row['investment_status']);
+        
+        // Compare the expected date with current date
+        $expected_timestamp = strtotime($debug_row['expected_date']);
+        $current_timestamp = time();
+        $time_diff = $expected_timestamp - $current_timestamp;
+        
+        log_message("Debug: Time difference (seconds): " . $time_diff . 
+                   " (" . floor($time_diff/86400) . " days, " . 
+                   floor(($time_diff % 86400)/3600) . " hours)");
+    } else {
+        log_message("Debug: No pending investment returns found");
     }
     
     $returns_count = $result->num_rows;
@@ -210,6 +295,109 @@ function process_investment_returns($conn) {
     }
     
     log_message("Completed processing investment returns");
+}
+
+/**
+ * Debug function to force process a specific investment return
+ */
+function debug_force_process_return($conn, $return_id) {
+    log_message("DEBUG: Attempting to force process investment return ID: " . $return_id);
+    
+    // Get the return details
+    $sql = "SELECT ir.*, i.plan_id, u.currency
+            FROM investment_returns ir
+            JOIN investments i ON ir.investment_id = i.id
+            JOIN users u ON ir.user_id = u.id
+            WHERE ir.id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $return_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows === 0) {
+        log_message("DEBUG: Investment return ID " . $return_id . " not found", "ERROR");
+        return;
+    }
+    
+    $return = $result->fetch_assoc();
+    log_message("DEBUG: Found return - User ID: " . $return['user_id'] . 
+                ", Investment ID: " . $return['investment_id'] . 
+                ", Amount: " . $return['return_amount'] . 
+                ", Status: " . $return['status'] . 
+                ", Expected date: " . $return['expected_date']);
+    
+    // Process the return if it's pending
+    if ($return['status'] === 'pending') {
+        $conn->begin_transaction();
+        
+        try {
+            $user_id = $return['user_id'];
+            $investment_id = $return['investment_id'];
+            $return_amount = $return['return_amount'];
+            $roi_percentage = $return['roi_percentage'];
+            $currency = $return['currency'] ?: 'USD';
+            
+            // Create transaction record
+            $description = "Return on investment #$investment_id, ROI: $roi_percentage%";
+            $transaction_id = create_transaction(
+                $conn, 
+                $user_id, 
+                'investment_return', 
+                $return_amount, 
+                $currency, 
+                'completed', 
+                $description,
+                $roi_percentage
+            );
+            
+            if (!$transaction_id) {
+                throw new Exception("Failed to create transaction record for investment return ID: " . $return['id']);
+            }
+            
+            // Update user's main balance
+            if (!update_user_balance($conn, $user_id, 'main_balance', $return_amount)) {
+                throw new Exception("Failed to update main balance for user ID: $user_id");
+            }
+            
+            // Update investment return status to paid
+            $update_sql = "UPDATE investment_returns SET 
+                           status = 'paid', 
+                           transaction_id = ?, 
+                           paid_at = NOW() 
+                           WHERE id = ?";
+            $stmt = $conn->prepare($update_sql);
+            $stmt->bind_param("ii", $transaction_id, $return['id']);
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Failed to update investment return status: " . $stmt->error);
+            }
+            
+            // Mark investment as completed if this is the final return
+            $update_investment_sql = "UPDATE investments SET 
+                                     status = 'completed' 
+                                     WHERE id = ? 
+                                     AND ends_at <= NOW()";
+            $stmt = $conn->prepare($update_investment_sql);
+            $stmt->bind_param("i", $investment_id);
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Failed to update investment status: " . $stmt->error);
+            }
+            
+            // Commit transaction
+            $conn->commit();
+            
+            log_message("DEBUG: Successfully processed investment return ID: " . $return['id']);
+            
+        } catch (Exception $e) {
+            // Rollback on error
+            $conn->rollback();
+            log_message("DEBUG ERROR: " . $e->getMessage(), "ERROR");
+        }
+    } else {
+        log_message("DEBUG: Return ID " . $return_id . " is not pending (status: " . $return['status'] . ")", "ERROR");
+    }
 }
 
 /**
@@ -639,6 +827,19 @@ function process_referral_commissions($conn) {
 // Main execution
 try {
     log_message("Starting cron updates...");
+    
+    // Find the first pending investment return for debugging
+    $debug_sql = "SELECT id FROM investment_returns WHERE status = 'pending' ORDER BY expected_date ASC LIMIT 1";
+    $debug_result = $conn_back->query($debug_sql);
+    
+    if ($debug_result && $debug_result->num_rows > 0) {
+        $debug_row = $debug_result->fetch_assoc();
+        $return_id = $debug_row['id'];
+        log_message("Debug: Found pending investment return with ID: " . $return_id);
+        
+        // Uncomment the following line to force process this specific return for debugging
+        // debug_force_process_return($conn_back, $return_id);
+    }
     
     // Process various update tasks
     process_investment_returns($conn_back);
