@@ -167,10 +167,25 @@ if (isset($user_id)) {
             break;
     }
 
-    $profile_photo = !empty($get_user['profile_photo'])
-        ? $site_link . '/back_assets/img/users/profile_photo/' . rawurlencode($get_user['profile_photo'])
-        : $default_photo;
-
+    // Updated profile photo handling to support both URLs and local paths
+    if (!empty($get_user['profile_photo'])) {
+        $photo_path = $get_user['profile_photo'];
+        
+        // Check if the profile photo is a full URL (starts with http or https)
+        if (preg_match('/^https?:\/\//', $photo_path)) {
+            $profile_photo = $photo_path;
+        } 
+        // Check if it's a local path starting with /profile_photos/
+        else if (strpos($photo_path, '/profile_photos/') === 0) {
+            $profile_photo = $site_link . $photo_path;
+        }
+        // Legacy path format
+        else {
+            $profile_photo = $site_link . '/back_assets/img/users/profile_photo/' . rawurlencode($photo_path);
+        }
+    } else {
+        $profile_photo = $default_photo;
+    }
 
     $sql_back = "SELECT * FROM general_settings";
     $back_general_settings = $conn_back->query($sql_back);
