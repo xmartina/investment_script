@@ -35,8 +35,8 @@ function TransactionsCard($conn_back) {
         header('Content-Type: application/json');
 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
-        $per_page = 10;
+        $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : $_SESSION['user_id'] ?? 0;
+        $per_page = 12;
         $offset = ($page - 1) * $per_page;
 
         $transactions = selectTransactionsByUserIdPaginated($conn_back, $user_id, $offset, $per_page);
@@ -95,10 +95,10 @@ function TransactionsCard($conn_back) {
     }
 
     // Normal Page Request
-    $user_id = 1; // Replace with session value if available
+    $user_id = $_SESSION['user_id'] ?? 0;
     $initial_page = 1;
     $initial_offset = 0;
-    $per_page = 10;
+    $per_page = 12;
     $initial_transactions = selectTransactionsByUserIdPaginated($conn_back, $user_id, $initial_offset, $per_page);
     $totalTransactions = countTransactionsByUserId($conn_back, $user_id);
 
@@ -134,27 +134,33 @@ function TransactionsCard($conn_back) {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($initial_transactions as $transaction): ?>
+            <?php if (empty($initial_transactions)): ?>
                 <tr>
-                    <td><?= $transaction['reference_id'] ?></td>
-                    <td><?= $currencies[$transaction['currency']] ?? '$' ?><?= number_format($transaction['amount'], 2) ?></td>
-                    <td class="<?= $types[$transaction['transaction_type']] ?? 'text-primary' ?>">
-                        <?= ucfirst($transaction['transaction_type']) ?>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm <?= $statuses[$transaction['status']] ?? 'btn-outline-warning' ?>">
-                            <?= ucfirst($transaction['status']) ?>
-                        </button>
-                    </td>
-                    <td>
-                        <i class="bi bi-calendar-check-fill"></i>
-                        <?= date('M d, Y H:i', strtotime($transaction['date_time'])) ?>
-                    </td>
+                    <td colspan="5" class="text-center">No transactions found</td>
                 </tr>
-            <?php endforeach; ?>
+            <?php else: ?>
+                <?php foreach ($initial_transactions as $transaction): ?>
+                    <tr>
+                        <td><?= $transaction['reference_id'] ?></td>
+                        <td><?= $currencies[$transaction['currency']] ?? '$' ?><?= number_format($transaction['amount'], 2) ?></td>
+                        <td class="<?= $types[$transaction['transaction_type']] ?? 'text-primary' ?>">
+                            <?= ucfirst($transaction['transaction_type']) ?>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm <?= $statuses[$transaction['status']] ?? 'btn-outline-warning' ?>">
+                                <?= ucfirst($transaction['status']) ?>
+                            </button>
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar-check-fill"></i>
+                            <?= date('M d, Y H:i', strtotime($transaction['date_time'])) ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
             </tbody>
         </table>
-        <?php if ($totalTransactions > 10): ?>
+        <?php if ($totalTransactions > $per_page): ?>
             <button id="loadMore" class="btn btn-primary mt-3"
                     data-page="2"
                     data-user-id="<?= $user_id ?>"
@@ -170,7 +176,7 @@ function TransactionsCard($conn_back) {
             const page = parseInt(button.dataset.page);
             const userId = parseInt(button.dataset.userId);
             const offset = parseInt(button.dataset.offset);
-            const perPage = 10;
+            const perPage = 12;
 
             button.disabled = true;
             button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
@@ -180,6 +186,10 @@ function TransactionsCard($conn_back) {
                 .then(data => {
                     if (data.success) {
                         const tbody = document.querySelector('tbody');
+                        if (tbody.querySelector('tr td[colspan="5"]')) {
+                            tbody.innerHTML = '';
+                        }
+                        
                         data.rows.forEach(row => {
                             tbody.innerHTML += `
                                 <tr>
