@@ -65,7 +65,13 @@ get('/user/transactions', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/transactions.php';
 });
 get('/user/withdraw', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/user/withdraw.php';
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal.php';
+});
+get('/user/withdrawal', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal.php';
+});
+get('/user/withdrawal_methods', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal_methods.php';
 });
 get('/user/investment_plans', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
@@ -87,6 +93,9 @@ get('/update_investment_returns', function() {
 });
 get('/update_staking_tables', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_staking_tables.php';
+});
+get('/update_withdrawal_tables', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/update_withdrawal_tables.php';
 });
 
 // Add these to your index.php
@@ -132,6 +141,15 @@ post('/user/deposit', function() {
 post('/user/settings', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/settings.php';
 });
+post('/user/withdraw', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal.php';
+});
+post('/user/withdrawal', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal.php';
+});
+post('/user/withdrawal_methods', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal_methods.php';
+});
 post('/user/investment_plans', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
 });
@@ -152,6 +170,9 @@ post('/update_investment_returns', function() {
 });
 post('/update_staking_tables', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_staking_tables.php';
+});
+post('/update_withdrawal_tables', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/update_withdrawal_tables.php';
 });
 
 
