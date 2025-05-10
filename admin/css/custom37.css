@@ -1,0 +1,272 @@
+.dark-skin .b-0:not([class*=border-]) {
+  border: 0px solid #292931  !important; }
+.dark-skin .bt-0:not([class*=border-]) {
+  border-top: 0px solid #292931  !important; }
+.dark-skin .be-0:not([class*=border-]) {
+  border-right: 0px solid #292931  !important; }
+.dark-skin .bb-0:not([class*=border-]) {
+  border-bottom: 0px solid #292931  !important; }
+.dark-skin .bs-0:not([class*=border-]) {
+  border-left: 0px solid #292931  !important; }
+.dark-skin .bx-0:not([class*=border-]) {
+  border-right: 0px solid #292931  !important;
+  border-left: 0px solid #292931  !important; }
+.dark-skin .by-0:not([class*=border-]) {
+  border-top: 0px solid #292931  !important;
+  border-bottom: 0px solid #292931  !important; }
+.dark-skin .b-1:not([class*=border-]) {
+  border: 1px solid #292931  !important; }
+.dark-skin .bt-1:not([class*=border-]) {
+  border-top: 1px solid #292931  !important; }
+.dark-skin .be-1:not([class*=border-]) {
+  border-right: 1px solid #292931  !important; }
+.dark-skin .bb-1:not([class*=border-]) {
+  border-bottom: 1px solid #292931  !important; }
+.dark-skin .bs-1:not([class*=border-]) {
+  border-left: 1px solid #292931  !important; }
+.dark-skin .bx-1:not([class*=border-]) {
+  border-right: 1px solid #292931  !important;
+  border-left: 1px solid #292931  !important; }
+.dark-skin .by-1:not([class*=border-]) {
+  border-top: 1px solid #292931  !important;
+  border-bottom: 1px solid #292931  !important; }
+.dark-skin .b-2:not([class*=border-]) {
+  border: 2px solid #292931  !important; }
+.dark-skin .bt-2:not([class*=border-]) {
+  border-top: 2px solid #292931  !important; }
+.dark-skin .be-2:not([class*=border-]) {
+  border-right: 2px solid #292931  !important; }
+.dark-skin .bb-2:not([class*=border-]) {
+  border-bottom: 2px solid #292931  !important; }
+.dark-skin .bs-2:not([class*=border-]) {
+  border-left: 2px solid #292931  !important; }
+.dark-skin .bx-2:not([class*=border-]) {
+  border-right: 2px solid #292931  !important;
+  border-left: 2px solid #292931  !important; }
+.dark-skin .by-2:not([class*=border-]) {
+  border-top: 2px solid #292931  !important;
+  border-bottom: 2px solid #292931  !important; }
+.dark-skin .b-3:not([class*=border-]) {
+  border: 3px solid #292931  !important; }
+.dark-skin .bt-3:not([class*=border-]) {
+  border-top: 3px solid #292931  !important; }
+.dark-skin .be-3:not([class*=border-]) {
+  border-right: 3px solid #292931  !important; }
+.dark-skin .bb-3:not([class*=border-]) {
+  border-bottom: 3px solid #292931  !important; }
+.dark-skin .bs-3:not([class*=border-]) {
+  border-left: 3px solid #292931  !important; }
+.dark-skin .bx-3:not([class*=border-]) {
+  border-right: 3px solid #292931  !important;
+  border-left: 3px solid #292931  !important; }
+.dark-skin .by-3:not([class*=border-]) {
+  border-top: 3px solid #292931  !important;
+  border-bottom: 3px solid #292931  !important; }
+.dark-skin .b-4:not([class*=border-]) {
+  border: 4px solid #292931  !important; }
+.dark-skin .bt-4:not([class*=border-]) {
+  border-top: 4px solid #292931  !important; }
+.dark-skin .be-4:not([class*=border-]) {
+  border-right: 4px solid #292931  !important; }
+.dark-skin .bb-4:not([class*=border-]) {
+  border-bottom: 4px solid #292931  !important; }
+.dark-skin .bs-4:not([class*=border-]) {
+  border-left: 4px solid #292931  !important; }
+.dark-skin .bx-4:not([class*=border-]) {
+  border-right: 4px solid #292931  !important;
+  border-left: 4px solid #292931  !important; }
+.dark-skin .by-4:not([class*=border-]) {
+  border-top: 4px solid #292931  !important;
+  border-bottom: 4px solid #292931  !important; }
+.dark-skin .b-5:not([class*=border-]) {
+  border: 5px solid #292931  !important; }
+.dark-skin .bt-5:not([class*=border-]) {
+  border-top: 5px solid #292931  !important; }
+.dark-skin .be-5:not([class*=border-]) {
+  border-right: 5px solid #292931  !important; }
+.dark-skin .bb-5:not([class*=border-]) {
+  border-bottom: 5px solid #292931  !important; }
+.dark-skin .bs-5:not([class*=border-]) {
+  border-left: 5px solid #292931  !important; }
+.dark-skin .bx-5:not([class*=border-]) {
+  border-right: 5px solid #292931  !important;
+  border-left: 5px solid #292931  !important; }
+.dark-skin .by-5:not([class*=border-]) {
+  border-top: 5px solid #292931  !important;
+  border-bottom: 5px solid #292931  !important; }
+
+.content-wrapper {
+    margin-right: 0rem;
+    margin-left: 19.3rem;
+}
+
+
+
+
+
+.dark-skin .box {
+  background-color: #060610;
+  box-shadow: -7.829px 11.607px 21px 0px rgba(25, 42, 70, 0.13);
+}
+.dark-skin .bg-lighter {
+  background-color: #0b0b15 !important;
+}
+.dark-skin .b-2:not([class*="border-"]) {
+  border: 2px solid #292931 !important;
+}
+.dark-skin .b-1:not([class*="border-"]) {
+  border: 1px solid #292931 !important;
+}
+.dark-skin .b-1 {
+  border: 1px solid #292931 !important;
+}
+.dark-skin.theme-warning.fixed .main-header {
+    background: #060610;
+}
+.dark-skin .main-header .logo-box {
+    background: #060610 !important;
+}
+.dark-skin .main-header .navbar .nav > li > a {
+    background-color: #0b0c16;
+    border: 1px solid #292931;
+}
+.dark-skin .main-header .app-menu .search-bx input[type="search"] {
+    background-color: #0b0c16;
+    color: #b5b5c3;
+}
+.dark-skin .main-header .app-menu .search-bx .btn {
+    background-color: #0b0c16;
+    color: #b5b5c3 !important;
+}
+.dark-skin .main-sidebar {
+    background-color: #060610;
+    border: 1px solid #292931;
+}
+.main-sidebar {
+    border: 1px solid #f3f6f9;
+}
+.dark-skin .sidebar-menu > li {
+    border-left: 0px solid #060610;
+}
+.btn-dark {
+    background-color: #060610;
+    border-color: #292931;
+    color: #ffffff;
+}
+.dark-skin .text-dark {
+    color: #b5b5c3 !important;
+}
+.dark-skin .main-footer {
+    background: #060610;
+    color: #b5b5c3;
+    border-top: 1px solid #292931;
+}
+.dark-skin .btn.btn-light {
+    background-color: #ffffff;
+    border: 1px solid #292931;
+    color: #000000 !important;
+}
+.dark-skin .btn-flat {
+    background-color: #060610 !important;
+}
+.bg-dark {
+    background-color: #0b0b15 !important;
+    color: #ffffff !important;
+}
+body.dark-skin .content-wrapper {
+  background-color: #060610;
+}
+
+
+.light-skin.sidebar-mini.sidebar-collapse .sidebar-menu > li > a > span {
+    box-shadow: 5px 8px 10px 0px rgba(0, 0, 0, 0);
+}
+.content-wrapper{
+    background-color: #f8f8f8;
+}
+
+.big-circle{
+    width: 150px;
+    height: 150px;
+    align-content: center;
+}
+.big-circle .growth{
+    position: absolute;
+    top: 54px;
+    left: 38px;
+}
+.hidden-chart{
+    background-image: url(../../images/chart1.png);
+    background-position: bottom center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    height: 230px;
+}
+.form-control::placeholder, .form-select::placeholder {
+  color: #9d9d9dc9;
+  opacity: 1;
+}
+.dark-skin .control-sidebar {
+    color: #b5b5c3;
+    background-color: #060610;
+    border-left: 1px solid #292931;
+}
+
+
+
+.recent-activitie{
+  height: 532px;
+}
+#balance-overview{
+  height: 271.50px;
+  width: 271px;
+  align-content: center;
+  overflow: hidden;
+}
+/*@media only screen and (max-width: 1440px) {
+  #balance-overview{
+    height: 242.5px;
+  }
+}*/
+/*@media only screen and (max-width: 1366px) {
+  .recent-activitie{
+    height: 503.50px;
+    overflow: scroll;
+  }
+  #balance-overview{
+    width: 275px;
+    min-width: 275px !important;
+  }
+}*/
+@media only screen and (max-width: 1199px) {
+  .recent-activitie{
+    height: auto;
+  }
+}
+@media (min-width: 768px) {
+    .sidebar-mini.sidebar-collapse .content-wrapper {
+        margin-left: 60px;
+        z-index: 840;
+    }
+    .rtl.sidebar-mini.sidebar-collapse .content-wrapper, .rtl.sidebar-mini.sidebar-collapse .main-footer, .rtl.sidebar-mini.sidebar-collapse .right-side {
+        margin-left: 0rem;
+        margin-right: 60px;
+    }
+}
+@media only screen and (max-width: 767px) {
+  .balance-status{
+    display: none;
+  }
+  #balance-overview{
+    width: auto;
+    min-width: auto !important;
+  }
+  .content-wrapper {
+      margin-right: 0rem;
+      margin-left: 0rem !important;
+  }
+  .rtl .content-wrapper, .rtl .main-footer {
+      margin-right: 0rem;
+      margin-left: 0em !important;
+  }
+}

@@ -1,0 +1,132 @@
+
+.col-12{
+	padding: 0px;
+}
+.light-skin .container-full{
+	background-color: #FAF9FF;
+}
+.content{
+	padding: 0px;
+}
+.c-f99480{
+	color: #f99480;
+}
+.c-08C2A2{
+	color: #08C2A2;
+}
+.first-section{
+	height: 76rem;
+}
+.last-section{
+	height: 76rem;
+}
+.text-left{
+	text-align: left;
+}
+.last-section .nav-pills .nav-link{
+  	background: none;
+	border: 0;
+	border-radius: 4.25rem;
+	background-color: black;
+}
+.last-section .theme-primary .nav > li > a:hover, .theme-primary .nav > li > a:active, .theme-primary .nav > li > a:focus{
+  	color: #fff;
+  	background-color: #6993ff;
+}
+
+/*===================Resolution=========================*/
+@media only screen and (max-width: 1600px) {
+
+  	.last-section {
+   		height: 78rem;
+  	}
+  	.first-section{
+  		height: 78rem;
+  	}
+  	.second-section .btn{
+  		padding: 8px 14px;
+  	}
+  	.last-section .box-header > .box-controls{
+  		top: 2.5rem;
+  	}
+  	.last-section .nav-pills .nav-link{
+  		background: none;
+	    border: 0;
+	    border-radius: 4.25rem;
+	    background-color: black;
+  	}
+  	.last-section .theme-primary .nav > li > a:hover, .theme-primary .nav > li > a:active, .theme-primary .nav > li > a:focus{
+  		color: #fff;
+  		background-color: #6993ff;
+  	}
+  	.second-section .fa-fw{
+  		width: 0px;
+  	}
+}
+
+@media screen and (min-device-width: 1367px) and (max-device-width: 1440px) {
+  	.col-xxl-6{
+  		flex: 0 0 auto;
+    	width: 40%;
+  	}
+  	.col-xxl-3{
+  		flex: 0 0 auto;
+    	width: 30%;
+  	}
+  	.last-section  .box-body{
+  		padding: 10px;
+  	}
+  	.last-section {
+   		height: 76rem;
+  	}
+  	.first-section{
+  		height: 76rem;
+  	}
+  	.last-section h3{
+  		margin-bottom: 15px;
+  	}
+  	.quick-actions-section .action-box{
+  		position: relative;
+  		left: -8px;
+  	}		
+}
+@media only screen and (max-width: 1366px) {
+  	.last-section {
+   		height: 76rem;
+   		border-top: 1px solid #f3f6f9;
+  	}
+  	.first-section{
+  		height: 76rem;
+  	}
+  	.quick-actions-section .action-box{
+  		position: none;
+  		left: 0px;
+  	}
+}
+
+@media only screen and (max-width: 835px) {
+  	.first-section{
+		height: auto;
+	}
+	.last-section{
+		height: auto;
+	}
+}
+@media only screen and (max-width: 500px) {
+  	.first-section .col-md-4{
+		width: 50%;
+	}	
+	.last-section .box-header > .box-controls{
+  		top: 2.5rem;
+  		right: 0.5rem;
+  	}
+  	.last-section i.cc{
+  		margin-right: 0px;
+  	}
+}
+@media only screen and (max-width: 390px) {	
+	.last-section .box-header > .box-controls{
+  		top: 0.5rem;
+  		right: 0.5rem;
+  	}
+}
