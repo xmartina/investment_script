@@ -1,7 +1,9 @@
 <?php
+// Main configuration file for Exodus AI Pro Investment Platform
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-include_once $_SERVER['DOCUMENT_ROOT'] . '/include/db.php';
+include_once(__DIR__ . '/db.php');
 
 //frontend config
 $sql_front = "SELECT * FROM general_settings";
