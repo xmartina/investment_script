@@ -12,7 +12,8 @@ $formData = [
     'lname' => '',
     'email' => '',
     'phone_code' => '',
-    'phone' => ''
+    'phone' => '',
+    'pin' => ''
 ];
 
 // Get referral code from URL if present
@@ -39,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'phone' => trim($_POST['phone'] ?? ''),
             'password' => $_POST['password'] ?? '',
             'confirm_password' => $_POST['confirm_password'] ?? '',
-            'referral_code' => trim($_POST['referral_code'] ?? '')
+            'referral_code' => trim($_POST['referral_code'] ?? ''),
+            'pin' => trim($_POST['pin'] ?? '')
         ];
 
         // Validate inputs
@@ -71,6 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Passwords do not match';
         }
 
+        if (empty($formData['pin']) || !is_numeric($formData['pin']) || strlen($formData['pin']) !== 4) {
+            $errors[] = 'PIN must be a 4-digit number';
+        }
+
         // Check if email exists
         $stmt = $conn_back->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->bind_param("s", $formData['email']);
@@ -95,6 +101,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Handle profile photo upload
+        $profile_photo_path = '';
+        if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
+            $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+            $file_type = $_FILES['profile_photo']['type'];
+            
+            if (!in_array($file_type, $allowed_types)) {
+                $errors[] = 'Invalid file type. Only JPG, PNG, and GIF images are allowed.';
+            } else {
+                // Create uploads directory if it doesn't exist
+                $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/profile_photos/';
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+                
+                // Generate unique filename
+                $filename = time() . '_' . basename($_FILES['profile_photo']['name']);
+                $target_file = $upload_dir . $filename;
+                
+                // Attempt to upload the file
+                if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $target_file)) {
+                    $profile_photo_path = '/profile_photos/' . $filename;
+                } else {
+                    $errors[] = 'Failed to upload profile photo. Please try again.';
+                }
+            }
+        } else {
+            // Use a placeholder service for default profile photo
+            // This will generate a default avatar based on user initials
+            $profile_photo_path = 'https://ui-avatars.com/api/?name=' . urlencode($formData['fname'] . '+' . $formData['lname']) . '&background=random&size=200';
+        }
+
         // If no errors, create user
         if (empty($errors)) {
             // Hash password
@@ -112,14 +150,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Insert user with referral information
                 $stmt = $conn_back->prepare("INSERT INTO users 
-                    (first_name, last_name, email, phone, password, referral_code, referred_by) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssssssi",
+                    (first_name, last_name, email, phone, password, profile_photo, pin, referral_code, referred_by) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssssssi",
                     $formData['fname'],
                     $formData['lname'],
                     $formData['email'],
                     $fullPhone,
                     $passwordHash,
+                    $profile_photo_path,
+                    $formData['pin'],
                     $new_referral_code,
                     $referrer_id
                 );
@@ -169,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
                 <?php endif; ?>
 
-                <form action="/register" method="post">
+                <form action="/register" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mb-3">
@@ -242,6 +282,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </button>
                     </div>
                     
+                    <!-- Profile Photo Upload Field -->
+                    <div class="mb-3">
+                        <label for="profile_photo" class="form-label">Profile Photo</label>
+                        <input type="file" class="form-control" id="profile_photo" name="profile_photo" accept="image/*">
+                        <div class="form-text">Upload a profile photo (optional). Max size: 2MB.</div>
+                    </div>
+
+                    <!-- 4-Digit PIN Field -->
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="pin" name="pin"
+                               placeholder="Enter 4-digit PIN" required maxlength="4" pattern="[0-9]{4}"
+                               value="<?= htmlspecialchars($formData['pin']) ?>">
+                        <label for="pin">4-Digit PIN</label>
+                        <div class="form-text">Create a 4-digit PIN for transactions and account security.</div>
+                    </div>
+                    
                     <!-- Referral Code Field -->
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="referral_code" name="referral_code"
@@ -284,6 +340,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 });
             });
+            
+            // Preview profile photo before upload
+            const profilePhotoInput = document.getElementById('profile_photo');
+            if (profilePhotoInput) {
+                profilePhotoInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const fileSize = this.files[0].size / 1024 / 1024; // in MB
+                        if (fileSize > 2) {
+                            alert('File size exceeds 2MB. Please choose a smaller file.');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        // Create preview if doesn't exist
+                        let preview = document.getElementById('profile_preview');
+                        if (!preview) {
+                            preview = document.createElement('img');
+                            preview.id = 'profile_preview';
+                            preview.style.maxWidth = '100px';
+                            preview.style.maxHeight = '100px';
+                            preview.style.marginTop = '10px';
+                            preview.style.borderRadius = '50%';
+                            this.parentNode.appendChild(preview);
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.src = e.target.result;
+                        }
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
         });
     </script>
 
