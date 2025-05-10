@@ -13,6 +13,9 @@ error_reporting(E_ALL);
 // Define the CRON_RUNNING constant to signal that we're in a cron job
 define('CRON_RUNNING', true);
 
+// Define KEEP_DB_OPEN to prevent cron_updates.php from closing the database connection
+define('KEEP_DB_OPEN', true);
+
 // Start time measurement
 $start_time = microtime(true);
 

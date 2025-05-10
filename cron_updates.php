@@ -878,5 +878,10 @@ try {
     log_message("Critical error in cron updates: " . $e->getMessage(), "ERROR");
 }
 
-// Close database connection
-$conn_back->close(); 
+// Don't close the database connection if KEEP_DB_OPEN constant is defined
+// This allows the auto_fix_dates.php script to reuse the connection
+if (!defined('KEEP_DB_OPEN')) {
+    // Close database connection
+    $conn_back->close();
+    log_message("Database connection closed");
+} 
