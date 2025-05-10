@@ -15,19 +15,6 @@
 // Set timezone
 date_default_timezone_set('UTC');
 
-// Debug timezone information
-$original_timezone = date_default_timezone_get();
-log_message("Debug: PHP timezone set to: " . $original_timezone);
-
-// Check MySQL timezone
-function get_mysql_timezone($conn) {
-    $result = $conn->query("SELECT @@time_zone, @@system_time_zone, NOW()");
-    if ($result && $row = $result->fetch_assoc()) {
-        return $row;
-    }
-    return null;
-}
-
 // Start time measurement
 $start_time = microtime(true);
 
@@ -39,15 +26,64 @@ if (php_sapi_name() !== 'cli' && !defined('CRON_RUNNING')) {
     die('This script can only be run from the command line or through the run_cron.php wrapper.');
 }
 
-// Load configuration - use the simplified cron config
-require_once __DIR__ . '/include/cron_config.php';
-
 // Initialize logging
 $log_file = __DIR__ . '/logs/cron_' . date('Y-m-d') . '.log';
 
-// Ensure log directory exists
-if (!file_exists(dirname($log_file))) {
-    mkdir(dirname($log_file), 0755, true);
+// Ensure log directory exists with proper error handling
+$log_dir = dirname($log_file);
+if (!file_exists($log_dir)) {
+    try {
+        if (!mkdir($log_dir, 0755, true)) {
+            echo "Warning: Failed to create log directory: $log_dir" . PHP_EOL;
+            $log_file = null; // Disable file logging if directory can't be created
+        } else {
+            echo "Created log directory: $log_dir" . PHP_EOL;
+        }
+    } catch (Exception $e) {
+        echo "Error creating log directory: " . $e->getMessage() . PHP_EOL;
+        $log_file = null; // Disable file logging on error
+    }
+} else {
+    // Check if the directory is writable
+    if (!is_writable($log_dir)) {
+        echo "Warning: Log directory exists but is not writable: $log_dir" . PHP_EOL;
+        $log_file = null; // Disable file logging if directory isn't writable
+    }
+}
+
+/**
+ * Logs a message to both console and log file
+ */
+function log_message($message, $level = 'INFO') {
+    global $log_file;
+    $timestamp = date('Y-m-d H:i:s');
+    $formatted_message = "[$timestamp] [$level] $message" . PHP_EOL;
+    
+    // Log to console
+    echo $formatted_message;
+    
+    // Log to file - add safety check to ensure log_file is not empty
+    if (!empty($log_file)) {
+        file_put_contents($log_file, $formatted_message, FILE_APPEND);
+    } else {
+        echo "Warning: Log file path is empty, cannot write to log file." . PHP_EOL;
+    }
+}
+
+// Debug timezone information
+$original_timezone = date_default_timezone_get();
+log_message("Debug: PHP timezone set to: " . $original_timezone);
+
+// Load configuration - use the simplified cron config
+require_once __DIR__ . '/include/cron_config.php';
+
+// Check MySQL timezone
+function get_mysql_timezone($conn) {
+    $result = $conn->query("SELECT @@time_zone, @@system_time_zone, NOW()");
+    if ($result && $row = $result->fetch_assoc()) {
+        return $row;
+    }
+    return null;
 }
 
 // Check MySQL timezone after database connection is available
@@ -68,21 +104,6 @@ if ($mysql_timezone) {
         log_message("WARNING: Timezone mismatch between PHP and MySQL: " . 
                    floor($time_diff/60) . " minutes " . ($time_diff % 60) . " seconds");
     }
-}
-
-/**
- * Logs a message to both console and log file
- */
-function log_message($message, $level = 'INFO') {
-    global $log_file;
-    $timestamp = date('Y-m-d H:i:s');
-    $formatted_message = "[$timestamp] [$level] $message" . PHP_EOL;
-    
-    // Log to console
-    echo $formatted_message;
-    
-    // Log to file
-    file_put_contents($log_file, $formatted_message, FILE_APPEND);
 }
 
 /**

@@ -31,15 +31,42 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
     return false;
 });
 
+// Variable to track if any returns were processed
+$returns_processed = false;
+
 try {
+    // Capture the output of cron_updates.php to check if returns were processed
+    ob_start();
+    
     // Run the actual cron script
     require_once __DIR__ . '/cron_updates.php';
-
+    
+    $output = ob_get_clean();
+    echo $output;
+    
+    // Check if any returns were processed
+    if (strpos($output, 'Found 0 due investment returns') !== false) {
+        echo "\nNo investment returns were processed during normal cron run. Trying auto-fix...\n";
+        
+        // Run the auto_fix_dates script to check and fix dates
+        echo "\n--- Starting Auto-Fix Script ---\n";
+        include_once __DIR__ . '/auto_fix_dates.php';
+        echo "--- Auto-Fix Script Completed ---\n";
+    } else {
+        $returns_processed = true;
+    }
+    
     // If we get here, the script completed without fatal errors
     echo "Cron job completed successfully!\n";
 } catch (Exception $e) {
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     echo "Error executing cron job: " . $e->getMessage() . "\n";
 } catch (Error $e) {
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     echo "PHP Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine() . "\n";
 }
 
