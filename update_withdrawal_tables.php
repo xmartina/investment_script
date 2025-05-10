@@ -167,28 +167,69 @@ $tableExists = $conn_back->query("SHOW TABLES LIKE 'withdrawal'");
 if ($tableExists->num_rows == 0) {
     echo "<p>Creating withdrawal table...</p>";
     
-    $sql = "CREATE TABLE `withdrawal` (
-        `id` int NOT NULL AUTO_INCREMENT,
-        `user_id` int NOT NULL,
-        `amount` decimal(15,2) NOT NULL,
-        `currency` varchar(10) NOT NULL,
-        `withdrawal_method_id` int NOT NULL,
-        `transaction_id` varchar(100) NOT NULL,
-        `status` enum('pending', 'approved', 'rejected', 'completed') NOT NULL DEFAULT 'pending',
-        `withdrawal_address` varchar(255) NOT NULL,
-        `transaction_proof_id` varchar(150) DEFAULT NULL,
-        `payment_proof` varchar(255) DEFAULT NULL,
-        `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        `approved_at` datetime DEFAULT NULL,
-        `rejected_at` datetime DEFAULT NULL,
-        `rejection_reason` text DEFAULT NULL,
-        `user_balance_before_withdrawal` decimal(15,2) NOT NULL,
-        `user_balance_after_withdrawal` decimal(15,2) NOT NULL,
-        `fee_amount` decimal(15,2) DEFAULT 0.00,
-        PRIMARY KEY (`id`),
-        FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-        FOREIGN KEY (`withdrawal_method_id`) REFERENCES `withdrawal_methods` (`id`) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci";
+    // First, check if users table exists and has proper index
+    $usersTableExists = $conn_back->query("SHOW TABLES LIKE 'users'");
+    $canCreateForeignKey = false;
+    
+    if ($usersTableExists->num_rows > 0) {
+        // Check if users table has primary key on id column
+        $usersPrimaryKey = $conn_back->query("SHOW KEYS FROM users WHERE Key_name = 'PRIMARY'");
+        if ($usersPrimaryKey->num_rows > 0) {
+            $canCreateForeignKey = true;
+        }
+    }
+    
+    // Create table without foreign key constraints if users table doesn't exist or isn't properly indexed
+    if (!$canCreateForeignKey) {
+        $sql = "CREATE TABLE `withdrawal` (
+            `id` int NOT NULL AUTO_INCREMENT,
+            `user_id` int NOT NULL,
+            `amount` decimal(15,2) NOT NULL,
+            `currency` varchar(10) NOT NULL,
+            `withdrawal_method_id` int NOT NULL,
+            `transaction_id` varchar(100) NOT NULL,
+            `status` enum('pending', 'approved', 'rejected', 'completed') NOT NULL DEFAULT 'pending',
+            `withdrawal_address` varchar(255) NOT NULL,
+            `transaction_proof_id` varchar(150) DEFAULT NULL,
+            `payment_proof` varchar(255) DEFAULT NULL,
+            `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `approved_at` datetime DEFAULT NULL,
+            `rejected_at` datetime DEFAULT NULL,
+            `rejection_reason` text DEFAULT NULL,
+            `user_balance_before_withdrawal` decimal(15,2) NOT NULL,
+            `user_balance_after_withdrawal` decimal(15,2) NOT NULL,
+            `fee_amount` decimal(15,2) DEFAULT 0.00,
+            PRIMARY KEY (`id`),
+            INDEX (`user_id`),
+            INDEX (`withdrawal_method_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci";
+        
+        echo "<p>Note: Creating withdrawal table without foreign key constraints as users table is not properly set up.</p>";
+    } else {
+        // Create table with foreign key constraints
+        $sql = "CREATE TABLE `withdrawal` (
+            `id` int NOT NULL AUTO_INCREMENT,
+            `user_id` int NOT NULL,
+            `amount` decimal(15,2) NOT NULL,
+            `currency` varchar(10) NOT NULL,
+            `withdrawal_method_id` int NOT NULL,
+            `transaction_id` varchar(100) NOT NULL,
+            `status` enum('pending', 'approved', 'rejected', 'completed') NOT NULL DEFAULT 'pending',
+            `withdrawal_address` varchar(255) NOT NULL,
+            `transaction_proof_id` varchar(150) DEFAULT NULL,
+            `payment_proof` varchar(255) DEFAULT NULL,
+            `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `approved_at` datetime DEFAULT NULL,
+            `rejected_at` datetime DEFAULT NULL,
+            `rejection_reason` text DEFAULT NULL,
+            `user_balance_before_withdrawal` decimal(15,2) NOT NULL,
+            `user_balance_after_withdrawal` decimal(15,2) NOT NULL,
+            `fee_amount` decimal(15,2) DEFAULT 0.00,
+            PRIMARY KEY (`id`),
+            FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+            FOREIGN KEY (`withdrawal_method_id`) REFERENCES `withdrawal_methods` (`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci";
+    }
     
     if ($conn_back->query($sql) === TRUE) {
         echo "<p>withdrawal table created successfully.</p>";
