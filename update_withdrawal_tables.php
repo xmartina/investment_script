@@ -109,19 +109,49 @@ $tableExists = $conn_back->query("SHOW TABLES LIKE 'user_withdrawal_methods'");
 if ($tableExists->num_rows == 0) {
     echo "<p>Creating user_withdrawal_methods table...</p>";
     
-    $sql = "CREATE TABLE `user_withdrawal_methods` (
-        `id` int NOT NULL AUTO_INCREMENT,
-        `user_id` int NOT NULL,
-        `withdrawal_method_id` int NOT NULL,
-        `account_details` text NOT NULL,
-        `is_default` tinyint(1) NOT NULL DEFAULT 0,
-        `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `user_method_unique` (`user_id`, `withdrawal_method_id`),
-        FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-        FOREIGN KEY (`withdrawal_method_id`) REFERENCES `withdrawal_methods` (`id`) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci";
+    // First, check if users table exists and has proper index
+    $usersTableExists = $conn_back->query("SHOW TABLES LIKE 'users'");
+    $canCreateForeignKey = false;
+    
+    if ($usersTableExists->num_rows > 0) {
+        // Check if users table has primary key on id column
+        $usersPrimaryKey = $conn_back->query("SHOW KEYS FROM users WHERE Key_name = 'PRIMARY'");
+        if ($usersPrimaryKey->num_rows > 0) {
+            $canCreateForeignKey = true;
+        }
+    }
+    
+    // Create table without foreign key constraints if users table doesn't exist or isn't properly indexed
+    if (!$canCreateForeignKey) {
+        $sql = "CREATE TABLE `user_withdrawal_methods` (
+            `id` int NOT NULL AUTO_INCREMENT,
+            `user_id` int NOT NULL,
+            `withdrawal_method_id` int NOT NULL,
+            `account_details` text NOT NULL,
+            `is_default` tinyint(1) NOT NULL DEFAULT 0,
+            `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `user_method_unique` (`user_id`, `withdrawal_method_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci";
+        
+        echo "<p>Note: Creating table without foreign key constraints as users table is not properly set up.</p>";
+    } else {
+        // Create table with foreign key constraints
+        $sql = "CREATE TABLE `user_withdrawal_methods` (
+            `id` int NOT NULL AUTO_INCREMENT,
+            `user_id` int NOT NULL,
+            `withdrawal_method_id` int NOT NULL,
+            `account_details` text NOT NULL,
+            `is_default` tinyint(1) NOT NULL DEFAULT 0,
+            `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `user_method_unique` (`user_id`, `withdrawal_method_id`),
+            FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+            FOREIGN KEY (`withdrawal_method_id`) REFERENCES `withdrawal_methods` (`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci";
+    }
     
     if ($conn_back->query($sql) === TRUE) {
         echo "<p>user_withdrawal_methods table created successfully.</p>";
