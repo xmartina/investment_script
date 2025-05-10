@@ -73,6 +73,9 @@ get('/user/withdrawal', function() {
 get('/user/withdrawal_methods', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal_methods.php';
 });
+get('/user/referral', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/referral.php';
+});
 get('/user/investment_plans', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
 });
@@ -96,6 +99,9 @@ get('/update_staking_tables', function() {
 });
 get('/update_withdrawal_tables', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_withdrawal_tables.php';
+});
+get('/update_referral_tables', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/update_referral_tables.php';
 });
 
 // Admin routes
@@ -155,6 +161,9 @@ post('/user/withdrawal', function() {
 post('/user/withdrawal_methods', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/withdrawal_methods.php';
 });
+post('/user/referral', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/user/referral.php';
+});
 post('/user/investment_plans', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/investment/index.php';
 });
@@ -178,6 +187,9 @@ post('/update_staking_tables', function() {
 });
 post('/update_withdrawal_tables', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_withdrawal_tables.php';
+});
+post('/update_referral_tables', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/update_referral_tables.php';
 });
 post('/admin/withdrawals', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';

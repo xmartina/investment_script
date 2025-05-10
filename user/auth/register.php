@@ -15,6 +15,12 @@ $formData = [
     'phone' => ''
 ];
 
+// Get referral code from URL if present
+$referral_code = '';
+if (isset($_GET['ref']) && !empty($_GET['ref'])) {
+    $referral_code = trim($_GET['ref']);
+}
+
 // Check if user is already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: /user/dashboard');
@@ -32,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'phone_code' => $_POST['phone_code'] ?? '',
             'phone' => trim($_POST['phone'] ?? ''),
             'password' => $_POST['password'] ?? '',
-            'confirm_password' => $_POST['confirm_password'] ?? ''
+            'confirm_password' => $_POST['confirm_password'] ?? '',
+            'referral_code' => trim($_POST['referral_code'] ?? '')
         ];
 
         // Validate inputs
@@ -72,6 +79,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Email already registered';
         }
 
+        // Validate referral code if provided
+        $referrer_id = null;
+        if (!empty($formData['referral_code'])) {
+            $stmt = $conn_back->prepare("SELECT id FROM users WHERE referral_code = ?");
+            $stmt->bind_param("s", $formData['referral_code']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $referrer = $result->fetch_assoc();
+                $referrer_id = $referrer['id'];
+            } else {
+                $errors[] = 'Invalid referral code';
+            }
+        }
+
         // If no errors, create user
         if (empty($errors)) {
             // Hash password
@@ -79,24 +102,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Create full phone number
             $fullPhone = $formData['phone_code'] . $formData['phone'];
-
-            // Insert user
-            $stmt = $conn_back->prepare("INSERT INTO users 
-                (first_name, last_name, email, phone, password) 
-                VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssss",
-                $formData['fname'],
-                $formData['lname'],
-                $formData['email'],
-                $fullPhone,
-                $passwordHash
-            );
-
-            if ($stmt->execute()) {
-                $success = 'Registration successful! Redirecting to login...';
-                header("Refresh: 3; url=/login");
-            } else {
-                throw new Exception('Registration failed. Please try again.');
+            
+            // Generate a unique referral code for new user
+            $new_referral_code = strtoupper(substr(md5(uniqid($formData['email'] . time(), true)), 0, 8));
+            
+            // Begin transaction
+            $conn_back->begin_transaction();
+            
+            try {
+                // Insert user with referral information
+                $stmt = $conn_back->prepare("INSERT INTO users 
+                    (first_name, last_name, email, phone, password, referral_code, referred_by) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssssi",
+                    $formData['fname'],
+                    $formData['lname'],
+                    $formData['email'],
+                    $fullPhone,
+                    $passwordHash,
+                    $new_referral_code,
+                    $referrer_id
+                );
+                
+                if ($stmt->execute()) {
+                    // Commit transaction
+                    $conn_back->commit();
+                    
+                    $success = 'Registration successful! Redirecting to login...';
+                    if ($referrer_id) {
+                        $success .= ' You were referred by a friend!';
+                    }
+                    header("Refresh: 3; url=/login");
+                } else {
+                    throw new Exception('Registration failed. Please try again.');
+                }
+            } catch (Exception $e) {
+                // Rollback transaction on error
+                $conn_back->rollback();
+                throw $e;
             }
         }
 
@@ -198,43 +241,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="bi bi-eye"></i>
                         </button>
                     </div>
-
-                    <button type="submit" class="btn btn-lg btn-theme w-100 mb-4">Sign up</button>
-
-                    <div class="text-center mb-3">
-                        Already have account? <a href="/login" class="">Login</a> here.
+                    
+                    <!-- Referral Code Field -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="referral_code" name="referral_code"
+                               placeholder="Referral code (if any)" value="<?= htmlspecialchars($referral_code) ?>">
+                        <label for="referral_code">Referral Code (Optional)</label>
                     </div>
 
-                    <!-- Social login section remains same -->
+                    <div class="d-grid gap-2 mb-3">
+                        <button class="btn btn-lg btn-theme-1" type="submit">Register</button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="small text-secondary">By clicking Register, you agree to our
+                            <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+                        </p>
+                        <p class="mt-2">
+                            Already have an account? <a href="/login">Login</a>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
+
     <script>
-        // Password visibility toggles
-        document.querySelectorAll('.bi-eye').forEach(button => {
-            button.parentElement.addEventListener('click', function(e) {
-                const input = this.closest('.position-relative').querySelector('input');
-                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-                input.setAttribute('type', type);
-                e.currentTarget.querySelector('i').classList.toggle('bi-eye-slash');
+        // Toggle password visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButtons = document.querySelectorAll('.btn-square.btn-link.text-theme-1');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.previousElementSibling.querySelector('input');
+                    const icon = this.querySelector('i');
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.replace('bi-eye', 'bi-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.replace('bi-eye-slash', 'bi-eye');
+                    }
+                });
             });
-        });
-
-        // Password strength indicator (basic example)
-        document.getElementById('checkstrength').addEventListener('input', function(e) {
-            const strengthDisplay = document.getElementById('checksterngthdisplay');
-            const strengthText = document.getElementById('textpassword');
-            const strength = Math.min(e.target.value.length / 2, 6); // Simple length-based strength
-
-            strengthDisplay.querySelectorAll('div').forEach((bar, index) => {
-                bar.style.backgroundColor = index < strength ? '#4CAF50' : '#ddd';
-            });
-
-            strengthText.textContent = strength >= 6 ? 'Strong' : strength >= 4 ? 'Medium' : 'Weak';
         });
     </script>
 
-<?php
-include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/auth/footer.php';
-?>
+<?php include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/auth/footer.php'; ?>

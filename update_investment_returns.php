@@ -5,6 +5,9 @@
 // Include database configuration
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 
+// Include referral commission processing
+include_once $_SERVER['DOCUMENT_ROOT'] . '/process_referral_commission.php';
+
 // Set to display errors for debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -189,4 +192,8 @@ echo "<ul>";
 echo "<li>Update the investments.php page to display returns information</li>";
 echo "<li>Create a cron job to process pending returns when they reach their expected date</li>";
 echo "</ul>";
+
+// Inside the main processing loop where profit is calculated and added,
+// add the following line to process referral commission:
+processReferralCommission($investment['user_id'], $investment['id'], $profit_amount, 'investment');
 ?> 
