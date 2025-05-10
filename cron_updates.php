@@ -293,9 +293,8 @@ function process_investment_returns($conn) {
             
             // Mark investment as completed if this is the final return
             $update_investment_sql = "UPDATE investments SET 
-                                     status = 'completed' 
-                                     WHERE id = ? 
-                                     AND ends_at <= NOW()";
+                                     status = IF(ends_at <= NOW(), 'completed', status) 
+                                     WHERE id = ?";
             $stmt = $conn->prepare($update_investment_sql);
             $stmt->bind_param("i", $investment_id);
             
@@ -396,9 +395,8 @@ function debug_force_process_return($conn, $return_id) {
             
             // Mark investment as completed if this is the final return
             $update_investment_sql = "UPDATE investments SET 
-                                     status = 'completed' 
-                                     WHERE id = ? 
-                                     AND ends_at <= NOW()";
+                                     status = IF(ends_at <= NOW(), 'completed', status) 
+                                     WHERE id = ?";
             $stmt = $conn->prepare($update_investment_sql);
             $stmt->bind_param("i", $investment_id);
             
@@ -749,6 +747,26 @@ function update_unstake_availability($conn) {
 }
 
 /**
+ * Update status of completed investments
+ */
+function update_completed_investments($conn) {
+    log_message("Updating completed investments...");
+    
+    // Find active investments that have passed their end date
+    $sql = "UPDATE investments 
+            SET status = 'completed' 
+            WHERE status = 'active' 
+            AND ends_at <= NOW()";
+    
+    if ($conn->query($sql)) {
+        $affected_rows = $conn->affected_rows;
+        log_message("Updated $affected_rows investments to completed status");
+    } else {
+        log_message("Error updating completed investments: " . $conn->error, "ERROR");
+    }
+}
+
+/**
  * Process referral commissions
  */
 function process_referral_commissions($conn) {
@@ -868,6 +886,7 @@ try {
     generate_staking_rewards($conn_back);
     update_completed_stakings($conn_back);
     update_unstake_availability($conn_back);
+    update_completed_investments($conn_back);
     process_referral_commissions($conn_back);
     
     // Calculate execution time
