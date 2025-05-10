@@ -92,6 +92,7 @@ Waves
 @import url(/admin/assets/icons/iconsmind/style.css);
 @import url(/admin/assets/icons/icomoon/style.css);
 @import url(/admin/assets/vendor_components/animate/animate.css);
+@import url(/admin/assets/icons/material-design-iconic-font/css/materialdesignicons.css);
 html {
   height: 100%;
   font-size: 14px; }
@@ -14281,13 +14282,13 @@ Margin property
 Width property 
 *******************/
 .w-0 {
-  width: 0px !important; }
+  width: 0 !important; }
 
 .min-w-0 {
-  min-width: 0px !important; }
+  min-width: 0 !important; }
 
 .max-w-0 {
-  max-width: 0px !important; }
+  max-width: 0 !important; }
 
 .w-10 {
   width: 10px !important; }

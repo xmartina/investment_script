@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="<?=$siteLink?>/admin/css/style.css">
     <link rel="stylesheet" href="<?=$siteLink?>/admin/css/skin_color.css">
     <link rel="stylesheet" href="<?=$siteLink?>/admin/css/custom.css">
-    <link rel="stylesheet" href="<?=$siteLink?>/admin/css/custom.css">
+<!--    <link rel="stylesheet" href="--><?php //=$siteLink?><!--/admin/css/custom.css">-->
 </head>
 
 <body class="dark-skin sidebar-mini theme-primary  fixed sidebar-collapse">
@@ -172,7 +172,7 @@
                                         <span class="pull-right-container"><i class="fa fa-angle-right pull-right"></i></span>
                                     </a>
                                     <ul class="treeview-menu">
-                                        <li><a href="<?=$siteLink?>/admin/index.html"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Dash 1</a></li>
+                                        <li><a href="<?=$siteLink?>/admin"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Dash 1</a></li>
                                         <!-- Repeat for other dashboard links -->
                                     </ul>
                                 </li>
