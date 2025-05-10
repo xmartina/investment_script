@@ -1,8 +1,8 @@
 /* MaterialDesignIcons.com */
 @font-face {
   font-family: "Material Design Icons";
-  src: url("https://crypto-admin-templates.multipurposethemes.com/bs5/assets/icons/material-design-iconic-font/fonts/materialdesignicons-webfont.eot?v=2.0.46");
-  src: url("https://crypto-admin-templates.multipurposethemes.com/bs5/assets/icons/material-design-iconic-font/fonts/materialdesignicons-webfont.eot?#iefix&v=2.0.46") format("embedded-opentype"), url("https://crypto-admin-templates.multipurposethemes.com/bs5/assets/icons/material-design-iconic-font/fonts/materialdesignicons-webfont.woff2?v=2.0.46") format("woff2"), url("https://crypto-admin-templates.multipurposethemes.com/bs5/assets/icons/material-design-iconic-font/fonts/materialdesignicons-webfont.woff?v=2.0.46") format("woff"), url("https://crypto-admin-templates.multipurposethemes.com/bs5/assets/icons/material-design-iconic-font/fonts/materialdesignicons-webfont.ttf?v=2.0.46") format("truetype"), url("https://crypto-admin-templates.multipurposethemes.com/bs5/assets/icons/material-design-iconic-font/fonts/materialdesignicons-webfont.svg?v=2.0.46#materialdesigniconsregular") format("svg");
+  src: url("/admin/assets/fonts/materialdesignicons-webfont.eot?v=2.0.46");
+  src: url("/admin/assets/fonts/materialdesignicons-webfont.eot?#iefix&v=2.0.46") format("embedded-opentype"), url("/admin/assets/fonts/materialdesignicons-webfont.woff2?v=2.0.46") format("woff2"), url("/admin/assets/fonts/materialdesignicons-webfont.woff2?v=2.0.46") format("woff"), url("/admin/assets/fonts/materialdesignicons-webfont.ttf?v=2.0.46") format("truetype"), url("https://crypto-admin-templates.multipurposethemes.com/bs5/assets/icons/material-design-iconic-font/fonts/materialdesignicons-webfont.svg?v=2.0.46#materialdesigniconsregular") format("svg");
   font-weight: normal;
   font-style: normal;
 }

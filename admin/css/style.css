@@ -32314,6 +32314,7 @@ img.away, img.busy, img.offline, img.online {
 
 .waves-circle {
   transform: translateZ(0);
+  mask-image: radial-gradient(circle, white 100%, black 100%);
   -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%); }
 
 .waves-input-wrapper {
