@@ -8,8 +8,8 @@ echo "Testing config loading...\n";
 require_once __DIR__ . '/include/config.php';
 
 // Check if database connection variable exists
-if (isset($conn_back) && $conn_back) {
-    echo "Database connection ($conn_back) is working!\n";
+if (isset($conn_back) && $conn_back instanceof mysqli) {
+    echo "Database connection is working! Connected to host: " . $conn_back->host_info . "\n";
 } else {
     echo "Database connection failed!\n";
 }

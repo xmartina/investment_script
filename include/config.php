@@ -28,7 +28,7 @@ $social_result = $conn_front->query($sql_front);
 
 const web_url = 'exodusaipro.online';
 const link = 'https://exodusaipro.online';
-$active_url = $_SERVER['REQUEST_URI'];
+$active_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
 //backend config
 if (isset($_POST['logout'])) {
     unset($_SESSION['user']); // remove specific session variable
@@ -37,5 +37,6 @@ if (isset($_POST['logout'])) {
     exit;
 }
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/front_functions.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/functions/back_functions.php';
+// Fix the paths to use __DIR__ for command-line compatibility
+include_once __DIR__ . '/../functions/front_functions.php';
+include_once __DIR__ . '/../functions/back_functions.php';
