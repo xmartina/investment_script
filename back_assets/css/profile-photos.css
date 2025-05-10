@@ -1,0 +1,62 @@
+/* Profile photo styles */
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar.avatar-28 {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    overflow: hidden;
+}
+
+.avatar.avatar-50 {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    overflow: hidden;
+}
+
+.avatar.avatar-100 {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    overflow: hidden;
+}
+
+.coverimg {
+    position: relative;
+}
+
+/* Fix for broken images */
+.avatar img:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.avatar img:after {
+    content: '\1F464';  /* Unicode for user icon */
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+/* Profile photo preview during upload */
+#profile_preview {
+    object-fit: cover;
+    border: 2px solid #f0f0f0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+} 
