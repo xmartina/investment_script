@@ -94,3 +94,28 @@ If investment returns or staking rewards aren't being processed:
 - Review the log files periodically to ensure the script is running properly
 - Consider implementing log rotation to prevent the logs from growing too large
 - Update the script if you make changes to the investment or staking logic 
+
+
+
+
+
+
+
+
+
+
+
+
+
+Notice
+: session_start(): Ignoring session_start() because a session is already active (started from /home/summitgu/domains/exodusaipro.online/public_html/user/withdrawal.php on line 3) in
+/home/summitgu/domains/exodusaipro.online/public_html/functions/front_functions.php
+on line
+4
+
+
+Notice
+: session_start(): Ignoring session_start() because a session is already active (started from /home/summitgu/domains/exodusaipro.online/public_html/user/withdrawal.php on line 3) in
+/home/summitgu/domains/exodusaipro.online/public_html/functions/back_functions.php
+on line
+4

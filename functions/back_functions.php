@@ -1,6 +1,6 @@
 <?php
-// First check if headers have been sent before starting session
-if (!headers_sent()) {
+// Check if a session doesn't already exist and headers haven't been sent before starting session
+if (!headers_sent() && session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
