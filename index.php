@@ -228,6 +228,18 @@ get('/admin/staking_rewards', function() {
 get('/admin/staking_rewards.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_rewards.php';
 });
+get('/admin/create_staking', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_staking.php';
+});
+get('/admin/create_staking.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_staking.php';
+});
+get('/admin/create_investment', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_investment.php';
+});
+get('/admin/create_investment.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_investment.php';
+});
 get('/admin/withdrawal_methods', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
 });
@@ -402,6 +414,18 @@ post('/admin/staking_rewards', function() {
 });
 post('/admin/staking_rewards.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_rewards.php';
+});
+post('/admin/create_staking', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_staking.php';
+});
+post('/admin/create_staking.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_staking.php';
+});
+post('/admin/create_investment', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_investment.php';
+});
+post('/admin/create_investment.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_investment.php';
 });
 post('/admin/withdrawal_methods', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
