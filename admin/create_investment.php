@@ -14,121 +14,100 @@ $current_page = "create_investment.php";
 $message = "";
 $error = "";
 
+// Get users for dropdown
+$users_query = "SELECT id, CONCAT(first_name, ' ', last_name, ' (', email, ')') as user_name FROM users ORDER BY first_name, last_name";
+$users_result = $conn_back->query($users_query);
+
+// Get investment plans for dropdown
+$plans_query = "SELECT id, name, min_amount, max_amount, roi_percent, duration_days FROM investment_plans WHERE is_active = 1 ORDER BY name";
+$plans_result = $conn_back->query($plans_query);
+
 // Process form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['create_investment'])) {
-        $user_id = intval($_POST['user_id']);
-        $plan_id = intval($_POST['plan_id']);
-        $amount = floatval($_POST['amount']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_investment'])) {
+    $user_id = (int)$_POST['user_id'];
+    $plan_id = (int)$_POST['plan_id'];
+    $amount = (float)$_POST['amount'];
+    $admin_id = $_SESSION['admin_id'];
+    
+    // Validate inputs
+    if ($user_id <= 0) {
+        $error = "Please select a valid user.";
+    } elseif ($plan_id <= 0) {
+        $error = "Please select a valid investment plan.";
+    } elseif ($amount <= 0) {
+        $error = "Please enter a valid amount greater than zero.";
+    } else {
+        // Get plan details to validate amount
+        $plan_stmt = $conn_back->prepare("SELECT * FROM investment_plans WHERE id = ?");
+        $plan_stmt->bind_param("i", $plan_id);
+        $plan_stmt->execute();
+        $plan = $plan_stmt->get_result()->fetch_assoc();
+        $plan_stmt->close();
         
-        // Validate inputs
-        if ($user_id <= 0) {
-            $error = "Please select a valid user.";
-        } elseif ($plan_id <= 0) {
-            $error = "Please select a valid investment plan.";
-        } elseif ($amount <= 0) {
-            $error = "Please enter a valid amount greater than zero.";
+        if (!$plan) {
+            $error = "Selected investment plan does not exist.";
+        } elseif ($amount < $plan['min_amount']) {
+            $error = "Amount is less than the minimum required for this plan ({$plan['min_amount']}).";
+        } elseif ($plan['max_amount'] > 0 && $amount > $plan['max_amount']) {
+            $error = "Amount exceeds the maximum allowed for this plan ({$plan['max_amount']}).";
         } else {
-            // Get plan details
-            $stmt = $conn_back->prepare("SELECT * FROM investment_plans WHERE id = ?");
-            $stmt->bind_param("i", $plan_id);
-            $stmt->execute();
-            $plan = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
+            // Calculate expected returns
+            $roi_percentage = $plan['roi_percent'];
+            $roi_expected = $amount * ($roi_percentage / 100);
             
-            // Get user details
-            $stmt = $conn_back->prepare("SELECT * FROM users WHERE id = ?");
-            $stmt->bind_param("i", $user_id);
-            $stmt->execute();
-            $user = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
+            // Calculate start and end dates
+            $now = new DateTime();
+            $started_at = $now->format('Y-m-d H:i:s');
+            $now->add(new DateInterval('P' . $plan['duration_days'] . 'D'));
+            $ends_at = $now->format('Y-m-d H:i:s');
             
-            if (!$plan) {
-                $error = "Selected investment plan does not exist.";
-            } elseif (!$user) {
-                $error = "Selected user does not exist.";
-            } elseif ($plan['min_amount'] > $amount) {
-                $error = "Amount is below the minimum required for this plan ($" . number_format($plan['min_amount'], 2) . ").";
-            } elseif ($plan['max_amount'] > 0 && $plan['max_amount'] < $amount) {
-                $error = "Amount exceeds the maximum allowed for this plan ($" . number_format($plan['max_amount'], 2) . ").";
-            } elseif ($user['main_balance'] < $amount && !isset($_POST['bypass_balance_check'])) {
-                $error = "User does not have sufficient balance. Current balance: $" . number_format($user['main_balance'], 2);
-            } else {
-                // Begin transaction
-                $conn_back->begin_transaction();
+            // Start a transaction
+            $conn_back->begin_transaction();
+            
+            try {
+                // Insert investment record
+                $stmt = $conn_back->prepare("
+                    INSERT INTO investments (
+                        user_id, plan_id, amount, roi_expected, roi_percentage,
+                        created_at, status, started_at, ends_at
+                    ) VALUES (?, ?, ?, ?, ?, NOW(), 'active', ?, ?)
+                ");
+                $stmt->bind_param("iiddiss", $user_id, $plan_id, $amount, $roi_expected, $roi_percentage, $started_at, $ends_at);
+                $stmt->execute();
+                $investment_id = $conn_back->insert_id;
+                $stmt->close();
                 
-                try {
-                    // Calculate investment details
-                    $roi_percent = $plan['roi_percent'];
-                    $duration_days = $plan['duration_days'];
-                    $expected_returns = $amount * (1 + ($roi_percent / 100));
-                    
-                    // Set dates
-                    $started_at = date('Y-m-d H:i:s');
-                    $ends_at = date('Y-m-d H:i:s', strtotime($started_at . " + $duration_days days"));
-                    
-                    // Create investment record
-                    $stmt = $conn_back->prepare("
-                        INSERT INTO investments (
-                            user_id, plan_id, amount, expected_returns, 
-                            status, started_at, ends_at, created_at
-                        ) VALUES (?, ?, ?, ?, 'active', ?, ?, NOW())
-                    ");
-                    $stmt->bind_param("iiddss", $user_id, $plan_id, $amount, $expected_returns, $started_at, $ends_at);
-                    $stmt->execute();
-                    $investment_id = $conn_back->insert_id;
-                    $stmt->close();
-                    
-                    // Deduct from user balance if not bypassed
-                    if (!isset($_POST['bypass_balance_check'])) {
-                        $stmt = $conn_back->prepare("UPDATE users SET main_balance = main_balance - ? WHERE id = ?");
-                        $stmt->bind_param("di", $amount, $user_id);
-                        $stmt->execute();
-                        $stmt->close();
-                    }
-                    
-                    // Create transaction record
-                    $description = "Investment in " . $plan['name'] . " plan";
-                    $stmt = $conn_back->prepare("
-                        INSERT INTO transactions (
-                            user_id, amount, transaction_type, status, 
-                            description, date_time
-                        ) VALUES (?, ?, 'investment', 'completed', ?, NOW())
-                    ");
-                    $stmt->bind_param("ids", $user_id, $amount, $description);
-                    $stmt->execute();
-                    $stmt->close();
-                    
-                    // Log admin activity
-                    $admin_id = $_SESSION['admin_id'];
-                    $action = "Created investment #$investment_id for user #$user_id in plan " . $plan['name'] . " for $" . number_format($amount, 2);
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                    
-                    $stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                    $stmt->bind_param("iss", $admin_id, $action, $ip);
-                    $stmt->execute();
-                    $stmt->close();
-                    
-                    // Commit transaction
-                    $conn_back->commit();
-                    
-                    $message = "Investment created successfully for " . $user['username'] . " in " . $plan['name'] . " plan.";
-                } catch (Exception $e) {
-                    // Rollback transaction on error
-                    $conn_back->rollback();
-                    $error = "Error creating investment: " . $e->getMessage();
-                }
+                // Create a transaction record
+                $transaction_reference = 'INV-' . time() . '-' . $user_id;
+                $transaction_proof = 'PROOF-' . time() . '-' . $user_id;
+                $description = "Investment in {$plan['name']} created by admin";
+                
+                $stmt = $conn_back->prepare("
+                    INSERT INTO transactions (
+                        user_id, amount, transaction_type, reference_id, transaction_proof_id,
+                        currency, status, date_time, description
+                    ) VALUES (?, ?, 'investment', ?, ?, '$', 'active', NOW(), ?)
+                ");
+                $stmt->bind_param("idsss", $user_id, $amount, $transaction_reference, $transaction_proof, $description);
+                $stmt->execute();
+                $stmt->close();
+                
+                // Log admin action
+                $admin_action = "Created investment #{$investment_id} of {$amount} for user #{$user_id} in plan #{$plan_id}";
+                $ip = $_SERVER['REMOTE_ADDR'];
+                
+                $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
+                $log_stmt->bind_param("iss", $admin_id, $admin_action, $ip);
+                $log_stmt->execute();
+                $log_stmt->close();
+                
+                $conn_back->commit();
+                $message = "Investment has been created successfully!";
+            } catch (Exception $e) {
+                $conn_back->rollback();
+                $error = "Error creating investment: " . $e->getMessage();
             }
         }
-    }
-}
-
-// Get investment plans
-$plans_result = $conn_back->query("SELECT * FROM investment_plans WHERE status = 1 ORDER BY name");
-$plans = [];
-if ($plans_result->num_rows > 0) {
-    while ($row = $plans_result->fetch_assoc()) {
-        $plans[] = $row;
     }
 }
 
@@ -138,6 +117,9 @@ include_once __DIR__ . '/layout/header.php';
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Create Investment</h1>
+        <a href="investments.php" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Investments
+        </a>
     </div>
 
     <?php if (!empty($message)): ?>
@@ -158,155 +140,181 @@ include_once __DIR__ . '/layout/header.php';
         </div>
     <?php endif; ?>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Create New Investment</h6>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">New Investment</h6>
+        </div>
+        <div class="card-body">
+            <form method="post" id="createInvestmentForm">
+                <div class="form-group">
+                    <label for="user_id">Select User:</label>
+                    <select class="form-control" id="user_id" name="user_id" required>
+                        <option value="">-- Select User --</option>
+                        <?php while ($user = $users_result->fetch_assoc()): ?>
+                            <option value="<?= $user['id'] ?>"><?= htmlspecialchars($user['user_name']) ?></option>
+                        <?php endwhile; ?>
+                    </select>
                 </div>
-                <div class="card-body">
-                    <form method="post">
+                
+                <div class="form-group">
+                    <label for="plan_id">Investment Plan:</label>
+                    <select class="form-control" id="plan_id" name="plan_id" required>
+                        <option value="">-- Select Plan --</option>
+                        <?php while ($plan = $plans_result->fetch_assoc()): ?>
+                            <option value="<?= $plan['id'] ?>" 
+                                    data-min="<?= $plan['min_amount'] ?>" 
+                                    data-max="<?= $plan['max_amount'] ?>"
+                                    data-roi="<?= $plan['roi_percent'] ?>"
+                                    data-duration="<?= $plan['duration_days'] ?>">
+                                <?= htmlspecialchars($plan['name']) ?> 
+                                (<?= $plan['roi_percent'] ?>% ROI, <?= $plan['duration_days'] ?> days)
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Investment Amount:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">$</span>
+                        </div>
+                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" required>
+                    </div>
+                    <small id="amountHelp" class="form-text text-muted">
+                        Min: $<span id="min_amount">0.00</span> 
+                        <?php /* Only show max if it exists */ ?>
+                        <span id="max_amount_container" style="display:none;">
+                            | Max: $<span id="max_amount">0.00</span>
+                        </span>
+                    </small>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Investment Summary</h6>
+                    </div>
+                    <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="user_id">Select User *</label>
-                                    <select class="form-control" id="user_id" name="user_id" required>
-                                        <option value="">Select User</option>
-                                    </select>
-                                    <small class="form-text text-muted">Search by username, email, or name</small>
-                                </div>
-                                
-                                <div class="form-group mt-3">
-                                    <label for="user_balance">User Balance</label>
-                                    <input type="text" class="form-control" id="user_balance" readonly>
-                                </div>
-                                
-                                <div class="form-group mt-3">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="bypass_balance_check" name="bypass_balance_check">
-                                        <label class="custom-control-label" for="bypass_balance_check">Bypass balance check (create investment without deducting from balance)</label>
-                                    </div>
-                                </div>
+                                <p><strong>ROI Percentage:</strong> <span id="roi_percent">0.00</span>%</p>
+                                <p><strong>ROI Amount:</strong> $<span id="roi_amount">0.00</span></p>
                             </div>
-                            
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="plan_id">Select Investment Plan *</label>
-                                    <select class="form-control" id="plan_id" name="plan_id" required>
-                                        <option value="">Select Plan</option>
-                                        <?php foreach ($plans as $plan): ?>
-                                        <option value="<?= $plan['id'] ?>" data-min="<?= $plan['min_amount'] ?>" data-max="<?= $plan['max_amount'] ?>" data-roi="<?= $plan['roi_percent'] ?>" data-duration="<?= $plan['duration_days'] ?>">
-                                            <?= htmlspecialchars($plan['name']) ?> (<?= $plan['roi_percent'] ?>% / <?= $plan['duration_days'] ?> days)
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group mt-3">
-                                    <label for="amount">Investment Amount ($) *</label>
-                                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" required>
-                                    <small class="form-text text-muted" id="amount_range"></small>
-                                </div>
-                                
-                                <div class="form-group mt-3">
-                                    <label for="expected_return">Expected Return</label>
-                                    <input type="text" class="form-control" id="expected_return" readonly>
-                                </div>
+                                <p><strong>Duration:</strong> <span id="duration_days">0</span> days</p>
+                                <p><strong>Total Return:</strong> $<span id="total_return">0.00</span></p>
                             </div>
                         </div>
-                        
-                        <div class="form-group mt-4">
-                            <button type="submit" name="create_investment" class="btn btn-primary">Create Investment</button>
-                            <a href="investments" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+                
+                <button type="submit" name="create_investment" class="btn btn-primary">Create Investment</button>
+                <a href="investments.php" class="btn btn-secondary">Cancel</a>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
 $(document).ready(function() {
-    // Initialize user select2 with AJAX
-    $('#user_id').select2({
-        ajax: {
-            url: 'ajax/search_users.php',
-            dataType: 'json',
-            delay: 250,
-            data: function(params) {
-                return {
-                    q: params.term
-                };
-            },
-            processResults: function(data) {
-                return {
-                    results: data
-                };
-            },
-            cache: true
-        },
-        minimumInputLength: 2,
-        placeholder: 'Search for a user',
-        templateResult: formatUser,
-        templateSelection: formatUserSelection
-    });
-    
-    function formatUser(user) {
-        if (!user.id) return user.text;
-        return $(`
-            <div>
-                <strong>${user.text}</strong>
-                <br>
-                <small>${user.email} (Balance: $${parseFloat(user.balance).toFixed(2)})</small>
-            </div>
-        `);
+    // Initialize select2 for better dropdowns
+    if ($.fn.select2) {
+        $('#user_id, #plan_id').select2({
+            placeholder: "Select an option"
+        });
     }
     
-    function formatUserSelection(user) {
-        if (!user.id) return user.text;
-        $('#user_balance').val('$' + parseFloat(user.balance).toFixed(2));
-        return user.text;
-    }
-    
-    // Update plan info on change
+    // Update amount limits and calculations when plan changes
     $('#plan_id').change(function() {
         var selectedOption = $(this).find('option:selected');
-        var minAmount = selectedOption.data('min');
-        var maxAmount = selectedOption.data('max');
-        var roi = selectedOption.data('roi');
+        var minAmount = parseFloat(selectedOption.data('min')) || 0;
+        var maxAmount = parseFloat(selectedOption.data('max')) || 0;
+        var roiPercent = parseFloat(selectedOption.data('roi')) || 0;
+        var durationDays = parseInt(selectedOption.data('duration')) || 0;
         
-        if (minAmount) {
-            var rangeText = 'Min: $' + parseFloat(minAmount).toFixed(2);
-            if (maxAmount > 0) {
-                rangeText += ' / Max: $' + parseFloat(maxAmount).toFixed(2);
-            }
-            $('#amount_range').text(rangeText);
-            $('#amount').attr('min', minAmount);
-            if (maxAmount > 0) {
-                $('#amount').attr('max', maxAmount);
-            } else {
-                $('#amount').removeAttr('max');
-            }
+        // Update min/max display
+        $('#min_amount').text(minAmount.toFixed(2));
+        $('#max_amount').text(maxAmount.toFixed(2));
+        
+        if (maxAmount > 0) {
+            $('#max_amount_container').show();
+        } else {
+            $('#max_amount_container').hide();
         }
         
-        calculateReturn();
+        // Update amount input constraints
+        $('#amount').attr('min', minAmount);
+        if (maxAmount > 0) {
+            $('#amount').attr('max', maxAmount);
+        } else {
+            $('#amount').removeAttr('max');
+        }
+        
+        // Update displayed values
+        $('#roi_percent').text(roiPercent.toFixed(2));
+        $('#duration_days').text(durationDays);
+        
+        // Calculate ROI if amount is entered
+        calculateROI();
     });
     
-    // Calculate expected return
-    $('#amount').on('input', calculateReturn);
+    // Calculate ROI when amount changes
+    $('#amount').on('input', function() {
+        calculateROI();
+    });
     
-    function calculateReturn() {
-        var amount = parseFloat($('#amount').val());
-        var roi = parseFloat($('#plan_id option:selected').data('roi'));
+    // Function to calculate and display ROI
+    function calculateROI() {
+        var amount = parseFloat($('#amount').val()) || 0;
+        var roiPercent = parseFloat($('#roi_percent').text()) || 0;
         
-        if (!isNaN(amount) && !isNaN(roi)) {
-            var expectedReturn = amount * (1 + (roi / 100));
-            $('#expected_return').val('$' + expectedReturn.toFixed(2));
-        } else {
-            $('#expected_return').val('');
-        }
+        var roiAmount = amount * (roiPercent / 100);
+        var totalReturn = amount + roiAmount;
+        
+        $('#roi_amount').text(roiAmount.toFixed(2));
+        $('#total_return').text(totalReturn.toFixed(2));
     }
+    
+    // Form validation
+    $('#createInvestmentForm').submit(function(e) {
+        var userId = $('#user_id').val();
+        var planId = $('#plan_id').val();
+        var amount = parseFloat($('#amount').val()) || 0;
+        var minAmount = parseFloat($('#min_amount').text()) || 0;
+        var maxAmount = parseFloat($('#max_amount').text()) || 0;
+        
+        if (!userId) {
+            alert('Please select a user');
+            e.preventDefault();
+            return false;
+        }
+        
+        if (!planId) {
+            alert('Please select an investment plan');
+            e.preventDefault();
+            return false;
+        }
+        
+        if (amount <= 0) {
+            alert('Please enter a valid amount greater than zero');
+            e.preventDefault();
+            return false;
+        }
+        
+        if (amount < minAmount) {
+            alert('Amount is less than the minimum required for this plan ($' + minAmount.toFixed(2) + ')');
+            e.preventDefault();
+            return false;
+        }
+        
+        if (maxAmount > 0 && amount > maxAmount) {
+            alert('Amount exceeds the maximum allowed for this plan ($' + maxAmount.toFixed(2) + ')');
+            e.preventDefault();
+            return false;
+        }
+        
+        return true;
+    });
 });
 </script>
 

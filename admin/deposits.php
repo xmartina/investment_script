@@ -9,44 +9,143 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-$page_name = "Deposit Management";
+$page_name = "Deposits";
+$current_page = "deposits.php";
 $message = "";
 $error = "";
 
-// Process deposit approval/rejection
+// Process form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Approve deposit
     if (isset($_POST['approve_deposit'])) {
-        $deposit_id = $_POST['deposit_id'];
+        $deposit_id = (int)$_POST['deposit_id'];
         
         // Get deposit details
-        $stmt = $conn_back->prepare("SELECT user_id, amount, status FROM deposit_requests WHERE id = ?");
+        $stmt = $conn_back->prepare("SELECT * FROM deposit_requests WHERE id = ? AND status = 'pending'");
         $stmt->bind_param("i", $deposit_id);
         $stmt->execute();
-        $result = $stmt->get_result();
-        $deposit = $result->fetch_assoc();
+        $deposit = $stmt->get_result()->fetch_assoc();
         $stmt->close();
         
-        if ($deposit && $deposit['status'] == 'pending') {
+        if ($deposit) {
             // Begin transaction
             $conn_back->begin_transaction();
             
             try {
-                // Update user balance
+                // Update deposit status
+                $stmt = $conn_back->prepare("UPDATE deposit_requests SET status = 'approved' WHERE id = ?");
+                $stmt->bind_param("i", $deposit_id);
+                $stmt->execute();
+                $stmt->close();
+                
+                // Add to user's balance
                 $stmt = $conn_back->prepare("UPDATE users SET main_balance = main_balance + ? WHERE id = ?");
                 $stmt->bind_param("di", $deposit['amount'], $deposit['user_id']);
                 $stmt->execute();
                 $stmt->close();
                 
-                // Update deposit status
-                $stmt = $conn_back->prepare("UPDATE deposit_requests SET status = 'approved', approved_at = NOW() WHERE id = ?");
+                // Create transaction record if not exists
+                $stmt = $conn_back->prepare("SELECT transaction_id FROM transactions WHERE deposit_request_id = ?");
                 $stmt->bind_param("i", $deposit_id);
                 $stmt->execute();
+                $transaction_result = $stmt->get_result();
                 $stmt->close();
                 
-                // Record transaction
-                $description = "Deposit #$deposit_id approved";
-                $stmt = $conn_back->prepare("INSERT INTO transactions (user_id, amount, type, status, description, created_at) VALUES (?, ?, 'deposit', 'completed', ?, NOW())");
-                $stmt->bind_param("ids", $deposit['user_id'], $deposit['amount'], $description);
+                if ($transaction_result->num_rows == 0) {
+                    // Insert new transaction
+                    $transaction_reference = 'DEP' . time() . rand(1000, 9999);
+                    $transaction_proof = 'DEPPROOF' . time();
+                    $description = 'Deposit via ' . $deposit['payment_method'];
+                    
+                    $stmt = $conn_back->prepare("
+                        INSERT INTO transactions (
+                            user_id, amount, transaction_type, reference_id, 
+                            transaction_proof_id, currency, status, 
+                            date_time, description, deposit_request_id
+                        ) VALUES (?, ?, 'deposit', ?, ?, ?, 'completed', NOW(), ?, ?)
+                    ");
+                    $stmt->bind_param("idsssssi", 
+                        $deposit['user_id'], 
+                        $deposit['amount'], 
+                        $transaction_reference, 
+                        $transaction_proof, 
+                        $deposit['currency'], 
+                        $description,
+                        $deposit_id
+                    );
+                    $stmt->execute();
+                    $stmt->close();
+                } else {
+                    // Update existing transaction
+                    $stmt = $conn_back->prepare("UPDATE transactions SET status = 'completed' WHERE deposit_request_id = ?");
+                    $stmt->bind_param("i", $deposit_id);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+                
+                // Check for referral bonus
+                $stmt = $conn_back->prepare("SELECT referred_by FROM users WHERE id = ? AND referred_by IS NOT NULL");
+                $stmt->bind_param("i", $deposit['user_id']);
+                $stmt->execute();
+                $referral_result = $stmt->get_result();
+                $stmt->close();
+                
+                if ($referral_result->num_rows > 0) {
+                    $referrer = $referral_result->fetch_assoc();
+                    $referrer_id = $referrer['referred_by'];
+                    
+                    // Calculate referral bonus (example: 5% of deposit)
+                    $bonus_percentage = 0.05; // 5%
+                    $bonus_amount = $deposit['amount'] * $bonus_percentage;
+                    
+                    // Add referral bonus to referrer's balance
+                    $stmt = $conn_back->prepare("UPDATE users SET main_balance = main_balance + ?, referral_bonus_earned = referral_bonus_earned + ? WHERE id = ?");
+                    $stmt->bind_param("ddi", $bonus_amount, $bonus_amount, $referrer_id);
+                    $stmt->execute();
+                    $stmt->close();
+                    
+                    // Create referral commission record
+                    $stmt = $conn_back->prepare("
+                        INSERT INTO referral_commissions (
+                            referrer_id, referred_id, amount, source_type, 
+                            source_id, status, created_at, paid_at
+                        ) VALUES (?, ?, ?, 'deposit', ?, 'paid', NOW(), NOW())
+                    ");
+                    $stmt->bind_param("iidi", $referrer_id, $deposit['user_id'], $bonus_amount, $deposit_id);
+                    $stmt->execute();
+                    $stmt->close();
+                    
+                    // Create transaction for referral bonus
+                    $ref_transaction_reference = 'REF' . time() . rand(1000, 9999);
+                    $ref_transaction_proof = 'REFPROOF' . time();
+                    $ref_description = 'Referral bonus for deposit #' . $deposit_id;
+                    
+                    $stmt = $conn_back->prepare("
+                        INSERT INTO transactions (
+                            user_id, amount, transaction_type, reference_id, 
+                            transaction_proof_id, currency, status, 
+                            date_time, description
+                        ) VALUES (?, ?, 'referral_bonus', ?, ?, ?, 'completed', NOW(), ?)
+                    ");
+                    $stmt->bind_param("idssss", 
+                        $referrer_id, 
+                        $bonus_amount, 
+                        $ref_transaction_reference, 
+                        $ref_transaction_proof, 
+                        $deposit['currency'], 
+                        $ref_description
+                    );
+                    $stmt->execute();
+                    $stmt->close();
+                }
+                
+                // Log admin action
+                $admin_id = $_SESSION['admin_id'];
+                $action = "Approved deposit #$deposit_id of {$deposit['amount']} {$deposit['currency']} for user #{$deposit['user_id']}";
+                $ip = $_SERVER['REMOTE_ADDR'];
+                
+                $stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
+                $stmt->bind_param("iss", $admin_id, $action, $ip);
                 $stmt->execute();
                 $stmt->close();
                 
@@ -60,83 +159,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = "Error approving deposit: " . $e->getMessage();
             }
         } else {
-            $error = "Invalid deposit or deposit already processed.";
+            $error = "Deposit not found or already processed.";
         }
-    } elseif (isset($_POST['reject_deposit'])) {
-        $deposit_id = $_POST['deposit_id'];
+    }
+    
+    // Reject deposit
+    if (isset($_POST['reject_deposit'])) {
+        $deposit_id = (int)$_POST['deposit_id'];
         $rejection_reason = $_POST['rejection_reason'];
         
-        // Update deposit status to rejected
-        $stmt = $conn_back->prepare("UPDATE deposit_requests SET status = 'rejected', rejection_reason = ?, rejected_at = NOW() WHERE id = ? AND status = 'pending'");
-        $stmt->bind_param("si", $rejection_reason, $deposit_id);
-        
-        if ($stmt->execute() && $stmt->affected_rows > 0) {
-            $message = "Deposit #$deposit_id has been rejected.";
-        } else {
-            $error = "Error rejecting deposit or deposit already processed.";
-        }
-        
+        // Get deposit details
+        $stmt = $conn_back->prepare("SELECT * FROM deposit_requests WHERE id = ? AND status = 'pending'");
+        $stmt->bind_param("i", $deposit_id);
+        $stmt->execute();
+        $deposit = $stmt->get_result()->fetch_assoc();
         $stmt->close();
+        
+        if ($deposit) {
+            // Update deposit status
+            $stmt = $conn_back->prepare("UPDATE deposit_requests SET status = 'rejected' WHERE id = ?");
+            $stmt->bind_param("i", $deposit_id);
+            
+            if ($stmt->execute()) {
+                // Log admin action
+                $admin_id = $_SESSION['admin_id'];
+                $action = "Rejected deposit #$deposit_id of {$deposit['amount']} {$deposit['currency']} for user #{$deposit['user_id']}. Reason: $rejection_reason";
+                $ip = $_SERVER['REMOTE_ADDR'];
+                
+                $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
+                $log_stmt->bind_param("iss", $admin_id, $action, $ip);
+                $log_stmt->execute();
+                
+                $message = "Deposit #$deposit_id has been rejected successfully.";
+            } else {
+                $error = "Error rejecting deposit: " . $stmt->error;
+            }
+            
+            $stmt->close();
+        } else {
+            $error = "Deposit not found or already processed.";
+        }
     }
 }
 
 // Pagination
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($page < 1) $page = 1;
-$records_per_page = 10;
+$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+$records_per_page = 20;
 $offset = ($page - 1) * $records_per_page;
 
-// Filtering
-$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
-$valid_statuses = ['pending', 'approved', 'rejected', ''];
-
-if (!in_array($status_filter, $valid_statuses)) {
-    $status_filter = '';
-}
-
 // Build query condition
-$condition = "1=1";
+$condition = "";
 $params = [];
 $types = "";
 
 if (!empty($status_filter)) {
-    $condition .= " AND status = ?";
+    $condition = " WHERE d.status = ?";
     $params[] = $status_filter;
     $types .= "s";
 }
 
 // Get total count
-$count_sql = "SELECT COUNT(*) as total FROM deposit_requests WHERE $condition";
-$stmt = $conn_back->prepare($count_sql);
+$count_sql = "SELECT COUNT(*) as total FROM deposit_requests d" . $condition;
 if (!empty($types)) {
+    $stmt = $conn_back->prepare($count_sql);
     $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $total_records = $row['total'];
+    $stmt->close();
+} else {
+    $result = $conn_back->query($count_sql);
+    $row = $result->fetch_assoc();
+    $total_records = $row['total'];
 }
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-$total_records = $row['total'];
+
 $total_pages = ceil($total_records / $records_per_page);
-$stmt->close();
 
 // Get deposits
+$params_paged = $params;
+$params_paged[] = $records_per_page;
+$params_paged[] = $offset;
+$types .= "ii";
+
 $sql = "
     SELECT 
-        d.*, 
-        CONCAT(u.first_name, ' ', u.last_name) AS username, 
-        p.name AS payment_method
+        d.*,
+        CONCAT(u.first_name, ' ', u.last_name) as username,
+        u.email
     FROM deposit_requests d
     JOIN users u ON d.user_id = u.id
-    LEFT JOIN payment_methods p ON d.payment_method_id = p.id
-    WHERE $condition
+    $condition
     ORDER BY d.created_at DESC
     LIMIT ? OFFSET ?
 ";
-$types .= "ii";
-$params[] = $records_per_page;
-$params[] = $offset;
 
 $stmt = $conn_back->prepare($sql);
-$stmt->bind_param($types, ...$params);
+$stmt->bind_param($types, ...$params_paged);
 $stmt->execute();
 $deposits = $stmt->get_result();
 $stmt->close();
@@ -146,7 +266,7 @@ include_once __DIR__ . '/layout/header.php';
 
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Deposit Management</h1>
+        <h1 class="h3 mb-0 text-gray-800">Deposits Management</h1>
     </div>
 
     <?php if (!empty($message)): ?>
@@ -171,11 +291,10 @@ include_once __DIR__ . '/layout/header.php';
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">Deposit Requests</h6>
             <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" role="button" id="filterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-filter fa-sm fa-fw text-gray-400"></i> Filter
+                <a class="dropdown-toggle" href="#" role="button" id="statusDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-filter fa-sm fa-fw text-gray-400"></i> Filter by Status
                 </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="filterDropdown">
-                    <div class="dropdown-header">Status Filter:</div>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="statusDropdown">
                     <a class="dropdown-item <?= $status_filter === '' ? 'active' : '' ?>" href="?status=">All</a>
                     <a class="dropdown-item <?= $status_filter === 'pending' ? 'active' : '' ?>" href="?status=pending">Pending</a>
                     <a class="dropdown-item <?= $status_filter === 'approved' ? 'active' : '' ?>" href="?status=approved">Approved</a>
@@ -185,7 +304,7 @@ include_once __DIR__ . '/layout/header.php';
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="depositsTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -194,6 +313,7 @@ include_once __DIR__ . '/layout/header.php';
                             <th>Method</th>
                             <th>Date</th>
                             <th>Status</th>
+                            <th>Proof</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -202,9 +322,14 @@ include_once __DIR__ . '/layout/header.php';
                             <?php while ($deposit = $deposits->fetch_assoc()): ?>
                                 <tr>
                                     <td><?= $deposit['id'] ?></td>
-                                    <td><?= htmlspecialchars($deposit['username']) ?></td>
-                                    <td>$<?= number_format($deposit['amount'], 2) ?></td>
-                                    <td><?= htmlspecialchars($deposit['payment_method'] ?? 'N/A') ?></td>
+                                    <td>
+                                        <a href="user_detail.php?id=<?= $deposit['user_id'] ?>">
+                                            <?= htmlspecialchars($deposit['username']) ?>
+                                        </a>
+                                        <small class="d-block text-muted"><?= htmlspecialchars($deposit['email']) ?></small>
+                                    </td>
+                                    <td><?= number_format($deposit['amount'], 2) ?> <?= htmlspecialchars($deposit['currency']) ?></td>
+                                    <td><?= htmlspecialchars($deposit['payment_method']) ?></td>
                                     <td><?= date('M d, Y H:i', strtotime($deposit['created_at'])) ?></td>
                                     <td>
                                         <span class="badge badge-<?php
@@ -219,33 +344,31 @@ include_once __DIR__ . '/layout/header.php';
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary view-details" data-toggle="modal" data-target="#detailsModal" 
-                                                data-id="<?= $deposit['id'] ?>" 
-                                                data-user="<?= htmlspecialchars($deposit['username']) ?>"
-                                                data-amount="<?= $deposit['amount'] ?>"
-                                                data-method="<?= htmlspecialchars($deposit['payment_method'] ?? 'N/A') ?>"
-                                                data-reference="<?= htmlspecialchars($deposit['transaction_reference'] ?? 'N/A') ?>"
-                                                data-date="<?= date('M d, Y H:i', strtotime($deposit['created_at'])) ?>"
-                                                data-status="<?= $deposit['status'] ?>"
-                                                data-proof="<?= $deposit['payment_proof'] ?? '' ?>"
-                                                data-rejection="<?= htmlspecialchars($deposit['rejection_reason'] ?? '') ?>">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        
+                                        <?php if (!empty($deposit['payment_proof'])): ?>
+                                            <a href="<?= $deposit['payment_proof'] ?>" target="_blank" class="btn btn-sm btn-info">
+                                                <i class="fas fa-image"></i> View
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="text-muted">No proof</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                         <?php if ($deposit['status'] === 'pending'): ?>
-                                            <button class="btn btn-sm btn-success approve-deposit" data-toggle="modal" data-target="#approveModal" data-id="<?= $deposit['id'] ?>">
-                                                <i class="fas fa-check"></i>
+                                            <button class="btn btn-sm btn-success approve-btn" data-toggle="modal" data-target="#approveModal" data-id="<?= $deposit['id'] ?>" data-amount="<?= $deposit['amount'] ?>" data-user="<?= htmlspecialchars($deposit['username']) ?>">
+                                                <i class="fas fa-check"></i> Approve
                                             </button>
-                                            <button class="btn btn-sm btn-danger reject-deposit" data-toggle="modal" data-target="#rejectModal" data-id="<?= $deposit['id'] ?>">
-                                                <i class="fas fa-times"></i>
+                                            <button class="btn btn-sm btn-danger reject-btn" data-toggle="modal" data-target="#rejectModal" data-id="<?= $deposit['id'] ?>" data-amount="<?= $deposit['amount'] ?>" data-user="<?= htmlspecialchars($deposit['username']) ?>">
+                                                <i class="fas fa-times"></i> Reject
                                             </button>
+                                        <?php else: ?>
+                                            <span class="text-muted">Processed</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center">No deposit requests found</td>
+                                <td colspan="8" class="text-center">No deposit requests found</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -258,12 +381,12 @@ include_once __DIR__ . '/layout/header.php';
                     <ul class="pagination justify-content-center">
                         <?php if ($page > 1): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?page=1<?= !empty($status_filter) ? '&status='.$status_filter : '' ?>" aria-label="First">
+                                <a class="page-link" href="?page=1<?= !empty($status_filter) ? '&status=' . $status_filter : '' ?>" aria-label="First">
                                     <span aria-hidden="true">&laquo;&laquo;</span>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?= $page - 1 ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?>" aria-label="Previous">
+                                <a class="page-link" href="?page=<?= $page - 1 ?><?= !empty($status_filter) ? '&status=' . $status_filter : '' ?>" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -284,18 +407,18 @@ include_once __DIR__ . '/layout/header.php';
                         for ($i = $start_page; $i <= $end_page; $i++):
                         ?>
                             <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?>"><?= $i ?></a>
+                                <a class="page-link" href="?page=<?= $i ?><?= !empty($status_filter) ? '&status=' . $status_filter : '' ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
                         
                         <?php if ($page < $total_pages): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?= $page + 1 ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?>" aria-label="Next">
+                                <a class="page-link" href="?page=<?= $page + 1 ?><?= !empty($status_filter) ? '&status=' . $status_filter : '' ?>" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?= $total_pages ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?>" aria-label="Last">
+                                <a class="page-link" href="?page=<?= $total_pages ?><?= !empty($status_filter) ? '&status=' . $status_filter : '' ?>" aria-label="Last">
                                     <span aria-hidden="true">&raquo;&raquo;</span>
                                 </a>
                             </li>
@@ -303,57 +426,6 @@ include_once __DIR__ . '/layout/header.php';
                     </ul>
                 </nav>
             <?php endif; ?>
-        </div>
-    </div>
-</div>
-
-<!-- Details Modal -->
-<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detailsModalLabel">Deposit Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center mb-4">
-                    <div id="statusBadge" class="badge badge-warning mb-2">Pending</div>
-                    <h4 id="detailAmount">$0.00</h4>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>ID:</strong> <span id="detailId"></span></p>
-                        <p><strong>User:</strong> <span id="detailUser"></span></p>
-                        <p><strong>Method:</strong> <span id="detailMethod"></span></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Reference:</strong> <span id="detailReference"></span></p>
-                        <p><strong>Date:</strong> <span id="detailDate"></span></p>
-                        <p><strong>Status:</strong> <span id="detailStatus"></span></p>
-                    </div>
-                </div>
-                
-                <div id="paymentProofDiv" class="form-group d-none">
-                    <label><strong>Payment Proof:</strong></label>
-                    <div class="text-center">
-                        <a id="paymentProofLink" href="#" target="_blank">
-                            <img id="paymentProofImage" src="" alt="Payment Proof" class="img-fluid mb-2">
-                            <div>View Full Image</div>
-                        </a>
-                    </div>
-                </div>
-                
-                <div id="rejectionReasonDiv" class="form-group d-none">
-                    <label><strong>Rejection Reason:</strong></label>
-                    <div id="detailRejection" class="p-2 bg-light border rounded"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
         </div>
     </div>
 </div>
@@ -370,12 +442,15 @@ include_once __DIR__ . '/layout/header.php';
             </div>
             <form method="post">
                 <div class="modal-body">
-                    <input type="hidden" name="deposit_id" id="approveDepositId">
-                    <p>Are you sure you want to approve this deposit request? This will add the funds to the user's account.</p>
+                    <input type="hidden" name="deposit_id" id="approve_deposit_id">
+                    <p>Are you sure you want to approve this deposit?</p>
+                    <p><strong>User:</strong> <span id="approve_user"></span></p>
+                    <p><strong>Amount:</strong> <span id="approve_amount"></span></p>
+                    <p class="text-info">This will add the funds to the user's balance and mark the deposit as approved.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" name="approve_deposit" class="btn btn-success">Approve</button>
+                    <button type="submit" name="approve_deposit" class="btn btn-success">Approve Deposit</button>
                 </div>
             </form>
         </div>
@@ -394,16 +469,21 @@ include_once __DIR__ . '/layout/header.php';
             </div>
             <form method="post">
                 <div class="modal-body">
-                    <input type="hidden" name="deposit_id" id="rejectDepositId">
+                    <input type="hidden" name="deposit_id" id="reject_deposit_id">
+                    <p>Are you sure you want to reject this deposit?</p>
+                    <p><strong>User:</strong> <span id="reject_user"></span></p>
+                    <p><strong>Amount:</strong> <span id="reject_amount"></span></p>
+                    
                     <div class="form-group">
-                        <label for="rejection_reason">Rejection Reason</label>
+                        <label for="rejection_reason">Rejection Reason:</label>
                         <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" required></textarea>
-                        <small class="form-text text-muted">Please provide a reason for rejecting this deposit request. This will be visible to the user.</small>
                     </div>
+                    
+                    <p class="text-danger">This will mark the deposit as rejected, and the user will not receive the funds.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" name="reject_deposit" class="btn btn-danger">Reject</button>
+                    <button type="submit" name="reject_deposit" class="btn btn-danger">Reject Deposit</button>
                 </div>
             </form>
         </div>
@@ -412,63 +492,26 @@ include_once __DIR__ . '/layout/header.php';
 
 <script>
 $(document).ready(function() {
-    // View details
-    $('.view-details').on('click', function() {
+    // Approve modal
+    $('.approve-btn').click(function() {
         var id = $(this).data('id');
-        var user = $(this).data('user');
         var amount = $(this).data('amount');
-        var method = $(this).data('method');
-        var reference = $(this).data('reference');
-        var date = $(this).data('date');
-        var status = $(this).data('status');
-        var proof = $(this).data('proof');
-        var rejection = $(this).data('rejection');
+        var user = $(this).data('user');
         
-        $('#detailId').text(id);
-        $('#detailUser').text(user);
-        $('#detailAmount').text('$' + parseFloat(amount).toFixed(2));
-        $('#detailMethod').text(method);
-        $('#detailReference').text(reference);
-        $('#detailDate').text(date);
-        $('#detailStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
-        
-        // Update status badge
-        var badgeClass = 'badge-secondary';
-        switch (status) {
-            case 'pending': badgeClass = 'badge-warning'; break;
-            case 'approved': badgeClass = 'badge-success'; break;
-            case 'rejected': badgeClass = 'badge-danger'; break;
-        }
-        $('#statusBadge').attr('class', 'badge ' + badgeClass + ' mb-2').text(status.charAt(0).toUpperCase() + status.slice(1));
-        
-        // Show/hide payment proof
-        if (proof) {
-            $('#paymentProofDiv').removeClass('d-none');
-            $('#paymentProofImage').attr('src', proof);
-            $('#paymentProofLink').attr('href', proof);
-        } else {
-            $('#paymentProofDiv').addClass('d-none');
-        }
-        
-        // Show/hide rejection reason
-        if (status === 'rejected' && rejection) {
-            $('#rejectionReasonDiv').removeClass('d-none');
-            $('#detailRejection').text(rejection);
-        } else {
-            $('#rejectionReasonDiv').addClass('d-none');
-        }
+        $('#approve_deposit_id').val(id);
+        $('#approve_user').text(user);
+        $('#approve_amount').text(amount);
     });
     
-    // Approve deposit
-    $('.approve-deposit').on('click', function() {
+    // Reject modal
+    $('.reject-btn').click(function() {
         var id = $(this).data('id');
-        $('#approveDepositId').val(id);
-    });
-    
-    // Reject deposit
-    $('.reject-deposit').on('click', function() {
-        var id = $(this).data('id');
-        $('#rejectDepositId').val(id);
+        var amount = $(this).data('amount');
+        var user = $(this).data('user');
+        
+        $('#reject_deposit_id').val(id);
+        $('#reject_user').text(user);
+        $('#reject_amount').text(amount);
     });
 });
 </script>
