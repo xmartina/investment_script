@@ -168,9 +168,9 @@ include_once __DIR__ . '/layout/header.php';
         </div>
     <?php endif; ?>
 
-    <div class="row">
+    <div class="row gy-4">
         <?php foreach ($plans as $plan): ?>
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-4 col-md-6 mb-5">
                 <div class="card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary text-truncate" style="max-width: 70%;" title="<?= htmlspecialchars($plan['name']) ?>"><?= htmlspecialchars($plan['name']) ?></h6>
