@@ -48,7 +48,7 @@ $count_result = $conn_back->query($count_query);
 $total_rows = 0;
 if ($count_result && $row = $count_result->fetch_assoc()) {
     $total_rows = $row['total'];
-}
+    }
 $total_pages = ceil($total_rows / $per_page);
 
 // Get users data with pagination
@@ -63,11 +63,11 @@ $query = "SELECT id, email, CONCAT(first_name, ' ', last_name) as full_name,
 $result = $conn_back->query($query);
 $users = [];
 if ($result) {
-    while ($row = $result->fetch_assoc()) {
+while ($row = $result->fetch_assoc()) {
         // Format data
         $row['total_deposit'] = $row['total_deposit'] ? $row['total_deposit'] : 0;
-        $users[] = $row;
-    }
+    $users[] = $row;
+}
 }
 ?>
 
@@ -115,28 +115,28 @@ if ($result) {
                             <tbody>
                                 <?php if (count($users) > 0): ?>
                                     <?php foreach ($users as $user): ?>
-                                    <tr>
-                                        <td><?php echo $user['id']; ?></td>
+                                        <tr>
+                                            <td><?php echo $user['id']; ?></td>
                                         <td>
                                             <a href="user_detail.php?id=<?php echo $user['id']; ?>">
                                                 <?php echo htmlspecialchars($user['full_name']); ?>
                                             </a>
                                         </td>
-                                        <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
                                         <td><?php echo htmlspecialchars($user['phone'] ?? 'N/A'); ?></td>
-                                        <td>
+                                            <td>
                                             <?php
                                             // Display account balance instead of status
                                             echo '$' . number_format($user['main_balance'], 2);
                                             ?>
-                                        </td>
+                                            </td>
                                         <td>$<?php echo number_format($user['total_deposit'], 2); ?></td>
-                                        <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
-                                        <td>
-                                            <div class="btn-group">
+                                            <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+                                            <td>
+                                                <div class="btn-group">
                                                 <button type="button" class="btn btn-info btn-sm dropdown-toggle" id="actionDropdown-<?php echo $user['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Action
-                                                </button>
+                                                        </button>
                                                 <ul class="dropdown-menu" aria-labelledby="actionDropdown-<?php echo $user['id']; ?>">
                                                     <li><a class="dropdown-item" href="user_detail.php?id=<?php echo $user['id']; ?>">
                                                         <i class="fa fa-eye"></i> View Details
@@ -145,49 +145,49 @@ if ($result) {
                                                         <i class="fa fa-edit"></i> Edit
                                                     </a></li>
                                                 </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                <tr>
+                                    <tr>
                                     <td colspan="8" class="text-center">No users found</td>
-                                </tr>
+                                    </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
-                </div>
-                
+                    </div>
+                    
                 <!-- Pagination -->
-                <?php if ($total_pages > 1): ?>
+                    <?php if ($total_pages > 1): ?>
                 <div class="box-footer clearfix">
                     <ul class="pagination pagination-sm m-0 float-right">
-                        <?php if ($page > 1): ?>
-                        <li class="page-item">
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
                             <a class="page-link" href="?page=<?php echo $page-1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?>">&laquo;</a>
-                        </li>
-                        <?php endif; ?>
-                        
-                        <?php
-                        $start_page = max(1, $page - 2);
-                        $end_page = min($total_pages, $page + 2);
-                        
-                        for ($i = $start_page; $i <= $end_page; $i++):
-                        ?>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <?php 
+                            $start_page = max(1, $page - 2);
+                            $end_page = min($total_pages, $page + 2);
+                            
+                            for ($i = $start_page; $i <= $end_page; $i++): 
+                            ?>
                         <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
                             <a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?>"><?php echo $i; ?></a>
-                        </li>
-                        <?php endfor; ?>
-                        
-                        <?php if ($page < $total_pages): ?>
-                        <li class="page-item">
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <?php if ($page < $total_pages): ?>
+                                <li class="page-item">
                             <a class="page-link" href="?page=<?php echo $page+1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?>">&raquo;</a>
-                        </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-                <?php endif; ?>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    <?php endif; ?>
             </div>
         </div>
     </div>

@@ -320,9 +320,14 @@ debug_to_console("Page rendering complete");
             <div class="box">
                 <div class="box-header with-border d-flex justify-content-between align-items-center">
                     <h4 class="box-title">User Details</h4>
-                    <a href="users.php" class="btn btn-secondary btn-sm">
-                        <i class="fa fa-arrow-left"></i> Back to Users
-                    </a>
+                    <div>
+                        <a href="edit_user.php?id=<?php echo $user_id; ?>" class="btn btn-primary btn-sm me-2">
+                            <i class="fa fa-edit"></i> Edit User
+                        </a>
+                        <a href="users.php" class="btn btn-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> Back to Users
+                        </a>
+                    </div>
                 </div>
                 <div class="box-body">
                     <?php if (isset($success_message)): ?>

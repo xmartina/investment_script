@@ -23,16 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Get withdrawal details
         $stmt = $conn_back->prepare("SELECT * FROM withdrawal WHERE id = ? AND status = 'pending'");
-        $stmt->bind_param("i", $withdrawal_id);
-        $stmt->execute();
+            $stmt->bind_param("i", $withdrawal_id);
+            $stmt->execute();
         $withdrawal = $stmt->get_result()->fetch_assoc();
         $stmt->close();
         
         if ($withdrawal) {
-            // Begin transaction
-            $conn_back->begin_transaction();
-            
-            try {
+        // Begin transaction
+        $conn_back->begin_transaction();
+        
+        try {
                 // Update withdrawal status
                 $stmt = $conn_back->prepare("UPDATE withdrawal SET status = 'approved', approved_at = NOW() WHERE id = ?");
                 $stmt->bind_param("i", $withdrawal_id);
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 if ($transaction_result->num_rows == 0) {
                     // Create new transaction record
-                    $stmt = $conn_back->prepare("
+            $stmt = $conn_back->prepare("
                         INSERT INTO transactions (
                             transaction_type, reference_id, transaction_proof_id, 
                             amount, currency, status, date_time, 
@@ -114,11 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Get withdrawal details
         $stmt = $conn_back->prepare("SELECT * FROM withdrawal WHERE id = ? AND status = 'pending'");
-        $stmt->bind_param("i", $withdrawal_id);
-        $stmt->execute();
-        $withdrawal = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-        
+            $stmt->bind_param("i", $withdrawal_id);
+            $stmt->execute();
+            $withdrawal = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            
         if ($withdrawal) {
             // Begin transaction
             $conn_back->begin_transaction();
@@ -127,16 +127,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Update withdrawal status
                 $stmt = $conn_back->prepare("UPDATE withdrawal SET status = 'rejected', rejected_at = NOW(), rejection_reason = ? WHERE id = ?");
                 $stmt->bind_param("si", $rejection_reason, $withdrawal_id);
-                $stmt->execute();
-                $stmt->close();
-                
+            $stmt->execute();
+            $stmt->close();
+            
                 // Refund user's balance
                 $stmt = $conn_back->prepare("UPDATE users SET main_balance = main_balance + ? WHERE id = ?");
                 $stmt->bind_param("di", $withdrawal['amount'], $withdrawal['user_id']);
-                $stmt->execute();
-                $stmt->close();
-                
-                // Update transaction status
+            $stmt->execute();
+            $stmt->close();
+            
+            // Update transaction status
                 $stmt = $conn_back->prepare("UPDATE transactions SET status = 'rejected' WHERE reference_id = ?");
                 $stmt->bind_param("s", $withdrawal['transaction_id']);
                 $stmt->execute();
@@ -152,19 +152,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
                 $stmt->bind_param("iss", $admin_id, $action, $ip);
-                $stmt->execute();
-                $stmt->close();
-                
-                // Commit transaction
-                $conn_back->commit();
-                
+            $stmt->execute();
+            $stmt->close();
+            
+            // Commit transaction
+            $conn_back->commit();
+            
                 $message = "Withdrawal #{$withdrawal_id} has been rejected and funds returned to the user's balance.";
-            } catch (Exception $e) {
-                // Rollback transaction on error
-                $conn_back->rollback();
-                $error = "Error rejecting withdrawal: " . $e->getMessage();
-            }
-        } else {
+        } catch (Exception $e) {
+            // Rollback transaction on error
+            $conn_back->rollback();
+            $error = "Error rejecting withdrawal: " . $e->getMessage();
+        }
+            } else {
             $error = "Withdrawal not found or already processed.";
         }
     }
@@ -192,10 +192,10 @@ $count_sql = "SELECT COUNT(*) as total FROM withdrawal w" . $condition;
 if (!empty($types)) {
     $stmt = $conn_back->prepare($count_sql);
     $stmt->bind_param($types, ...$params);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    $total_records = $row['total'];
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$total_records = $row['total'];
     $stmt->close();
 } else {
     $result = $conn_back->query($count_sql);
@@ -213,10 +213,10 @@ $types .= "ii";
 
 $sql = "
     SELECT 
-        w.*,
+        w.*, 
         CONCAT(u.first_name, ' ', u.last_name) as username,
         u.email,
-        wm.method_name
+        wm.method_name 
     FROM withdrawal w
     JOIN users u ON w.user_id = u.id
     JOIN withdrawal_methods wm ON w.withdrawal_method_id = wm.id
@@ -334,8 +334,8 @@ include_once __DIR__ . '/layout/header.php';
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-info view-details-btn" data-toggle="modal" data-target="#detailsModal" 
-                                                data-id="<?= $withdrawal['id'] ?>"
-                                                data-user="<?= htmlspecialchars($withdrawal['username']) ?>" 
+                                                data-id="<?= $withdrawal['id'] ?>" 
+                                                data-user="<?= htmlspecialchars($withdrawal['username']) ?>"
                                                 data-amount="<?= $withdrawal['amount'] ?>"
                                                 data-currency="<?= htmlspecialchars($withdrawal['currency']) ?>"
                                                 data-fee="<?= $withdrawal['fee_amount'] ?>"
@@ -528,8 +528,8 @@ include_once __DIR__ . '/layout/header.php';
                     <div class="form-group">
                         <label for="rejection_reason">Rejection Reason:</label>
                         <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" required></textarea>
-                    </div>
-                    
+</div>
+
                     <p class="text-danger">This will mark the withdrawal as rejected and refund the amount to the user's balance.</p>
                 </div>
                 <div class="modal-footer">
