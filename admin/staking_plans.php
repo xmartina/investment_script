@@ -172,12 +172,53 @@ include_once __DIR__ . '/layout/header.php';
     .card-deck .card, .row .card {
         display: flex;
         flex-direction: column;
+        height: 100%;
     }
     .card-body {
         flex: 1 1 auto;
+        overflow: hidden;
     }
     .card-deck {
         margin-bottom: 15px;
+    }
+    
+    /* Prevent text overflow */
+    .card-body p, .card-body div, .card-header h6 {
+        word-break: break-word;
+        max-width: 100%;
+        white-space: normal;
+    }
+    
+    /* Limit description height with scrolling */
+    .card-body .description-container {
+        max-height: 80px;
+        overflow-y: auto;
+    }
+    
+    /* Lighten text colors */
+    .text-gray-800 {
+        color: #f8f9fc !important;
+    }
+    .text-xs {
+        color: #d1d3e2 !important;
+    }
+    .card-body div:not(.text-xs) {
+        color: #f8f9fc !important;
+    }
+    
+    /* Improve card header text contrast */
+    .card-header h6.text-primary {
+        color: #ffffff !important;
+    }
+    
+    /* Add spacing for better readability */
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    /* Make numbers more readable */
+    .h5.mb-0 {
+        font-size: 1.5rem;
     }
 </style>
 
@@ -273,11 +314,11 @@ include_once __DIR__ . '/layout/header.php';
                             <div class="row">
                                 <div class="col-6">
                                     <div class="text-xs font-weight-bold text-uppercase mb-1">Min Stake</div>
-                                    <div>$<?= number_format($plan['min_amount'], 2) ?></div>
+                                    <div class="text-nowrap">$<?= number_format($plan['min_amount'], 2) ?></div>
                                 </div>
                                 <div class="col-6">
                                     <div class="text-xs font-weight-bold text-uppercase mb-1">Max Stake</div>
-                                    <div>
+                                    <div class="text-nowrap">
                                         <?php if ($plan['max_amount'] > 0): ?>
                                             $<?= number_format($plan['max_amount'], 2) ?>
                                         <?php else: ?>
@@ -291,7 +332,9 @@ include_once __DIR__ . '/layout/header.php';
                                 <hr>
                                 <div class="mb-0">
                                     <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
-                                    <p class="mb-0"><?= nl2br(htmlspecialchars($plan['description'])) ?></p>
+                                    <div class="description-container">
+                                        <p class="mb-0"><?= nl2br(htmlspecialchars($plan['description'])) ?></p>
+                                    </div>
                                 </div>
                             <?php endif; ?>
                         </div>
