@@ -344,10 +344,10 @@ if ($table_exists) {
     $stats_sql = "
         SELECT 
             COUNT(CASE WHEN status = 'active' THEN 1 END) as active_count,
-            SUM(CASE WHEN status = 'active' THEN amount ELSE 0 END) as active_amount,
+            IFNULL(SUM(CASE WHEN status = 'active' THEN amount ELSE 0 END), 0) as active_amount,
             COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_count,
             COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count,
-            SUM(total_rewards) as total_rewards
+            IFNULL(SUM(total_rewards), 0) as total_rewards
         FROM staking_positions
     ";
     $stats_result = $conn_back->query($stats_sql);
@@ -454,7 +454,7 @@ include_once __DIR__ . '/layout/header.php';
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                     Active Staking Positions</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($stats['total_active']) ?></div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($stats['total_active'] ?? 0) ?></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-coins fa-2x text-gray-300"></i>
@@ -471,7 +471,7 @@ include_once __DIR__ . '/layout/header.php';
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                     Total Staked Amount</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">$<?= number_format($stats['total_amount'], 2) ?></div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">$<?= number_format($stats['total_amount'] ?? 0, 2) ?></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -488,7 +488,7 @@ include_once __DIR__ . '/layout/header.php';
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                     Pending Requests</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($stats['total_pending']) ?></div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= number_format($stats['total_pending'] ?? 0) ?></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-clock fa-2x text-gray-300"></i>
@@ -505,7 +505,7 @@ include_once __DIR__ . '/layout/header.php';
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                     Total Rewards Paid</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">$<?= number_format($stats['total_rewards'], 2) ?></div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">$<?= number_format($stats['total_rewards'] ?? 0, 2) ?></div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-trophy fa-2x text-gray-300"></i>
