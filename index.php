@@ -206,6 +206,14 @@ get('/admin/db_test.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_test.php';
 });
 
+// Add database initialization route
+get('/admin/db_init', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_init.php';
+});
+get('/admin/db_init.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_init.php';
+});
+
 // Add these to your index.php
 post('/user/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';
