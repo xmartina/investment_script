@@ -316,6 +316,30 @@
             }, 1000);
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+    let count = 0;
+
+    function hideElements() {
+      const chatBox = document.querySelector('.chat-box-body');
+      const toolbar = document.querySelector('.sticky-toolbar');
+
+      if (chatBox) chatBox.style.display = 'none';
+      if (toolbar) toolbar.style.display = 'none';
+    }
+
+    // Hide on page load
+    hideElements();
+
+    // Repeat every 3 seconds, up to 6 times
+    const interval = setInterval(() => {
+      hideElements();
+      count++;
+      if (count >= 6) {
+        clearInterval(interval);
+      }
+    }, 3000);
+  });
 </script>
 
 </body>
