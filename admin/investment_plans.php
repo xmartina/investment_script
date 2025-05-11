@@ -162,7 +162,7 @@ include_once __DIR__ . '/layout/header.php';
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Investment Plans Management</h1>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#addPlanModal">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPlanModal">
             <i class="fas fa-plus mr-2"></i> Add New Plan
         </button>
     </div>
@@ -170,18 +170,14 @@ include_once __DIR__ . '/layout/header.php';
     <?php if (!empty($message)): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <?= $message ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
     <?php if (!empty($error)): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?= $error ?>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     <?php endif; ?>
 
@@ -276,7 +272,7 @@ include_once __DIR__ . '/layout/header.php';
                         </div>
                         <div class="card-footer py-2">
                             <div class="d-flex justify-content-between">
-                                <button class="btn btn-primary btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" 
+                                <button class="btn btn-primary btn-sm edit-plan" data-bs-toggle="modal" data-bs-target="#editPlanModal" 
                                         data-id="<?= $plan['id'] ?>"
                                         data-name="<?= htmlspecialchars($plan['name']) ?>"
                                         data-description="<?= htmlspecialchars($plan['description'] ?? '') ?>"
@@ -292,7 +288,7 @@ include_once __DIR__ . '/layout/header.php';
                                         data-return-interval="<?= htmlspecialchars($plan['return_interval']) ?>">
                                     <i class="fas fa-edit mr-1"></i> Edit
                                 </button>
-                                <button class="btn btn-danger btn-sm delete-plan" data-toggle="modal" data-target="#deletePlanModal" 
+                                <button class="btn btn-danger btn-sm delete-plan" data-bs-toggle="modal" data-bs-target="#deletePlanModal" 
                                         data-id="<?= $plan['id'] ?>" 
                                         data-name="<?= htmlspecialchars($plan['name']) ?>">
                                     <i class="fas fa-trash mr-1"></i> Delete
@@ -320,9 +316,7 @@ include_once __DIR__ . '/layout/header.php';
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="addPlanModalLabel">Add New Investment Plan</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post">
                 <div class="modal-body">
@@ -439,7 +433,7 @@ include_once __DIR__ . '/layout/header.php';
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" name="add_plan" class="btn btn-primary">Add Plan</button>
                 </div>
             </form>
@@ -453,9 +447,7 @@ include_once __DIR__ . '/layout/header.php';
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="editPlanModalLabel">Edit Investment Plan</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post">
                 <div class="modal-body">
@@ -573,7 +565,7 @@ include_once __DIR__ . '/layout/header.php';
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" name="update_plan" class="btn btn-primary">Update Plan</button>
                 </div>
             </form>
@@ -587,9 +579,7 @@ include_once __DIR__ . '/layout/header.php';
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deletePlanModalLabel">Delete Investment Plan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="post">
                 <div class="modal-body">
@@ -598,7 +588,7 @@ include_once __DIR__ . '/layout/header.php';
                     <p class="text-danger">This action cannot be undone. Plans with active investments cannot be deleted.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" name="delete_plan" class="btn btn-danger">Delete Plan</button>
                 </div>
             </form>
@@ -607,7 +597,7 @@ include_once __DIR__ . '/layout/header.php';
 </div>
 
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Edit plan
     $('.edit-plan').on('click', function() {
         var id = $(this).data('id');
@@ -647,6 +637,14 @@ $(document).ready(function() {
         $('#delete_plan_id').val(id);
         $('#delete_plan_name').text(name);
     });
+    
+    // Initialize Bootstrap 5 modals
+    var modals = document.querySelectorAll('.modal');
+    if (modals.length > 0 && typeof bootstrap !== 'undefined') {
+        modals.forEach(function(modal) {
+            new bootstrap.Modal(modal);
+        });
+    }
 });
 </script>
 

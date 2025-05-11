@@ -207,6 +207,65 @@
     setTimeout(function() {
         $('.alert-dismissible').fadeOut('slow');
     }, 5000);
+
+    // Bootstrap 4 to Bootstrap 5 adapter for modals
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle data-toggle="modal" for Bootstrap 5
+        const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+        modalTriggers.forEach(trigger => {
+            const targetId = trigger.getAttribute('data-target');
+            if (targetId) {
+                trigger.setAttribute('data-bs-toggle', 'modal');
+                trigger.setAttribute('data-bs-target', targetId);
+                
+                // Remove the old attributes to prevent conflicts
+                // trigger.removeAttribute('data-toggle');
+                // trigger.removeAttribute('data-target');
+            }
+        });
+        
+        // Handle data-dismiss="modal" for Bootstrap 5
+        const dismissButtons = document.querySelectorAll('[data-dismiss="modal"]');
+        dismissButtons.forEach(button => {
+            button.setAttribute('data-bs-dismiss', 'modal');
+            
+            // Replace close button with btn-close if it's a close button
+            if (button.classList.contains('close')) {
+                button.classList.remove('close');
+                button.classList.add('btn-close');
+                
+                // Remove any child span with &times;
+                const closeSpan = button.querySelector('span');
+                if (closeSpan) {
+                    closeSpan.remove();
+                }
+            }
+            
+            // Remove the old attribute to prevent conflicts
+            // button.removeAttribute('data-dismiss');
+        });
+        
+        // Handle alerts with data-dismiss="alert"
+        const dismissAlerts = document.querySelectorAll('[data-dismiss="alert"]');
+        dismissAlerts.forEach(button => {
+            button.setAttribute('data-bs-dismiss', 'alert');
+            
+            // Replace close button with btn-close if it's a close button
+            if (button.classList.contains('close')) {
+                button.classList.remove('close');
+                button.classList.add('btn-close');
+                
+                // Remove any child span with &times;
+                const closeSpan = button.querySelector('span');
+                if (closeSpan) {
+                    closeSpan.remove();
+                }
+            }
+            
+            // Remove the old attribute to prevent conflicts
+            // button.removeAttribute('data-dismiss');
+        });
+    });
 </script>
 
 </body>
