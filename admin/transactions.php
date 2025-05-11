@@ -95,11 +95,10 @@ if ($user_id > 0) {
 
 if (!empty($search)) {
     $search_term = "%$search%";
-    $where[] = "(t.reference_id LIKE ? OR u.username LIKE ? OR CONCAT(u.first_name, ' ', u.last_name) LIKE ?)";
+    $where[] = "(t.reference_id LIKE ? OR CONCAT(u.first_name, ' ', u.last_name) LIKE ?)";
     $params[] = $search_term;
     $params[] = $search_term;
-    $params[] = $search_term;
-    $types .= "sss";
+    $types .= "ss";
 }
 
 $where_clause = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
@@ -126,7 +125,6 @@ $total_pages = ceil($total_records / $records_per_page);
 // Get transactions
 $sql = "SELECT t.*, 
         CONCAT(u.first_name, ' ', u.last_name) as user_name,
-        u.username,
         u.email
         FROM transactions t
         LEFT JOIN users u ON t.user_id = u.id
@@ -253,7 +251,7 @@ if ($statuses_result) {
                                             <a href="user_detail.php?id=<?php echo $transaction['user_id']; ?>">
                                                 <?php echo htmlspecialchars($transaction['user_name']); ?>
                                             </a>
-                                            <small class="d-block text-muted"><?php echo htmlspecialchars($transaction['username']); ?></small>
+                                            <small class="d-block text-muted"><?php echo htmlspecialchars($transaction['email']); ?></small>
                                         </td>
                                         <td>
                                             <span class="badge <?php 
@@ -327,7 +325,6 @@ if ($statuses_result) {
                                                                 data-description="<?php echo htmlspecialchars($transaction['description'] ?? 'N/A'); ?>"
                                                                 data-date="<?php echo date('M d, Y H:i', strtotime($transaction['date_time'])); ?>"
                                                                 data-user="<?php echo htmlspecialchars($transaction['user_name']); ?>"
-                                                                data-username="<?php echo htmlspecialchars($transaction['username']); ?>"
                                                                 data-email="<?php echo htmlspecialchars($transaction['email']); ?>"
                                                                 data-fee="<?php echo $transaction['fee'] ?? '0'; ?>"
                                                         >
@@ -428,8 +425,9 @@ if ($statuses_result) {
                     </div>
                     <div class="col-md-6">
                         <p><strong>User:</strong> <span id="detailUser"></span></p>
-                        <p><strong>Username:</strong> <span id="detailUsername"></span></p>
                         <p><strong>Email:</strong> <span id="detailEmail"></span></p>
+                        <!-- Username field removed as it doesn't exist in the database -->
+                        <p style="display:none;"><strong>Username:</strong> <span id="detailUsername"></span></p>
                         <p><strong>Status:</strong> <span id="detailStatusText"></span></p>
                     </div>
                 </div>
@@ -499,7 +497,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const description = this.getAttribute('data-description');
                 const date = this.getAttribute('data-date');
                 const user = this.getAttribute('data-user');
-                const username = this.getAttribute('data-username');
                 const email = this.getAttribute('data-email');
                 const fee = this.getAttribute('data-fee');
                 
@@ -510,7 +507,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('detailDescription').textContent = description;
                 document.getElementById('detailDate').textContent = date;
                 document.getElementById('detailUser').textContent = user;
-                document.getElementById('detailUsername').textContent = username;
                 document.getElementById('detailEmail').textContent = email;
                 document.getElementById('detailFee').textContent = parseFloat(fee).toFixed(2);
                 document.getElementById('detailStatusText').textContent = status.charAt(0).toUpperCase() + status.slice(1);
