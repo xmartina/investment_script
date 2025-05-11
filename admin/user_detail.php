@@ -188,7 +188,7 @@ try {
         (SELECT COUNT(*) FROM investments WHERE user_id = u.id) as total_investments,
         (SELECT IFNULL(SUM(amount), 0) FROM transactions WHERE user_id = u.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposits,
         (SELECT IFNULL(SUM(amount), 0) FROM transactions WHERE user_id = u.id AND transaction_type = 'withdrawal' AND status = 'completed') as total_withdrawals,
-        (SELECT IFNULL(SUM(roi_received), 0) FROM investments WHERE user_id = u.id) as total_earnings
+        (SELECT IFNULL(SUM(expected_returns), 0) FROM investments WHERE user_id = u.id) as total_earnings
         FROM users u 
         WHERE u.id = ?
     ");
@@ -275,7 +275,9 @@ try {
     debug_to_console("Starting investments query for user ID: " . $user_id);
     
     $investments_query = $conn_back->prepare("
-        SELECT i.*, p.name as plan_name
+        SELECT i.id, i.user_id, i.plan_id, i.amount, i.expected_returns, 
+               i.roi_percentage, i.created_at, i.status, i.started_at, i.ends_at,
+               p.name as plan_name
         FROM investments i
         JOIN investment_plans p ON i.plan_id = p.id
         WHERE i.user_id = ?
@@ -566,7 +568,7 @@ if (ob_get_level() > 0) {
                                 <tr>
                                     <th>Plan</th>
                                     <th>Amount</th>
-                                    <th>ROI</th>
+                                    <th>Expected Returns</th>
                                     <th>Status</th>
                                     <th>Date</th>
                                 </tr>
@@ -577,7 +579,7 @@ if (ob_get_level() > 0) {
                                     <tr>
                                         <td><?php echo htmlspecialchars($inv['plan_name']); ?></td>
                                         <td>$<?php echo number_format($inv['amount'], 2); ?></td>
-                                        <td>$<?php echo number_format($inv['roi_received'], 2); ?> / $<?php echo number_format($inv['roi_expected'], 2); ?></td>
+                                        <td>$<?php echo number_format($inv['expected_returns'] ?? 0, 2); ?></td>
                                         <td>
                                             <span class="badge 
                                                 <?php 
