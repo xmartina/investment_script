@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $max_amount = floatval($_POST['max_amount']);
         $roi_percent = floatval($_POST['roi_percent']);
         $duration_days = intval($_POST['duration_days']);
-        $status = isset($_POST['status']) ? 1 : 0;
+        $is_active = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
@@ -32,10 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Insert new plan
             $stmt = $conn_back->prepare("
-                INSERT INTO investment_plans (name, description, min_amount, max_amount, roi_percent, duration_days, status, featured, created_at) 
+                INSERT INTO investment_plans (name, description, min_amount, max_amount, roi_percent, duration_days, is_active, featured, created_at) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
-            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $status, $featured);
+            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $is_active, $featured);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Add Investment Plan', "Added new plan: $name");
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $max_amount = floatval($_POST['max_amount']);
         $roi_percent = floatval($_POST['roi_percent']);
         $duration_days = intval($_POST['duration_days']);
-        $status = isset($_POST['status']) ? 1 : 0;
+        $is_active = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
@@ -69,10 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 UPDATE investment_plans 
                 SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
                     roi_percent = ?, duration_days = ?,
-                    status = ?, featured = ?, updated_at = NOW() 
+                    is_active = ?, featured = ?, updated_at = NOW() 
                 WHERE id = ?
             ");
-            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $status, $featured, $plan_id);
+            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $is_active, $featured, $plan_id);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Update Investment Plan', "Updated plan #$plan_id: $name");
@@ -166,7 +166,7 @@ include_once __DIR__ . '/layout/header.php';
                             <?php if ($plan['featured']): ?>
                                 <span class="badge badge-primary">Featured</span>
                             <?php endif; ?>
-                            <?php if ($plan['status']): ?>
+                            <?php if ($plan['is_active']): ?>
                                 <span class="badge badge-success">Active</span>
                             <?php else: ?>
                                 <span class="badge badge-secondary">Inactive</span>
@@ -221,13 +221,14 @@ include_once __DIR__ . '/layout/header.php';
                             <button class="btn btn-primary btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" 
                                     data-id="<?= $plan['id'] ?>"
                                     data-name="<?= htmlspecialchars($plan['name']) ?>"
-                                    data-description="<?= htmlspecialchars($plan['description']) ?>"
+                                    data-description="<?= htmlspecialchars($plan['description'] ?? '') ?>"
                                     data-min="<?= $plan['min_amount'] ?>"
                                     data-max="<?= $plan['max_amount'] ?>"
                                     data-rate="<?= $plan['roi_percent'] ?>"
                                     data-duration="<?= $plan['duration_days'] ?>"
-                                    data-status="<?= $plan['status'] ?>"
-                                    data-featured="<?= $plan['featured'] ?>">
+                                    data-status="<?= $plan['is_active'] ?? 0 ?>"
+                                    data-featured="<?= $plan['featured'] ?>"
+                                    >
                                 <i class="fas fa-edit mr-1"></i> Edit
                             </button>
                             <button class="btn btn-danger btn-sm delete-plan" data-toggle="modal" data-target="#deletePlanModal" 
