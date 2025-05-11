@@ -7,11 +7,11 @@
                 <a class="nav-link" href="javascript:void(0)">FAQ</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="https://themeforest.net/item/crypto-admin-responsive-bootstrap-4-admin-html-templates/21604673" target="_blank">Purchase Now</a>
+                <a class="nav-link" href="#" target="_blank">Support</a>
             </li>
         </ul>
     </div>
-    &copy; 2024 <a href="https://www.multipurposethemes.com/">Multipurpose Themes</a>. All Rights Reserved.
+    &copy; <?php echo date('Y'); ?> <a href="<?=$siteLink?>"><?=$site_name?></a>. All Rights Reserved.
 </footer>
 
 <!-- Control Sidebar -->
@@ -171,6 +171,9 @@
 <script src="<?=$siteLink?>/admin/js/pages/chat-popup.js"></script>
 <script src="<?=$siteLink?>/admin/assets/icons/feather-icons/feather.min.js"></script>
 
+<!-- Bootstrap 5 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <!-- Crypto Admin App -->
 <script src="<?=$siteLink?>/admin/js/template.js"></script>
 <script src="<?=$siteLink?>/admin/js/pages/dashboard.js"></script>
@@ -178,7 +181,11 @@
 <!-- Custom JS -->
 <script>
     // Initialize feather icons
-    feather.replace();
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    });
     
     // Disable form resubmission on page refresh
     if (window.history.replaceState) {

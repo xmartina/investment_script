@@ -12,6 +12,13 @@
 
     <!-- Vendors Style-->
     <link rel="stylesheet" href="<?=$siteLink?>/admin/css/vendors_css.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    
     <!--amcharts -->
     <link href="https://www.amcharts.com/lib/3/plugins/export/export.css" rel="stylesheet" type="text/css" />
 
@@ -19,6 +26,9 @@
     <link rel="stylesheet" href="<?=$siteLink?>/admin/css/style.css">
     <link rel="stylesheet" href="<?=$siteLink?>/admin/css/skin_color.css">
     <link rel="stylesheet" href="<?=$siteLink?>/admin/css/custom.css">
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body class="dark-skin sidebar-mini theme-primary fixed">
@@ -171,7 +181,7 @@
                             </a>
                         </li>
                         <li class="header">ADMINISTRATOR</li>
-                        <?php if (hasPermission('super_admin')): ?>
+                        <?php if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] == 'super_admin'): ?>
                         <li class="<?php echo $current_page == 'admins.php' ? 'active' : ''; ?>">
                             <a href="<?=$siteLink?>/admin/admins.php">
                                 <i data-feather="shield"></i>
@@ -190,3 +200,7 @@
             </div>
         </section>
     </aside>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Main Content -->

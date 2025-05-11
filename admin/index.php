@@ -1,80 +1,157 @@
 <?php
-session_start();
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/include/config.php';
+// Enable full error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// Check if the admin is logged in
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: login.php");
-    exit();
-}
+// Start output buffering to capture errors
+ob_start();
 
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/header.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
-
-// Fetch counts for dashboard
-$total_users = 0;
-$total_investments = 0;
-$total_deposits = 0;
-$pending_withdrawals = 0;
-$total_profit = 0;
-
-// Count users
-$result = $conn_back->query("SELECT COUNT(*) as total FROM users");
-if ($result && $row = $result->fetch_assoc()) {
-    $total_users = $row['total'];
-}
-
-// Count investments
-$result = $conn_back->query("SELECT COUNT(*) as total FROM investments");
-if ($result && $row = $result->fetch_assoc()) {
-    $total_investments = $row['total'];
-}
-
-// Sum deposits
-$result = $conn_back->query("SELECT SUM(amount) as total FROM deposits WHERE status = 'completed'");
-if ($result && $row = $result->fetch_assoc()) {
-    $total_deposits = $row['total'] ?: 0;
-}
-
-// Count pending withdrawals
-$result = $conn_back->query("SELECT COUNT(*) as total FROM withdrawals WHERE status = 'pending'");
-if ($result && $row = $result->fetch_assoc()) {
-    $pending_withdrawals = $row['total'];
-}
-
-// Sum profit
-$result = $conn_back->query("SELECT SUM(profit) as total FROM investments");
-if ($result && $row = $result->fetch_assoc()) {
-    $total_profit = $row['total'] ?: 0;
-}
-
-// Recent users
-$recent_users = [];
-$result = $conn_back->query("SELECT id, username, email, created_at FROM users ORDER BY created_at DESC LIMIT 5");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $recent_users[] = $row;
+try {
+    session_start();
+    
+    // Check if the admin is logged in
+    if (!isset($_SESSION['admin_id'])) {
+        header("Location: login.php");
+        exit();
     }
-}
-
-// Recent transactions
-$recent_transactions = [];
-$result = $conn_back->query("
-    SELECT 'deposit' as type, d.amount, d.status, d.created_at, u.username 
-    FROM deposits d 
-    JOIN users u ON d.user_id = u.id 
-    UNION ALL 
-    SELECT 'withdrawal' as type, w.amount, w.status, w.created_at, u.username 
-    FROM withdrawals w 
-    JOIN users u ON w.user_id = u.id 
-    ORDER BY created_at DESC 
-    LIMIT 5
-");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $recent_transactions[] = $row;
+    
+    // Debug info
+    $debug_info = [];
+    $debug_info[] = "Session admin_id: " . (isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : 'Not set');
+    
+    try {
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/include/config.php';
+        $debug_info[] = "Admin config file included successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error including admin config: " . $e->getMessage();
     }
-}
+    
+    try {
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/header.php';
+        $debug_info[] = "Header included successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error including header: " . $e->getMessage();
+    }
+    
+    try {
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
+        $debug_info[] = "Breadcrumb included successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error including breadcrumb: " . $e->getMessage();
+    }
+    
+    // Fetch counts for dashboard - wrapped in try/catch blocks
+    $total_users = 0;
+    $total_investments = 0;
+    $total_deposits = 0;
+    $pending_withdrawals = 0;
+    $total_profit = 0;
+    
+    try {
+        // Count users
+        $result = $conn_back->query("SELECT COUNT(*) as total FROM users");
+        if ($result && $row = $result->fetch_assoc()) {
+            $total_users = $row['total'];
+        }
+        $debug_info[] = "Users query executed successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error querying users: " . $e->getMessage();
+    }
+    
+    try {
+        // Count investments
+        $result = $conn_back->query("SELECT COUNT(*) as total FROM investments");
+        if ($result && $row = $result->fetch_assoc()) {
+            $total_investments = $row['total'];
+        }
+        $debug_info[] = "Investments query executed successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error querying investments: " . $e->getMessage();
+    }
+    
+    try {
+        // Sum deposits
+        $result = $conn_back->query("SELECT SUM(amount) as total FROM deposits WHERE status = 'completed'");
+        if ($result && $row = $result->fetch_assoc()) {
+            $total_deposits = $row['total'] ?: 0;
+        }
+        $debug_info[] = "Deposits query executed successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error querying deposits: " . $e->getMessage();
+    }
+    
+    try {
+        // Count pending withdrawals
+        $result = $conn_back->query("SELECT COUNT(*) as total FROM withdrawals WHERE status = 'pending'");
+        if ($result && $row = $result->fetch_assoc()) {
+            $pending_withdrawals = $row['total'];
+        }
+        $debug_info[] = "Withdrawals query executed successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error querying withdrawals: " . $e->getMessage();
+    }
+    
+    try {
+        // Sum profit
+        $result = $conn_back->query("SELECT SUM(profit) as total FROM investments");
+        if ($result && $row = $result->fetch_assoc()) {
+            $total_profit = $row['total'] ?: 0;
+        }
+        $debug_info[] = "Profit query executed successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error querying profit: " . $e->getMessage();
+    }
+    
+    // Recent users
+    $recent_users = [];
+    try {
+        $result = $conn_back->query("SELECT id, username, email, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $recent_users[] = $row;
+            }
+        }
+        $debug_info[] = "Recent users query executed successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error querying recent users: " . $e->getMessage();
+    }
+    
+    // Recent transactions
+    $recent_transactions = [];
+    try {
+        $result = $conn_back->query("
+            SELECT 'deposit' as type, d.amount, d.status, d.created_at, u.username 
+            FROM deposits d 
+            JOIN users u ON d.user_id = u.id 
+            UNION ALL 
+            SELECT 'withdrawal' as type, w.amount, w.status, w.created_at, u.username 
+            FROM withdrawals w 
+            JOIN users u ON w.user_id = u.id 
+            ORDER BY created_at DESC 
+            LIMIT 5
+        ");
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $recent_transactions[] = $row;
+            }
+        }
+        $debug_info[] = "Recent transactions query executed successfully";
+    } catch (Exception $e) {
+        $debug_info[] = "Error querying recent transactions: " . $e->getMessage();
+    }
+    
+    // Debug section - will only be visible when there's a problem
+    if (false) {
+        echo "<div style='background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border: 1px solid #f5c6cb;'>";
+        echo "<h3>Debug Information</h3>";
+        echo "<ul>";
+        foreach ($debug_info as $info) {
+            echo "<li>" . htmlspecialchars($info) . "</li>";
+        }
+        echo "</ul>";
+        echo "</div>";
+    }
 ?>
 
 <!-- Main content -->
@@ -239,5 +316,51 @@ if ($result) {
 <!-- /.content -->
 
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/footer.php';
+try {
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/footer.php';
+    $debug_info[] = "Footer included successfully";
+} catch (Exception $e) {
+    $debug_info[] = "Error including footer: " . $e->getMessage();
+}
+
+// If there were any errors, let's display the debug information
+$error_occurred = false;
+foreach ($debug_info as $info) {
+    if (strpos($info, 'Error') !== false) {
+        $error_occurred = true;
+        break;
+    }
+}
+
+if ($error_occurred) {
+    echo "<div style='background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border: 1px solid #f5c6cb;'>";
+    echo "<h3>Debug Information</h3>";
+    echo "<ul>";
+    foreach ($debug_info as $info) {
+        echo "<li>" . htmlspecialchars($info) . "</li>";
+    }
+    echo "</ul>";
+    echo "</div>";
+}
+
+// Get any errors that occurred during script execution
+$errors = ob_get_clean();
+if (!empty($errors)) {
+    echo "<div style='background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border: 1px solid #f5c6cb;'>";
+    echo "<h3>PHP Errors</h3>";
+    echo "<pre>";
+    echo htmlspecialchars($errors);
+    echo "</pre>";
+    echo "</div>";
+} else {
+    echo ob_get_clean(); // Output the normal page if no errors
+}
+
+} catch (Exception $e) {
+    // Catch any uncaught exceptions
+    echo "<div style='background-color: #f8d7da; color: #721c24; padding: 10px; margin: 10px; border: 1px solid #f5c6cb;'>";
+    echo "<h3>Fatal Error</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
+}
 ?>

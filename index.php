@@ -198,6 +198,13 @@ get('/admin/profile', function() {
 get('/admin/profile.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
 });
+// Add database test route
+get('/admin/db_test', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_test.php';
+});
+get('/admin/db_test.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_test.php';
+});
 
 // Add these to your index.php
 post('/user/login', function() {
