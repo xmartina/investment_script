@@ -79,14 +79,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Get all settings
-$settings_query = "SELECT setting_key, setting_value FROM admin_settings";
-$settings_result = $conn_back->query($settings_query);
 $settings = [];
-
-if ($settings_result && $settings_result->num_rows > 0) {
-    while ($row = $settings_result->fetch_assoc()) {
-        $settings[$row['setting_key']] = $row['setting_value'];
+try {
+    $settings_query = "SELECT setting_key, setting_value FROM admin_settings";
+    $settings_result = $conn_back->query($settings_query);
+    
+    if ($settings_result && $settings_result->num_rows > 0) {
+        while ($row = $settings_result->fetch_assoc()) {
+            $settings[$row['setting_key']] = $row['setting_value'];
+        }
     }
+} catch (Exception $e) {
+    // Table might not exist or there's a database error
+    $error_message = "There was an issue loading settings: " . $e->getMessage();
+    $error_message .= "<br>Please run the <a href='update_database.php' class='alert-link'>Database Update Tool</a> to fix this issue.";
 }
 
 // Default settings if not set
@@ -147,6 +153,13 @@ foreach ($default_settings as $key => $value) {
                     <div class="alert alert-<?php echo isset($success) && $success ? 'success' : 'danger'; ?> alert-dismissible">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         <?php echo $message; ?>
+                    </div>
+                    <?php endif; ?>
+                    
+                    <?php if (isset($error_message)): ?>
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <?php echo $error_message; ?>
                     </div>
                     <?php endif; ?>
                     

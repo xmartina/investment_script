@@ -84,6 +84,62 @@ try {
             )
         ");
         
+        // Insert default settings if they don't exist
+        $default_settings = [
+            // General Settings
+            ['site_name', 'Investment Platform', 'The name of your website'],
+            ['site_url', 'https://example.com', 'Full URL of your website'],
+            ['admin_email', 'admin@example.com', 'Main admin email address for notifications'],
+            ['site_currency', 'USD', 'Default currency code'],
+            ['site_currency_symbol', '$', 'Currency symbol'],
+            
+            // Payment Settings
+            ['min_deposit', '50', 'Minimum deposit amount'],
+            ['min_withdrawal', '100', 'Minimum withdrawal amount'],
+            ['withdrawal_fee', '2.5', 'Withdrawal fee percentage'],
+            ['deposit_fee', '0', 'Deposit fee percentage'],
+            
+            // Email Settings
+            ['email_from', 'no-reply@example.com', 'Email address used to send emails'],
+            ['email_name', 'Investment Platform', 'Name displayed as sender'],
+            ['email_host', 'smtp.example.com', 'SMTP server address'],
+            ['email_port', '587', 'SMTP server port'],
+            ['email_encryption', 'tls', 'Email encryption method (tls/ssl)'],
+            ['email_username', 'smtp_username', 'SMTP username'],
+            ['email_password', 'smtp_password', 'SMTP password'],
+            
+            // Referral Settings
+            ['referral_enabled', '1', 'Enable referral system'],
+            ['referral_commission', '5', 'Referral commission percentage'],
+            ['referral_minimum_deposit', '100', 'Minimum deposit for referral commission'],
+            ['referral_levels', '1', 'Number of referral levels'],
+            
+            // Security Settings
+            ['login_attempts', '5', 'Maximum number of failed login attempts before lockout'],
+            ['login_lockout_time', '30', 'Time in minutes to lock account after failed attempts'],
+            ['require_email_verification', '1', 'Require email verification for new accounts'],
+            ['enable_2fa', '0', 'Enable two-factor authentication option for users'],
+            ['maintenance_mode', '0', 'Enable maintenance mode']
+        ];
+        
+        foreach ($default_settings as $setting) {
+            $key = $conn_back->real_escape_string($setting[0]);
+            $value = $conn_back->real_escape_string($setting[1]);
+            $description = $conn_back->real_escape_string($setting[2]);
+            
+            // Check if setting already exists
+            $check_setting = $conn_back->query("SELECT id FROM admin_settings WHERE setting_key = '{$key}'");
+            
+            if ($check_setting->num_rows == 0) {
+                $conn_back->query("
+                    INSERT INTO admin_settings (setting_key, setting_value, setting_description) 
+                    VALUES ('{$key}', '{$value}', '{$description}')
+                ");
+            }
+        }
+        
+        $message .= "Admin settings table created and initialized.<br>";
+        
         // Create admin_logs table
         $conn_back->query("
             CREATE TABLE IF NOT EXISTS admin_logs (
