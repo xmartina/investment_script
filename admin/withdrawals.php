@@ -196,7 +196,10 @@ $stmt->close();
 
 // Get withdrawals
 $sql = "
-    SELECT w.*, u.username, wm.method_name 
+    SELECT 
+        w.*, 
+        CONCAT(u.first_name, ' ', u.last_name) AS username, 
+        wm.method_name 
     FROM withdrawal w
     JOIN users u ON w.user_id = u.id
     JOIN withdrawal_methods wm ON w.withdrawal_method_id = wm.id

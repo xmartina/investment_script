@@ -221,7 +221,7 @@ if (isset($conn_back) && $conn_back) {
                     </div>
                 </div>
                 <div class="box-footer text-center">
-                    <a href="transactions.php" class="text-uppercase d-none d-md-inline-block">View All Transactions</a>
+                    <a href="transactions" class="text-uppercase d-none d-md-inline-block">View All Transactions</a>
                 </div>
             </div>
         </div>
@@ -259,7 +259,7 @@ if (isset($conn_back) && $conn_back) {
                     </div>
                 </div>
                 <div class="box-footer text-center">
-                    <a href="users.php" class="text-uppercase d-none d-md-inline-block">View All Users</a>
+                    <a href="users" class="text-uppercase d-none d-md-inline-block">View All Users</a>
                 </div>
             </div>
         </div>

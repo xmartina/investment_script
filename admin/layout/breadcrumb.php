@@ -123,7 +123,7 @@ try {
                             <?php if ($index === count($breadcrumbs) - 1): ?>
                                 <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($item['title']); ?></li>
                             <?php else: ?>
-                                <li class="breadcrumb-item"><a href="<?=$siteLink?>/admin/<?php echo htmlspecialchars($item['url']); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
+                                <li class="breadcrumb-item"><a href="<?=$siteLink?>/admin/<?php echo str_replace('.php', '', htmlspecialchars($item['url'])); ?>"><?php echo htmlspecialchars($item['title']); ?></a></li>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </ol>

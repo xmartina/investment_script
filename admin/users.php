@@ -68,7 +68,7 @@ $search_condition = '';
 $search_params = [];
 
 if (!empty($search)) {
-    $search_condition = "WHERE username LIKE ? OR email LIKE ? OR full_name LIKE ?";
+    $search_condition = "WHERE first_name LIKE ? OR last_name LIKE ? OR email LIKE ?";
     $search_params = ["%$search%", "%$search%", "%$search%"];
 }
 
@@ -98,8 +98,8 @@ $total_pages = ceil($total_users / $limit);
 // Get users
 $users = [];
 $sql = "SELECT u.*, 
-        (SELECT SUM(amount) FROM deposits WHERE user_id = u.id AND status = 'completed') as total_deposits,
-        (SELECT SUM(amount) FROM withdrawals WHERE user_id = u.id AND status = 'completed') as total_withdrawals,
+        (SELECT SUM(amount) FROM deposit_requests WHERE user_id = u.id) as total_deposits,
+        (SELECT SUM(amount) FROM withdrawal WHERE user_id = u.id) as total_withdrawals,
         (SELECT COUNT(*) FROM investments WHERE user_id = u.id) as total_investments
         FROM users u $search_condition ORDER BY u.created_at DESC LIMIT ? OFFSET ?";
 
@@ -164,12 +164,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
                                     <?php foreach ($users as $user): ?>
                                         <tr>
                                             <td><?php echo $user['id']; ?></td>
-                                            <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></td>
+                                            <td><?php echo htmlspecialchars($user['username'] ? $user['username'] : $user['first_name'] . ' ' . $user['last_name']); ?></td>
+                                            <td><?php echo htmlspecialchars(($user['full_name'] ?? '') ? $user['full_name'] : $user['first_name'] . ' ' . $user['last_name']); ?></td>
                                             <td><?php echo htmlspecialchars($user['email']); ?></td>
                                             <td>
-                                                <span class="badge badge-<?php echo $user['status'] == 'active' ? 'success' : 'danger'; ?>">
-                                                    <?php echo ucfirst($user['status']); ?>
+                                                <span class="badge badge-success">
+                                                    Active
                                                 </span>
                                             </td>
                                             <td>$<?php echo number_format($user['total_deposits'] ?? 0, 2); ?></td>
@@ -181,15 +181,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
                                                     <a href="user_details.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-info" title="View Details">
                                                         <i data-feather="eye"></i>
                                                     </a>
-                                                    <form action="" method="POST" class="d-inline">
-                                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                                        <input type="hidden" name="status" value="<?php echo $user['status']; ?>">
-                                                        <button type="submit" name="change_status" class="btn btn-sm btn-<?php echo $user['status'] == 'active' ? 'warning' : 'success'; ?>" 
-                                                                title="<?php echo $user['status'] == 'active' ? 'Deactivate' : 'Activate'; ?> User" 
-                                                                onclick="return confirm('Are you sure you want to <?php echo $user['status'] == 'active' ? 'deactivate' : 'activate'; ?> this user?')">
-                                                            <i data-feather="<?php echo $user['status'] == 'active' ? 'slash' : 'check-circle'; ?>"></i>
-                                                        </button>
-                                                    </form>
                                                     <form action="" method="POST" class="d-inline">
                                                         <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
                                                         <button type="submit" name="delete_user" class="btn btn-sm btn-danger" title="Delete User" 

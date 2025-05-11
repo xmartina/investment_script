@@ -120,10 +120,10 @@
                         </a>
                         <ul class="dropdown-menu animated flipInX">
                             <li class="user-body">
-                                <a class="dropdown-item" href="<?=$siteLink?>/admin/profile.php"><i class="ti-user text-muted me-2"></i> Profile</a>
-                                <a class="dropdown-item" href="<?=$siteLink?>/admin/settings.php"><i class="ti-settings text-muted me-2"></i> Settings</a>
+                                <a class="dropdown-item" href="<?=$siteLink?>/admin/profile"><i class="ti-user text-muted me-2"></i> Profile</a>
+                                <a class="dropdown-item" href="<?=$siteLink?>/admin/settings"><i class="ti-settings text-muted me-2"></i> Settings</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="<?=$siteLink?>/admin/logout.php"><i class="ti-lock text-muted me-2"></i> Logout</a>
+                                <a class="dropdown-item" href="<?=$siteLink?>/admin/logout"><i class="ti-lock text-muted me-2"></i> Logout</a>
                             </li>
                         </ul>
                     </li>
@@ -140,55 +140,55 @@
                     <!-- sidebar menu-->
                     <ul class="sidebar-menu" data-widget="tree">
                         <li class="<?php echo $current_page == 'index.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/index.php">
+                            <a href="<?=$siteLink?>/admin">
                                 <i data-feather="monitor"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'users.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/users.php">
+                            <a href="<?=$siteLink?>/admin/users">
                                 <i data-feather="users"></i>
                                 <span>Users</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'deposits.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/deposits.php">
+                            <a href="<?=$siteLink?>/admin/deposits">
                                 <i data-feather="credit-card"></i>
                                 <span>Deposits</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'withdrawals.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/withdrawals.php">
+                            <a href="<?=$siteLink?>/admin/withdrawals">
                                 <i data-feather="dollar-sign"></i>
                                 <span>Withdrawals</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'investments.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/investments.php">
+                            <a href="<?=$siteLink?>/admin/investments">
                                 <i data-feather="trending-up"></i>
                                 <span>Investments</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'investment_plans.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/investment_plans.php">
+                            <a href="<?=$siteLink?>/admin/investment_plans">
                                 <i data-feather="list"></i>
                                 <span>Investment Plans</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'transactions.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/transactions.php">
+                            <a href="<?=$siteLink?>/admin/transactions">
                                 <i data-feather="refresh-cw"></i>
                                 <span>Transactions</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'referrals.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/referrals.php">
+                            <a href="<?=$siteLink?>/admin/referrals">
                                 <i data-feather="share-2"></i>
                                 <span>Referrals</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'settings.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/settings.php">
+                            <a href="<?=$siteLink?>/admin/settings">
                                 <i data-feather="settings"></i>
                                 <span>Settings</span>
                             </a>
@@ -196,13 +196,13 @@
                         <li class="header">ADMINISTRATOR</li>
                         <?php if (isset($_SESSION['admin_role']) && $_SESSION['admin_role'] == 'super_admin'): ?>
                         <li class="<?php echo $current_page == 'admins.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/admins.php">
+                            <a href="<?=$siteLink?>/admin/admins">
                                 <i data-feather="shield"></i>
                                 <span>Admin Users</span>
                             </a>
                         </li>
                         <li class="<?php echo $current_page == 'logs.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/logs.php">
+                            <a href="<?=$siteLink?>/admin/logs">
                                 <i data-feather="file-text"></i>
                                 <span>Activity Logs</span>
                             </a>
