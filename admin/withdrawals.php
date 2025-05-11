@@ -144,10 +144,10 @@ $total_pages = ceil($total_rows / $per_page);
 $query = "SELECT w.*, 
           CONCAT(u.first_name, ' ', u.last_name) as full_name,
           u.username, u.email
-          FROM withdrawal w 
+    FROM withdrawal w
           LEFT JOIN users u ON w.user_id = u.id 
           {$where_clause}
-          ORDER BY w.created_at DESC
+    ORDER BY w.created_at DESC
           LIMIT {$offset}, {$per_page}";
 
 $result = $conn_back->query($query);
@@ -188,7 +188,7 @@ $stats = $stats_result->fetch_assoc();
                         </div>
                     </div>
                 </div>
-            </div>
+    </div>
         </div>
         <div class="col-xl-4 col-md-6 col-12">
             <div class="box bg-success bg-hover-success">
@@ -261,21 +261,21 @@ $stats = $stats_result->fetch_assoc();
                     <div class="alert alert-danger m-3"><?php echo $error_message; ?></div>
                     <?php endif; ?>
                     
-                    <div class="table-responsive">
+            <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User</th>
-                                    <th>Amount</th>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Amount</th>
                                     <th>Payment Method</th>
                                     <th>Wallet/Account</th>
                                     <th>Status</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                                 <?php if (count($withdrawals) > 0): ?>
                                     <?php foreach ($withdrawals as $withdrawal): ?>
                                     <tr>
@@ -297,8 +297,8 @@ $stats = $stats_result->fetch_assoc();
                                                 else echo 'badge-danger';
                                                 ?>">
                                                 <?php echo ucfirst($withdrawal['status']); ?>
-                                            </span>
-                                        </td>
+                                        </span>
+                                    </td>
                                         <td><?php echo date('M d, Y H:i', strtotime($withdrawal['created_at'])); ?></td>
                                         <td>
                                             <?php if ($withdrawal['status'] == 'pending'): ?>
@@ -308,40 +308,40 @@ $stats = $stats_result->fetch_assoc();
                                                     <input type="hidden" name="action" value="approve">
                                                     <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to approve this withdrawal?')">
                                                         <i class="fa fa-check"></i> Approve
-                                                    </button>
+                                        </button>
                                                 </form>
                                                 <form method="post">
                                                     <input type="hidden" name="withdrawal_id" value="<?php echo $withdrawal['id']; ?>">
                                                     <input type="hidden" name="action" value="reject">
                                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to reject this withdrawal? The amount will be refunded to the user\'s account.')">
                                                         <i class="fa fa-times"></i> Reject
-                                                    </button>
+                                            </button>
                                                 </form>
                                             </div>
                                             <?php else: ?>
                                             <span class="text-muted">No actions available</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                <tr>
-                                    <td colspan="8" class="text-center">No withdrawals found</td>
+                                        <?php endif; ?>
+                                    </td>
                                 </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                    <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                    <td colspan="8" class="text-center">No withdrawals found</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
                     </div>
-                </div>
-                
-                <!-- Pagination -->
-                <?php if ($total_pages > 1): ?>
+            </div>
+            
+            <!-- Pagination -->
+            <?php if ($total_pages > 1): ?>
                 <div class="box-footer clearfix">
                     <ul class="pagination pagination-sm m-0 float-right">
                         <?php if ($page > 1): ?>
-                        <li class="page-item">
+                            <li class="page-item">
                             <a class="page-link" href="?page=<?php echo $page-1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status='.$status_filter : ''; ?>">&laquo;</a>
-                        </li>
+                            </li>
                         <?php endif; ?>
                         
                         <?php
@@ -352,13 +352,13 @@ $stats = $stats_result->fetch_assoc();
                         ?>
                         <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
                             <a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status='.$status_filter : ''; ?>"><?php echo $i; ?></a>
-                        </li>
+                            </li>
                         <?php endfor; ?>
                         
                         <?php if ($page < $total_pages): ?>
-                        <li class="page-item">
+                            <li class="page-item">
                             <a class="page-link" href="?page=<?php echo $page+1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status='.$status_filter : ''; ?>">&raquo;</a>
-                        </li>
+                            </li>
                         <?php endif; ?>
                     </ul>
                 </div>

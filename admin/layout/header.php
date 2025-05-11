@@ -151,36 +151,76 @@
                                 <span>Users</span>
                             </a>
                         </li>
-                        <li class="<?php echo $current_page == 'deposits.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/deposits">
-                                <i data-feather="credit-card"></i>
-                                <span>Deposits</span>
-                            </a>
-                        </li>
-                        <li class="<?php echo $current_page == 'withdrawals.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/withdrawals">
+                        
+                        <li class="treeview <?php echo in_array($current_page, ['deposits.php', 'withdrawals.php', 'withdrawal_methods.php', 'transactions.php']) ? 'active' : ''; ?>">
+                            <a href="#">
                                 <i data-feather="dollar-sign"></i>
-                                <span>Withdrawals</span>
+                                <span>Finance</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-right pull-right"></i>
+                                </span>
                             </a>
+                            <ul class="treeview-menu">
+                                <li class="<?php echo $current_page == 'deposits.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/deposits"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Deposits</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'withdrawals.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/withdrawals"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Withdrawals</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'withdrawal_methods.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/withdrawal_methods"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Payment Methods</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'transactions.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/transactions"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Transactions</a>
+                                </li>
+                            </ul>
                         </li>
-                        <li class="<?php echo $current_page == 'investments.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/investments">
+                        
+                        <li class="treeview <?php echo in_array($current_page, ['investments.php', 'investment_plans.php', 'create_investment.php']) ? 'active' : ''; ?>">
+                            <a href="#">
                                 <i data-feather="trending-up"></i>
                                 <span>Investments</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-right pull-right"></i>
+                                </span>
                             </a>
+                            <ul class="treeview-menu">
+                                <li class="<?php echo $current_page == 'investments.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/investments"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>All Investments</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'investment_plans.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/investment_plans"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Investment Plans</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'create_investment.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/create_investment"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Create Investment</a>
+                                </li>
+                            </ul>
                         </li>
-                        <li class="<?php echo $current_page == 'investment_plans.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/investment_plans">
-                                <i data-feather="list"></i>
-                                <span>Investment Plans</span>
+                        
+                        <li class="treeview <?php echo in_array($current_page, ['staking.php', 'staking_plans.php', 'staking_rewards.php', 'create_staking.php']) ? 'active' : ''; ?>">
+                            <a href="#">
+                                <i data-feather="bar-chart-2"></i>
+                                <span>Staking</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-right pull-right"></i>
+                                </span>
                             </a>
+                            <ul class="treeview-menu">
+                                <li class="<?php echo $current_page == 'staking.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/staking"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>All Staking Positions</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'staking_plans.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/staking_plans"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Staking Plans</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'staking_rewards.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/staking_rewards"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Staking Rewards</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'create_staking.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/create_staking"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Create Staking</a>
+                                </li>
+                            </ul>
                         </li>
-                        <li class="<?php echo $current_page == 'transactions.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/transactions">
-                                <i data-feather="refresh-cw"></i>
-                                <span>Transactions</span>
-                            </a>
-                        </li>
+                        
                         <li class="<?php echo $current_page == 'referrals.php' ? 'active' : ''; ?>">
                             <a href="<?=$siteLink?>/admin/referrals">
                                 <i data-feather="share-2"></i>

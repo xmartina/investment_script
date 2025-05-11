@@ -1,553 +1,571 @@
 <?php
-// Staking management page for admin panel
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
+// Admin Staking Management Page
 session_start();
+require_once __DIR__ . '/include/config.php';
 
-// Check if the admin is logged in
+// Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
-    header("Location: login.php");
+    header("Location: /admin/login");
     exit();
 }
 
-// Include necessary files
-try {
-    require_once __DIR__ . '/include/config.php';
-    
-    // Set current page for menu highlighting
-    $current_page = 'staking.php';
-    
-    require_once __DIR__ . '/layout/header.php';
-    require_once __DIR__ . '/layout/breadcrumb.php';
-} catch (Exception $e) {
-    echo "Error loading required files: " . $e->getMessage();
-    exit;
-}
+$page_name = "Staking Management";
+$current_page = "staking.php";
+$message = "";
+$error = "";
 
-// Process actions
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Handle staking status change
-    if (isset($_POST['action']) && $_POST['action'] == 'change_status' && isset($_POST['staking_id'])) {
-        $staking_id = (int)$_POST['staking_id'];
-        $new_status = $conn_back->real_escape_string($_POST['status']);
+// Process form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Cancel staking
+    if (isset($_POST['cancel_staking'])) {
+        $staking_id = intval($_POST['staking_id']);
         
-        if (in_array($new_status, ['active', 'completed', 'cancelled'])) {
-            $stmt = $conn_back->prepare("UPDATE staking SET status = ? WHERE id = ?");
-            $stmt->bind_param("si", $new_status, $staking_id);
+        // Get staking details
+        $stmt = $conn_back->prepare("
+            SELECT s.*, p.name as plan_name 
+            FROM staking_positions s 
+            JOIN staking_plans p ON s.plan_id = p.id 
+            WHERE s.id = ? AND s.status = 'active'
+        ");
+        $stmt->bind_param("i", $staking_id);
+        $stmt->execute();
+        $staking = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        
+        if ($staking) {
+            // Begin transaction
+            $conn_back->begin_transaction();
             
-            if ($stmt->execute()) {
-                // If cancelled, handle refund
-                if ($new_status == 'cancelled') {
-                    // Get the staking details
-                    $staking_query = $conn_back->prepare("
-                        SELECT s.user_id, s.amount, u.username, s.plan_id, s.earned_reward
-                        FROM staking s
-                        JOIN users u ON s.user_id = u.id
-                        WHERE s.id = ?
-                    ");
-                    $staking_query->bind_param("i", $staking_id);
-                    $staking_query->execute();
-                    $staking_result = $staking_query->get_result();
-                    
-                    if ($staking_row = $staking_result->fetch_assoc()) {
-                        $user_id = $staking_row['user_id'];
-                        $staking_amount = $staking_row['amount'];
-                        $username = $staking_row['username'];
-                        $plan_id = $staking_row['plan_id'];
-                        $earned_reward = $staking_row['earned_reward'];
-                        
-                        // Get early unstaking penalty from staking plan
-                        $penalty_query = $conn_back->prepare("
-                            SELECT early_unstake_penalty FROM staking_plans WHERE id = ?
-                        ");
-                        $penalty_query->bind_param("i", $plan_id);
-                        $penalty_query->execute();
-                        $penalty_result = $penalty_query->get_result();
-                        $penalty_percent = 0;
-                        
-                        if ($penalty_row = $penalty_result->fetch_assoc()) {
-                            $penalty_percent = $penalty_row['early_unstake_penalty'];
-                        }
-                        
-                        // Calculate penalty amount
-                        $penalty_amount = ($staking_amount * $penalty_percent) / 100;
-                        $refund_amount = $staking_amount - $penalty_amount + $earned_reward;
-                        
-                        // Begin transaction
-                        $conn_back->begin_transaction();
-                        
-                        try {
-                            // Add transaction record for the refund
-                            $refund_txn = $conn_back->prepare("
-                                INSERT INTO transactions (user_id, transaction_type, amount, status, description, date_time) 
-                                VALUES (?, 'refund', ?, 'completed', ?, NOW())
-                            ");
-                            $refund_desc = "Refund for cancelled staking #{$staking_id}. Applied penalty: {$penalty_percent}%";
-                            $refund_txn->bind_param("ids", $user_id, $refund_amount, $refund_desc);
-                            $refund_txn->execute();
-                            
-                            // Update user's balance
-                            $update_balance = $conn_back->prepare("
-                                UPDATE users SET main_balance = main_balance + ?, staking_balance = staking_balance - ? WHERE id = ?
-                            ");
-                            $update_balance->bind_param("ddi", $refund_amount, $staking_amount, $user_id);
-                            $update_balance->execute();
-                            
-                            // Commit transaction
-                            $conn_back->commit();
-                            
-                            // Log the action
-                            $admin_id = $_SESSION['admin_id'];
-                            $action = "Cancelled staking ID {$staking_id} for user {$username} (ID: {$user_id}) and refunded {$refund_amount}";
-                            $ip = $_SERVER['REMOTE_ADDR'];
-                            
-                            $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                            $log_stmt->bind_param("iss", $admin_id, $action, $ip);
-                            $log_stmt->execute();
-                            
-                            $success_message = "Staking cancelled and {$refund_amount} refunded to user account.";
-                        } catch (Exception $e) {
-                            $conn_back->rollback();
-                            $error_message = "Error during refund process: " . $e->getMessage();
-                        }
-                    } else {
-                        $error_message = "Failed to retrieve staking details.";
-                    }
-                } else {
-                    // Log the action
-                    $admin_id = $_SESSION['admin_id'];
-                    $action = "Changed staking ID {$staking_id} status to {$new_status}";
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                    
-                    $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                    $log_stmt->bind_param("iss", $admin_id, $action, $ip);
-                    $log_stmt->execute();
-                    
-                    $success_message = "Staking status updated successfully.";
-                }
-            } else {
-                $error_message = "Failed to update staking status: " . $conn_back->error;
+            try {
+                // Update staking status
+                $stmt = $conn_back->prepare("
+                    UPDATE staking_positions 
+                    SET status = 'cancelled', 
+                        unstaked_at = NOW(),
+                        updated_at = NOW() 
+                    WHERE id = ?
+                ");
+                $stmt->bind_param("i", $staking_id);
+                $result = $stmt->execute();
+                $stmt->close();
+                
+                if (!$result) throw new Exception("Failed to update staking status");
+                
+                // Return staked amount to user
+                $stmt = $conn_back->prepare("
+                    UPDATE users 
+                    SET main_balance = main_balance + ? 
+                    WHERE id = ?
+                ");
+                $stmt->bind_param("di", $staking['amount'], $staking['user_id']);
+                $result = $stmt->execute();
+                $stmt->close();
+                
+                if (!$result) throw new Exception("Failed to update user balance");
+                
+                // Create transaction record
+                $description = "Staking cancelled and funds returned. Plan: " . $staking['plan_name'];
+                $stmt = $conn_back->prepare("
+                    INSERT INTO transactions (
+                        user_id, amount, transaction_type, status, 
+                        description, date_time
+                    ) VALUES (?, ?, 'staking_return', 'completed', ?, NOW())
+                ");
+                $stmt->bind_param("ids", $staking['user_id'], $staking['amount'], $description);
+                $result = $stmt->execute();
+                $stmt->close();
+                
+                if (!$result) throw new Exception("Failed to create transaction record");
+                
+                // Log admin activity
+                $admin_id = $_SESSION['admin_id'];
+                $action = "Cancelled staking position #$staking_id for user #" . $staking['user_id'] . " and returned $" . number_format($staking['amount'], 2);
+                $ip = $_SERVER['REMOTE_ADDR'];
+                
+                $stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
+                $stmt->bind_param("iss", $admin_id, $action, $ip);
+                $stmt->execute();
+                $stmt->close();
+                
+                // Commit transaction
+                $conn_back->commit();
+                
+                $message = "Staking position #$staking_id has been cancelled and $" . number_format($staking['amount'], 2) . " has been returned to the user.";
+            } catch (Exception $e) {
+                // Rollback transaction on error
+                $conn_back->rollback();
+                $error = "Error cancelling staking position: " . $e->getMessage();
             }
         } else {
-            $error_message = "Invalid status value.";
+            $error = "Staking position not found or already cancelled.";
         }
     }
     
-    // Handle compound toggle
-    if (isset($_POST['action']) && $_POST['action'] == 'toggle_compound' && isset($_POST['staking_id'])) {
-        $staking_id = (int)$_POST['staking_id'];
-        $compound_value = isset($_POST['compound']) && $_POST['compound'] == 1 ? 1 : 0;
+    // Toggle compounding
+    if (isset($_POST['toggle_compounding'])) {
+        $staking_id = intval($_POST['staking_id']);
+        $is_compounding = isset($_POST['is_compounding']) ? 1 : 0;
         
-        $stmt = $conn_back->prepare("UPDATE staking SET is_compounding = ?, last_compound_at = NOW() WHERE id = ?");
-        $stmt->bind_param("ii", $compound_value, $staking_id);
+        $stmt = $conn_back->prepare("
+            UPDATE staking_positions 
+            SET is_compounding = ?,
+                updated_at = NOW()
+            WHERE id = ? AND status = 'active'
+        ");
+        $stmt->bind_param("ii", $is_compounding, $staking_id);
         
         if ($stmt->execute()) {
-            // Log the action
+            // Log admin activity
             $admin_id = $_SESSION['admin_id'];
-            $action = "Updated staking ID {$staking_id} compounding to " . ($compound_value ? 'enabled' : 'disabled');
+            $status_text = $is_compounding ? 'enabled' : 'disabled';
+            $action = "Changed compounding to '$status_text' for staking position #$staking_id";
             $ip = $_SERVER['REMOTE_ADDR'];
             
             $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
             $log_stmt->bind_param("iss", $admin_id, $action, $ip);
             $log_stmt->execute();
             
-            $success_message = "Compounding option updated successfully.";
+            $message = "Compounding status updated successfully for staking position #$staking_id.";
         } else {
-            $error_message = "Failed to update compounding option: " . $conn_back->error;
+            $error = "Failed to update compounding status: " . $stmt->error;
+        }
+        
+        $stmt->close();
+    }
+}
+
+// Check if staking_positions table exists
+$table_exists = false;
+$result = $conn_back->query("SHOW TABLES LIKE 'staking_positions'");
+if ($result && $result->num_rows > 0) {
+    $table_exists = true;
+}
+
+// Pagination
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$records_per_page = 20;
+$offset = ($page - 1) * $records_per_page;
+
+// Filtering
+$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+$user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
+$plan_id = isset($_GET['plan_id']) ? (int)$_GET['plan_id'] : 0;
+
+// Build query condition
+$condition = "1=1";
+$params = [];
+$types = "";
+
+if (!empty($status_filter)) {
+    $condition .= " AND s.status = ?";
+    $params[] = $status_filter;
+    $types .= "s";
+}
+
+if ($user_id > 0) {
+    $condition .= " AND s.user_id = ?";
+    $params[] = $user_id;
+    $types .= "i";
+}
+
+if ($plan_id > 0) {
+    $condition .= " AND s.plan_id = ?";
+    $params[] = $plan_id;
+    $types .= "i";
+}
+
+if ($table_exists) {
+    // Get total count
+    $count_sql = "SELECT COUNT(*) as total FROM staking_positions s WHERE $condition";
+    $stmt = $conn_back->prepare($count_sql);
+    if (!empty($types)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $total_records = $row['total'];
+    $total_pages = ceil($total_records / $records_per_page);
+    $stmt->close();
+
+    // Get staking positions
+    $sql = "
+        SELECT 
+            s.*,
+            CONCAT(u.first_name, ' ', u.last_name) as username,
+            u.email,
+            p.name as plan_name,
+            p.roi_daily,
+            p.lockup_period
+        FROM staking_positions s
+        JOIN users u ON s.user_id = u.id
+        JOIN staking_plans p ON s.plan_id = p.id
+        WHERE $condition
+        ORDER BY s.created_at DESC
+        LIMIT ? OFFSET ?
+    ";
+    $types .= "ii";
+    $params[] = $records_per_page;
+    $params[] = $offset;
+
+    $stmt = $conn_back->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $stakings = $stmt->get_result();
+    $stmt->close();
+
+    // Get staking plans for filter
+    $plans_result = $conn_back->query("SELECT id, name FROM staking_plans ORDER BY name");
+    $plans = [];
+    if ($plans_result->num_rows > 0) {
+        while ($row = $plans_result->fetch_assoc()) {
+            $plans[] = $row;
         }
     }
 }
 
-// Handle search and filtering
-$search = isset($_GET['search']) ? $_GET['search'] : '';
-$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
-$user_id_filter = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
-$plan_id_filter = isset($_GET['plan_id']) ? (int)$_GET['plan_id'] : 0;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$per_page = 10;
-$offset = ($page - 1) * $per_page;
-
-// Build query conditions
-$where_conditions = [];
-$where_clause = "";
-
-if (!empty($search)) {
-    $search_term = $conn_back->real_escape_string($search);
-    $where_conditions[] = "(u.username LIKE '%{$search_term}%' OR 
-                           u.email LIKE '%{$search_term}%' OR 
-                           CONCAT(u.first_name, ' ', u.last_name) LIKE '%{$search_term}%')";
-}
-
-if (!empty($status_filter)) {
-    $status = $conn_back->real_escape_string($status_filter);
-    $where_conditions[] = "s.status = '{$status}'";
-}
-
-if ($user_id_filter > 0) {
-    $where_conditions[] = "s.user_id = {$user_id_filter}";
-}
-
-if ($plan_id_filter > 0) {
-    $where_conditions[] = "s.plan_id = {$plan_id_filter}";
-}
-
-if (!empty($where_conditions)) {
-    $where_clause = "WHERE " . implode(" AND ", $where_conditions);
-}
-
-// Get total count for pagination
-$count_query = "SELECT COUNT(*) as total FROM staking s 
-                LEFT JOIN users u ON s.user_id = u.id 
-                LEFT JOIN staking_plans sp ON s.plan_id = sp.id 
-                {$where_clause}";
-$count_result = $conn_back->query($count_query);
-$total_rows = 0;
-if ($count_result && $row = $count_result->fetch_assoc()) {
-    $total_rows = $row['total'];
-}
-$total_pages = ceil($total_rows / $per_page);
-
-// Get staking data
-$query = "SELECT s.*, 
-          CONCAT(u.first_name, ' ', u.last_name) as full_name,
-          u.username, u.email,
-          sp.name as plan_name, sp.duration_days as plan_duration, sp.lock_period_days, sp.early_unstake_penalty
-          FROM staking s 
-          LEFT JOIN users u ON s.user_id = u.id 
-          LEFT JOIN staking_plans sp ON s.plan_id = sp.id 
-          {$where_clause}
-          ORDER BY s.created_at DESC
-          LIMIT {$offset}, {$per_page}";
-
-$result = $conn_back->query($query);
-$stakings = [];
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $stakings[] = $row;
-    }
-}
-
-// Get staking plans for filter dropdown
-$plans_query = "SELECT id, name FROM staking_plans ORDER BY name";
-$plans_result = $conn_back->query($plans_query);
-$staking_plans = [];
-if ($plans_result) {
-    while ($row = $plans_result->fetch_assoc()) {
-        $staking_plans[] = $row;
-    }
-}
-
-// Get summary statistics
-$stats_query = "SELECT 
-                COUNT(*) as total_stakes,
-                SUM(amount) as total_staked,
-                SUM(CASE WHEN status = 'active' THEN amount ELSE 0 END) as active_amount,
-                COUNT(CASE WHEN status = 'active' THEN 1 END) as active_count,
-                SUM(CASE WHEN status = 'completed' THEN amount ELSE 0 END) as completed_amount,
-                COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count,
-                SUM(earned_reward) as total_rewards
-                FROM staking";
-$stats_result = $conn_back->query($stats_query);
-$stats = $stats_result->fetch_assoc();
+include_once __DIR__ . '/layout/header.php';
 ?>
 
-<!-- Main content -->
-<section class="content">
-    <!-- Stats boxes -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6 col-12">
-            <div class="box bg-primary bg-hover-primary">
-                <div class="box-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="text-white"><?php echo number_format($stats['total_stakes'] ?? 0); ?></h4>
-                            <p class="text-white mb-0">Total Stakes</p>
-                        </div>
-                        <div>
-                            <h4 class="text-white">$<?php echo number_format($stats['total_staked'] ?? 0, 2); ?></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 col-12">
-            <div class="box bg-success bg-hover-success">
-                <div class="box-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="text-white"><?php echo $stats['active_count'] ?? 0; ?></h4>
-                            <p class="text-white mb-0">Active Stakes</p>
-                        </div>
-                        <div>
-                            <h4 class="text-white">$<?php echo number_format($stats['active_amount'] ?? 0, 2); ?></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 col-12">
-            <div class="box bg-info bg-hover-info">
-                <div class="box-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="text-white"><?php echo $stats['completed_count'] ?? 0; ?></h4>
-                            <p class="text-white mb-0">Completed Stakes</p>
-                        </div>
-                        <div>
-                            <h4 class="text-white">$<?php echo number_format($stats['completed_amount'] ?? 0, 2); ?></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 col-12">
-            <div class="box bg-warning bg-hover-warning">
-                <div class="box-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="text-white">$<?php echo number_format($stats['total_rewards'] ?? 0, 2); ?></h4>
-                            <p class="text-white mb-0">Total Rewards Earned</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Staking Management</h1>
+        <a href="create_staking.php" class="btn btn-primary">
+            <i class="fas fa-plus mr-2"></i> Create Staking Position
+        </a>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="box">
-                <div class="box-header with-border">
-                    <h4 class="box-title">Staking Management</h4>
-                    <div class="box-controls pull-right d-flex">
-                        <form class="me-2" method="GET">
-                            <?php if (!empty($search)): ?>
-                            <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                            <?php endif; ?>
-                            <?php if ($user_id_filter > 0): ?>
-                            <input type="hidden" name="user_id" value="<?php echo $user_id_filter; ?>">
-                            <?php endif; ?>
-                            
-                            <div class="input-group">
-                                <select name="status" class="form-select">
-                                    <option value="">All Status</option>
-                                    <option value="active" <?php echo $status_filter == 'active' ? 'selected' : ''; ?>>Active</option>
-                                    <option value="completed" <?php echo $status_filter == 'completed' ? 'selected' : ''; ?>>Completed</option>
-                                    <option value="cancelled" <?php echo $status_filter == 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
-                                </select>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-filter"></i>
-                                </button>
-                            </div>
-                        </form>
+    <?php if (!empty($message)): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= $message ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= $error ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!$table_exists): ?>
+        <div class="alert alert-warning">
+            <p>The staking_positions table does not exist in the database. Please run the database initialization script.</p>
+            <form method="post" action="db_fix.php">
+                <input type="hidden" name="create_staking_tables" value="1">
+                <button type="submit" class="btn btn-primary">Create Staking Tables</button>
+            </form>
+        </div>
+    <?php else: ?>
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">User Staking Positions</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="filterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-filter fa-sm fa-fw text-gray-400"></i> Filter
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="filterDropdown">
+                        <div class="dropdown-header">Status Filter:</div>
+                        <a class="dropdown-item <?= $status_filter === '' ? 'active' : '' ?>" href="?status=">All</a>
+                        <a class="dropdown-item <?= $status_filter === 'active' ? 'active' : '' ?>" href="?status=active">Active</a>
+                        <a class="dropdown-item <?= $status_filter === 'completed' ? 'active' : '' ?>" href="?status=completed">Completed</a>
+                        <a class="dropdown-item <?= $status_filter === 'cancelled' ? 'active' : '' ?>" href="?status=cancelled">Cancelled</a>
                         
-                        <form class="me-2" method="GET">
-                            <?php if (!empty($search)): ?>
-                            <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                            <?php endif; ?>
-                            <?php if (!empty($status_filter)): ?>
-                            <input type="hidden" name="status" value="<?php echo htmlspecialchars($status_filter); ?>">
-                            <?php endif; ?>
-                            
-                            <div class="input-group">
-                                <select name="plan_id" class="form-select">
-                                    <option value="0">All Plans</option>
-                                    <?php foreach ($staking_plans as $plan): ?>
-                                    <option value="<?php echo $plan['id']; ?>" <?php echo $plan_id_filter == $plan['id'] ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($plan['name']); ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-filter"></i>
-                                </button>
-                            </div>
-                        </form>
-                        
-                        <form method="GET">
-                            <?php if (!empty($status_filter)): ?>
-                            <input type="hidden" name="status" value="<?php echo htmlspecialchars($status_filter); ?>">
-                            <?php endif; ?>
-                            <?php if ($plan_id_filter > 0): ?>
-                            <input type="hidden" name="plan_id" value="<?php echo $plan_id_filter; ?>">
-                            <?php endif; ?>
-                            
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="search" placeholder="Search users..." value="<?php echo htmlspecialchars($search); ?>">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </div>
-                        </form>
+                        <?php if (count($plans) > 0): ?>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-header">Plans Filter:</div>
+                            <a class="dropdown-item <?= $plan_id === 0 ? 'active' : '' ?>" href="?plan_id=0<?= !empty($status_filter) ? '&status='.$status_filter : '' ?>">All Plans</a>
+                            <?php foreach ($plans as $plan): ?>
+                                <a class="dropdown-item <?= $plan_id === $plan['id'] ? 'active' : '' ?>" href="?plan_id=<?= $plan['id'] ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?>"><?= htmlspecialchars($plan['name']) ?></a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
-                <div class="box-body p-0">
-                    <?php if (isset($success_message)): ?>
-                    <div class="alert alert-success m-3"><?php echo $success_message; ?></div>
-                    <?php endif; ?>
-                    
-                    <?php if (isset($error_message)): ?>
-                    <div class="alert alert-danger m-3"><?php echo $error_message; ?></div>
-                    <?php endif; ?>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User</th>
-                                    <th>Plan</th>
-                                    <th>Amount</th>
-                                    <th>Reward / APY</th>
-                                    <th>Duration</th>
-                                    <th>Compounding</th>
-                                    <th>Status</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($stakings) > 0): ?>
-                                    <?php foreach ($stakings as $staking): ?>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Plan</th>
+                                <th>Amount</th>
+                                <th>Daily Reward</th>
+                                <th>Total Rewards</th>
+                                <th>Created</th>
+                                <th>Compounding</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($stakings && $stakings->num_rows > 0): ?>
+                                <?php while ($staking = $stakings->fetch_assoc()): ?>
                                     <tr>
-                                        <td><?php echo $staking['id']; ?></td>
+                                        <td><?= $staking['id'] ?></td>
                                         <td>
-                                            <a href="user_detail.php?id=<?php echo $staking['user_id']; ?>">
-                                                <?php echo htmlspecialchars($staking['full_name']); ?>
+                                            <a href="user_detail.php?id=<?= $staking['user_id'] ?>">
+                                                <?= htmlspecialchars($staking['username']) ?>
                                             </a>
-                                            <small class="d-block text-muted"><?php echo htmlspecialchars($staking['username']); ?></small>
+                                            <small class="d-block text-muted"><?= htmlspecialchars($staking['email']) ?></small>
                                         </td>
-                                        <td><?php echo htmlspecialchars($staking['plan_name']); ?></td>
-                                        <td>$<?php echo number_format($staking['amount'], 2); ?></td>
+                                        <td><?= htmlspecialchars($staking['plan_name']) ?></td>
+                                        <td>$<?= number_format($staking['amount'], 2) ?></td>
+                                        <td>$<?= number_format($staking['daily_reward'], 2) ?> (<?= number_format($staking['roi_daily'], 2) ?>%)</td>
+                                        <td>$<?= number_format($staking['total_rewards'], 2) ?></td>
+                                        <td><?= date('M d, Y', strtotime($staking['created_at'])) ?></td>
                                         <td>
-                                            $<?php echo number_format($staking['earned_reward'], 2); ?> / <?php echo $staking['apy']; ?>%
-                                        </td>
-                                        <td>
-                                            <?php echo $staking['duration_days']; ?> days
-                                            <small class="d-block text-muted">
-                                                <?php if ($staking['status'] == 'active'): ?>
-                                                <?php 
-                                                    $start_date = new DateTime($staking['started_at']);
-                                                    $end_date = new DateTime($staking['ends_at']);
-                                                    $now = new DateTime();
-                                                    $progress = min(100, ($now->getTimestamp() - $start_date->getTimestamp()) / ($end_date->getTimestamp() - $start_date->getTimestamp()) * 100);
-                                                ?>
-                                                <div class="progress progress-xs mt-1">
-                                                    <div class="progress-bar bg-success" style="width: <?php echo $progress; ?>%"></div>
-                                                </div>
-                                                <?php endif; ?>
-                                            </small>
-                                        </td>
-                                        <td>
-                                            <?php if ($staking['status'] == 'active'): ?>
-                                            <form method="post">
-                                                <input type="hidden" name="action" value="toggle_compound">
-                                                <input type="hidden" name="staking_id" value="<?php echo $staking['id']; ?>">
-                                                <input type="hidden" name="compound" value="<?php echo $staking['is_compounding'] ? '0' : '1'; ?>">
-                                                <button type="submit" class="btn btn-xs <?php echo $staking['is_compounding'] ? 'btn-success' : 'btn-outline-success'; ?>">
-                                                    <?php echo $staking['is_compounding'] ? 'On' : 'Off'; ?>
-                                                </button>
-                                            </form>
+                                            <?php if ($staking['status'] === 'active'): ?>
+                                                <form method="post">
+                                                    <input type="hidden" name="staking_id" value="<?= $staking['id'] ?>">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="compounding_<?= $staking['id'] ?>" name="is_compounding" <?= $staking['is_compounding'] ? 'checked' : '' ?> onchange="this.form.submit()">
+                                                        <label class="custom-control-label" for="compounding_<?= $staking['id'] ?>"></label>
+                                                    </div>
+                                                    <input type="hidden" name="toggle_compounding" value="1">
+                                                </form>
                                             <?php else: ?>
-                                            <span class="badge <?php echo $staking['is_compounding'] ? 'badge-success' : 'badge-light'; ?>">
-                                                <?php echo $staking['is_compounding'] ? 'Enabled' : 'Disabled'; ?>
-                                            </span>
+                                                <?= $staking['is_compounding'] ? 'Yes' : 'No' ?>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <span class="badge <?php 
-                                                if ($staking['status'] == 'active') echo 'badge-success';
-                                                elseif ($staking['status'] == 'completed') echo 'badge-info';
-                                                else echo 'badge-danger';
+                                            <span class="badge badge-<?php
+                                                switch ($staking['status']) {
+                                                    case 'active': echo 'success'; break;
+                                                    case 'completed': echo 'info'; break;
+                                                    case 'cancelled': echo 'danger'; break;
+                                                    default: echo 'secondary';
+                                                }
                                             ?>">
-                                                <?php echo ucfirst($staking['status']); ?>
+                                                <?= ucfirst($staking['status']) ?>
                                             </span>
                                         </td>
-                                        <td><?php echo date('M d, Y', strtotime($staking['created_at'])); ?></td>
                                         <td>
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Action
+                                            <button class="btn btn-sm btn-primary view-details" data-toggle="modal" data-target="#detailsModal" 
+                                                    data-id="<?= $staking['id'] ?>" 
+                                                    data-user="<?= htmlspecialchars($staking['username']) ?>"
+                                                    data-plan="<?= htmlspecialchars($staking['plan_name']) ?>"
+                                                    data-amount="<?= $staking['amount'] ?>"
+                                                    data-daily="<?= $staking['daily_reward'] ?>"
+                                                    data-rate="<?= $staking['roi_daily'] ?>"
+                                                    data-lockup="<?= $staking['lockup_period'] ?>"
+                                                    data-created="<?= date('M d, Y', strtotime($staking['created_at'])) ?>"
+                                                    data-rewards="<?= $staking['total_rewards'] ?>"
+                                                    data-compound="<?= $staking['is_compounding'] ? 'Yes' : 'No' ?>"
+                                                    data-last-reward="<?= $staking['last_reward_date'] ? date('M d, Y H:i:s', strtotime($staking['last_reward_date'])) : 'N/A' ?>"
+                                                    data-status="<?= $staking['status'] ?>">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            
+                                            <?php if ($staking['status'] === 'active'): ?>
+                                                <button class="btn btn-sm btn-danger cancel-staking" data-toggle="modal" data-target="#cancelModal" data-id="<?= $staking['id'] ?>">
+                                                    <i class="fas fa-times"></i>
                                                 </button>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="staking_rewards.php?staking_id=<?php echo $staking['id']; ?>">
-                                                        <i class="fa fa-money"></i> View Rewards
-                                                    </a>
-                                                    
-                                                    <?php if ($staking['status'] == 'active'): ?>
-                                                    <div class="dropdown-divider"></div>
-                                                    
-                                                    <form method="post" onsubmit="return confirm('Are you sure you want to mark this staking as completed?');">
-                                                        <input type="hidden" name="action" value="change_status">
-                                                        <input type="hidden" name="staking_id" value="<?php echo $staking['id']; ?>">
-                                                        <input type="hidden" name="status" value="completed">
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fa fa-check text-success"></i> Mark as Completed
-                                                        </button>
-                                                    </form>
-                                                    
-                                                    <form method="post" onsubmit="return confirm('Are you sure you want to cancel this staking? Funds will be returned to user with any applicable penalties.');">
-                                                        <input type="hidden" name="action" value="change_status">
-                                                        <input type="hidden" name="staking_id" value="<?php echo $staking['id']; ?>">
-                                                        <input type="hidden" name="status" value="cancelled">
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fa fa-times text-danger"></i> Cancel Staking
-                                                        </button>
-                                                    </form>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                                <?php endwhile; ?>
+                            <?php else: ?>
                                 <tr>
-                                    <td colspan="10" class="text-center">No staking records found</td>
+                                    <td colspan="10" class="text-center">No staking positions found</td>
                                 </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
                 
                 <!-- Pagination -->
                 <?php if ($total_pages > 1): ?>
-                <div class="box-footer clearfix">
-                    <ul class="pagination pagination-sm m-0 float-right">
-                        <?php if ($page > 1): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?php echo $page-1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status='.$status_filter : ''; ?><?php echo $plan_id_filter > 0 ? '&plan_id='.$plan_id_filter : ''; ?><?php echo $user_id_filter > 0 ? '&user_id='.$user_id_filter : ''; ?>">&laquo;</a>
-                        </li>
-                        <?php endif; ?>
-                        
-                        <?php
-                        $start_page = max(1, $page - 2);
-                        $end_page = min($total_pages, $page + 2);
-                        
-                        for ($i = $start_page; $i <= $end_page; $i++):
-                        ?>
-                        <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status='.$status_filter : ''; ?><?php echo $plan_id_filter > 0 ? '&plan_id='.$plan_id_filter : ''; ?><?php echo $user_id_filter > 0 ? '&user_id='.$user_id_filter : ''; ?>"><?php echo $i; ?></a>
-                        </li>
-                        <?php endfor; ?>
-                        
-                        <?php if ($page < $total_pages): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?php echo $page+1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?><?php echo !empty($status_filter) ? '&status='.$status_filter : ''; ?><?php echo $plan_id_filter > 0 ? '&plan_id='.$plan_id_filter : ''; ?><?php echo $user_id_filter > 0 ? '&user_id='.$user_id_filter : ''; ?>">&raquo;</a>
-                        </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1<?= !empty($status_filter) ? '&status='.$status_filter : '' ?><?= $plan_id > 0 ? '&plan_id='.$plan_id : '' ?>" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page - 1 ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?><?= $plan_id > 0 ? '&plan_id='.$plan_id : '' ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <?php
+                            $start_page = max(1, $page - 2);
+                            $end_page = min($total_pages, $page + 2);
+                            
+                            if ($end_page - $start_page + 1 < 5 && $total_pages >= 5) {
+                                if ($start_page == 1) {
+                                    $end_page = min($total_pages, 5);
+                                } elseif ($end_page == $total_pages) {
+                                    $start_page = max(1, $total_pages - 4);
+                                }
+                            }
+                            
+                            for ($i = $start_page; $i <= $end_page; $i++):
+                            ?>
+                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $i ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?><?= $plan_id > 0 ? '&plan_id='.$plan_id : '' ?>"><?= $i ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <?php if ($page < $total_pages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page + 1 ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?><?= $plan_id > 0 ? '&plan_id='.$plan_id : '' ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $total_pages ?><?= !empty($status_filter) ? '&status='.$status_filter : '' ?><?= $plan_id > 0 ? '&plan_id='.$plan_id : '' ?>" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
                 <?php endif; ?>
             </div>
         </div>
-    </div>
-</section>
-<!-- /.content -->
+    <?php endif; ?>
+</div>
 
-<?php
-// Include footer
-require_once __DIR__ . '/layout/footer.php';
-?> 
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Staking Position Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div id="statusBadge" class="badge badge-success mb-2">Active</div>
+                    <h4 id="detailAmount">$0.00</h4>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID:</strong> <span id="detailId"></span></p>
+                        <p><strong>User:</strong> <span id="detailUser"></span></p>
+                        <p><strong>Plan:</strong> <span id="detailPlan"></span></p>
+                        <p><strong>Daily Rate:</strong> <span id="detailRate"></span>%</p>
+                        <p><strong>Daily Reward:</strong> $<span id="detailDaily"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Created:</strong> <span id="detailCreated"></span></p>
+                        <p><strong>Lockup Period:</strong> <span id="detailLockup"></span> days</p>
+                        <p><strong>Total Rewards:</strong> $<span id="detailRewards"></span></p>
+                        <p><strong>Last Reward:</strong> <span id="detailLastReward"></span></p>
+                        <p><strong>Compounding:</strong> <span id="detailCompound"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="cancelBtn" class="btn btn-danger d-none" data-toggle="modal" data-target="#cancelModal">Cancel Staking</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Cancel Staking Position</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="staking_id" id="cancelStakingId">
+                    <p>Are you sure you want to cancel this staking position? This will:</p>
+                    <ul>
+                        <li>Stop accruing rewards immediately</li>
+                        <li>Return the full staked amount to the user</li>
+                        <li>Mark the staking position as cancelled</li>
+                    </ul>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" name="cancel_staking" class="btn btn-danger">Cancel Staking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // View details
+    $('.view-details').on('click', function() {
+        var id = $(this).data('id');
+        var user = $(this).data('user');
+        var plan = $(this).data('plan');
+        var amount = $(this).data('amount');
+        var daily = $(this).data('daily');
+        var rate = $(this).data('rate');
+        var lockup = $(this).data('lockup');
+        var created = $(this).data('created');
+        var rewards = $(this).data('rewards');
+        var compound = $(this).data('compound');
+        var lastReward = $(this).data('last-reward');
+        var status = $(this).data('status');
+        
+        $('#detailId').text(id);
+        $('#detailUser').text(user);
+        $('#detailPlan').text(plan);
+        $('#detailAmount').text('$' + parseFloat(amount).toFixed(2));
+        $('#detailDaily').text(parseFloat(daily).toFixed(2));
+        $('#detailRate').text(parseFloat(rate).toFixed(2));
+        $('#detailLockup').text(lockup);
+        $('#detailCreated').text(created);
+        $('#detailRewards').text(parseFloat(rewards).toFixed(2));
+        $('#detailCompound').text(compound);
+        $('#detailLastReward').text(lastReward);
+        $('#detailStatus').text(status.charAt(0).toUpperCase() + status.slice(1));
+        
+        // Show/hide cancel button
+        if (status === 'active') {
+            $('#cancelBtn').removeClass('d-none').data('id', id);
+        } else {
+            $('#cancelBtn').addClass('d-none');
+        }
+        
+        // Update status badge
+        var badgeClass = 'badge-secondary';
+        switch (status) {
+            case 'active': badgeClass = 'badge-success'; break;
+            case 'completed': badgeClass = 'badge-info'; break;
+            case 'cancelled': badgeClass = 'badge-danger'; break;
+        }
+        $('#statusBadge').attr('class', 'badge ' + badgeClass + ' mb-2').text(status.charAt(0).toUpperCase() + status.slice(1));
+    });
+    
+    // Cancel staking
+    $('.cancel-staking').on('click', function() {
+        var id = $(this).data('id');
+        $('#cancelStakingId').val(id);
+    });
+    
+    $('#cancelBtn').on('click', function() {
+        var id = $(this).data('id');
+        $('#cancelStakingId').val(id);
+        $('#detailsModal').modal('hide');
+    });
+});
+</script>
+
+<?php include_once __DIR__ . '/layout/footer.php'; ?> 

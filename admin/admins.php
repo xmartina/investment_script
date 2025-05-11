@@ -178,7 +178,7 @@ $query = "SELECT id, username, email, full_name, role, status, last_login, creat
 $result = $conn_back->query($query);
 $admin_users = [];
 if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+while ($row = $result->fetch_assoc()) {
         $admin_users[] = $row;
     }
 }
@@ -230,28 +230,28 @@ if ($result && $result->num_rows > 0) {
                             <tbody>
                                 <?php if (count($admin_users) > 0): ?>
                                     <?php foreach ($admin_users as $admin): ?>
-                                    <tr>
-                                        <td><?php echo $admin['id']; ?></td>
-                                        <td><?php echo htmlspecialchars($admin['username']); ?></td>
-                                        <td><?php echo htmlspecialchars($admin['full_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($admin['email']); ?></td>
-                                        <td>
+                                        <tr>
+                                            <td><?php echo $admin['id']; ?></td>
+                                            <td><?php echo htmlspecialchars($admin['username']); ?></td>
+                                            <td><?php echo htmlspecialchars($admin['full_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($admin['email']); ?></td>
+                                            <td>
                                             <span class="badge <?php echo $admin['role'] == 'super_admin' ? 'badge-danger' : 'badge-info'; ?>">
-                                                <?php echo ucfirst(str_replace('_', ' ', $admin['role'])); ?>
-                                            </span>
-                                        </td>
-                                        <td>
+                                                    <?php echo ucfirst(str_replace('_', ' ', $admin['role'])); ?>
+                                                </span>
+                                            </td>
+                                            <td>
                                             <span class="badge <?php echo $admin['status'] == 'active' ? 'badge-success' : 'badge-warning'; ?>">
-                                                <?php echo ucfirst($admin['status']); ?>
-                                            </span>
-                                        </td>
+                                                    <?php echo ucfirst($admin['status']); ?>
+                                                </span>
+                                            </td>
                                         <td><?php echo $admin['last_login'] ? date('M d, Y H:i', strtotime($admin['last_login'])) : 'Never'; ?></td>
                                         <td><?php echo date('M d, Y', strtotime($admin['created_at'])); ?></td>
-                                        <td>
-                                            <div class="btn-group">
+                                            <td>
+                                                <div class="btn-group">
                                                 <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Action
-                                                </button>
+                                                    </button>
                                                 <div class="dropdown-menu">
                                                     <?php if ($_SESSION['admin_id'] != $admin['id']): ?>
                                                         <?php if ($admin['status'] == 'active'): ?>
@@ -261,7 +261,7 @@ if ($result && $result->num_rows > 0) {
                                                             <input type="hidden" name="status" value="inactive">
                                                             <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to deactivate this admin?')">
                                                                 <i class="fa fa-ban text-warning"></i> Deactivate
-                                                            </button>
+                                                    </button>
                                                         </form>
                                                         <?php else: ?>
                                                         <form method="post">
@@ -270,7 +270,7 @@ if ($result && $result->num_rows > 0) {
                                                             <input type="hidden" name="status" value="active">
                                                             <button type="submit" class="dropdown-item">
                                                                 <i class="fa fa-check text-success"></i> Activate
-                                                            </button>
+                                                        </button>
                                                         </form>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
@@ -282,15 +282,15 @@ if ($result && $result->num_rows > 0) {
                                                             data-admin-name="<?php echo htmlspecialchars($admin['full_name']); ?>">
                                                         <i class="fa fa-key text-primary"></i> Reset Password
                                                     </button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                                        </div>
+                                                    </div>
+                                            </td>
+                                        </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                <tr>
+                                    <tr>
                                     <td colspan="9" class="text-center">No admin users found</td>
-                                </tr>
+                                    </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>

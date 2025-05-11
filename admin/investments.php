@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Return remaining principal to user
                 $days_passed = (time() - strtotime($investment['created_at'])) / (60 * 60 * 24);
-                $total_days = (strtotime($investment['end_date']) - strtotime($investment['start_date'])) / (60 * 60 * 24);
+                $total_days = (strtotime($investment['ends_at']) - strtotime($investment['started_at'])) / (60 * 60 * 24);
                 $remaining_percentage = max(0, 1 - ($days_passed / $total_days));
                 $refund_amount = $investment['amount'] * $remaining_percentage;
                 
@@ -121,8 +121,8 @@ $sql = "
         i.*,
         CONCAT(u.first_name, ' ', u.last_name) as username,
         p.name as plan_name,
-        p.interest_rate,
-        p.duration
+        p.roi_percent,
+        p.duration_days as duration
     FROM investments i
     JOIN users u ON i.user_id = u.id
     JOIN investment_plans p ON i.plan_id = p.id
@@ -206,9 +206,9 @@ include_once __DIR__ . '/layout/header.php';
                                     <td><?= htmlspecialchars($investment['username']) ?></td>
                                     <td><?= htmlspecialchars($investment['plan_name']) ?></td>
                                     <td>$<?= number_format($investment['amount'], 2) ?></td>
-                                    <td><?= $investment['interest_rate'] ?>%</td>
-                                    <td><?= date('M d, Y', strtotime($investment['start_date'])) ?></td>
-                                    <td><?= date('M d, Y', strtotime($investment['end_date'])) ?></td>
+                                    <td><?= $investment['roi_percent'] ?>%</td>
+                                    <td><?= date('M d, Y', strtotime($investment['started_at'])) ?></td>
+                                    <td><?= date('M d, Y', strtotime($investment['ends_at'])) ?></td>
                                     <td>
                                         <span class="badge badge-<?php
                                             switch ($investment['status']) {
@@ -227,9 +227,9 @@ include_once __DIR__ . '/layout/header.php';
                                                 data-user="<?= htmlspecialchars($investment['username']) ?>"
                                                 data-plan="<?= htmlspecialchars($investment['plan_name']) ?>"
                                                 data-amount="<?= $investment['amount'] ?>"
-                                                data-rate="<?= $investment['interest_rate'] ?>"
-                                                data-start="<?= date('M d, Y', strtotime($investment['start_date'])) ?>"
-                                                data-end="<?= date('M d, Y', strtotime($investment['end_date'])) ?>"
+                                                data-rate="<?= $investment['roi_percent'] ?>"
+                                                data-start="<?= date('M d, Y', strtotime($investment['started_at'])) ?>"
+                                                data-end="<?= date('M d, Y', strtotime($investment['ends_at'])) ?>"
                                                 data-status="<?= $investment['status'] ?>"
                                                 data-returns="<?= $investment['expected_returns'] ?>">
                                             <i class="fas fa-eye"></i>

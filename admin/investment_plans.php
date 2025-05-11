@@ -21,14 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = $_POST['description'];
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
-        $interest_rate = floatval($_POST['interest_rate']);
+        $roi_percent = floatval($_POST['roi_percent']);
         $duration = intval($_POST['duration']);
         $duration_unit = $_POST['duration_unit'];
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $interest_rate <= 0 || $duration <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Calculate duration in days
@@ -43,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Insert new plan
             $stmt = $conn_back->prepare("
-                INSERT INTO investment_plans (name, description, min_amount, max_amount, interest_rate, duration, duration_unit, duration_days, status, featured, created_at) 
+                INSERT INTO investment_plans (name, description, min_amount, max_amount, roi_percent, duration, duration_unit, duration_days, status, featured, created_at) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
-            $stmt->bind_param("ssdddiisii", $name, $description, $min_amount, $max_amount, $interest_rate, $duration, $duration_unit, $days, $status, $featured);
+            $stmt->bind_param("ssdddiisii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration, $duration_unit, $days, $status, $featured);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Add Investment Plan', "Added new plan: $name");
@@ -66,14 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = $_POST['description'];
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
-        $interest_rate = floatval($_POST['interest_rate']);
+        $roi_percent = floatval($_POST['roi_percent']);
         $duration = intval($_POST['duration']);
         $duration_unit = $_POST['duration_unit'];
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $interest_rate <= 0 || $duration <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Calculate duration in days
@@ -90,11 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn_back->prepare("
                 UPDATE investment_plans 
                 SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
-                    interest_rate = ?, duration = ?, duration_unit = ?, duration_days = ?,
+                    roi_percent = ?, duration = ?, duration_unit = ?, duration_days = ?,
                     status = ?, featured = ?, updated_at = NOW() 
                 WHERE id = ?
             ");
-            $stmt->bind_param("ssdddiisiii", $name, $description, $min_amount, $max_amount, $interest_rate, $duration, $duration_unit, $days, $status, $featured, $plan_id);
+            $stmt->bind_param("ssdddiisiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration, $duration_unit, $days, $status, $featured, $plan_id);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Update Investment Plan', "Updated plan #$plan_id: $name");
@@ -199,7 +199,7 @@ include_once __DIR__ . '/layout/header.php';
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Return Rate</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $plan['interest_rate'] ?>%</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $plan['roi_percent'] ?>%</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-chart-line fa-2x text-gray-300"></i>
@@ -246,7 +246,7 @@ include_once __DIR__ . '/layout/header.php';
                                     data-description="<?= htmlspecialchars($plan['description']) ?>"
                                     data-min="<?= $plan['min_amount'] ?>"
                                     data-max="<?= $plan['max_amount'] ?>"
-                                    data-rate="<?= $plan['interest_rate'] ?>"
+                                    data-rate="<?= $plan['roi_percent'] ?>"
                                     data-duration="<?= $plan['duration'] ?>"
                                     data-unit="<?= $plan['duration_unit'] ?>"
                                     data-status="<?= $plan['status'] ?>"
@@ -312,8 +312,8 @@ include_once __DIR__ . '/layout/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="interest_rate">Interest Rate (%) *</label>
-                                <input type="number" class="form-control" id="interest_rate" name="interest_rate" step="0.01" min="0" required>
+                                <label for="roi_percent">Interest Rate (%) *</label>
+                                <input type="number" class="form-control" id="roi_percent" name="roi_percent" step="0.01" min="0" required>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -401,8 +401,8 @@ include_once __DIR__ . '/layout/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="edit_interest_rate">Interest Rate (%) *</label>
-                                <input type="number" class="form-control" id="edit_interest_rate" name="interest_rate" step="0.01" min="0" required>
+                                <label for="edit_roi_percent">Interest Rate (%) *</label>
+                                <input type="number" class="form-control" id="edit_roi_percent" name="roi_percent" step="0.01" min="0" required>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -496,7 +496,7 @@ $(document).ready(function() {
         $('#edit_description').val(description);
         $('#edit_min_amount').val(min);
         $('#edit_max_amount').val(max);
-        $('#edit_interest_rate').val(rate);
+        $('#edit_roi_percent').val(rate);
         $('#edit_duration').val(duration);
         $('#edit_duration_unit').val(unit);
         $('#edit_status').prop('checked', status == 1);

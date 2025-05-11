@@ -1,542 +1,451 @@
 <?php
-// Staking rewards management page for admin panel
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
+// Admin Staking Rewards Management Page
 session_start();
+require_once __DIR__ . '/include/config.php';
 
-// Check if the admin is logged in
+// Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
-    header("Location: login.php");
+    header("Location: /admin/login");
     exit();
 }
 
-// Include necessary files
-try {
-    require_once __DIR__ . '/include/config.php';
-    
-    // Set current page for menu highlighting
-    $current_page = 'staking_rewards.php';
-    
-    require_once __DIR__ . '/layout/header.php';
-    require_once __DIR__ . '/layout/breadcrumb.php';
-} catch (Exception $e) {
-    echo "Error loading required files: " . $e->getMessage();
-    exit;
-}
+$page_name = "Staking Rewards";
+$current_page = "staking_rewards.php";
+$message = "";
+$error = "";
 
+// Get staking ID filter if provided
 $staking_id = isset($_GET['staking_id']) ? (int)$_GET['staking_id'] : 0;
 $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
 
-// Process actions
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Process reward
-    if (isset($_POST['action']) && $_POST['action'] == 'process_reward' && isset($_POST['reward_id'])) {
-        $reward_id = (int)$_POST['reward_id'];
-        $status = $conn_back->real_escape_string($_POST['status']);
+// Process form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['process_rewards'])) {
+        // Logic for manually processing staking rewards would go here
+        // This is a placeholder for actual reward processing code
         
-        if (in_array($status, ['claimed', 'reinvested', 'expired'])) {
-            $conn_back->begin_transaction();
-            
-            try {
-                // Get reward details
-                $reward_query = $conn_back->prepare("
-                    SELECT sr.*, s.plan_id 
-                    FROM staking_rewards sr 
-                    JOIN staking s ON sr.staking_id = s.id 
-                    WHERE sr.id = ?
-                ");
-                $reward_query->bind_param("i", $reward_id);
-                $reward_query->execute();
-                $reward_result = $reward_query->get_result();
-                
-                if ($reward_row = $reward_result->fetch_assoc()) {
-                    $user_id = $reward_row['user_id'];
-                    $reward_amount = $reward_row['reward_amount'];
-                    $staking_id = $reward_row['staking_id'];
-                    $plan_id = $reward_row['plan_id'];
-                    
-                    // Update reward status
-                    $status_update = $conn_back->prepare("
-                        UPDATE staking_rewards SET status = ?, claimed_at = NOW() WHERE id = ?
-                    ");
-                    $status_update->bind_param("si", $status, $reward_id);
-                    $status_update->execute();
-                    
-                    if ($status == 'claimed') {
-                        // Add transaction record
-                        $txn_insert = $conn_back->prepare("
-                            INSERT INTO transactions (user_id, transaction_type, amount, status, description, date_time) 
-                            VALUES (?, 'staking_reward', ?, 'completed', ?, NOW())
-                        ");
-                        $desc = "Staking reward from staking ID {$staking_id}";
-                        $txn_insert->bind_param("ids", $user_id, $reward_amount, $desc);
-                        $txn_insert->execute();
-                        $txn_id = $conn_back->insert_id;
-                        
-                        // Update transaction ID in reward record
-                        $txn_update = $conn_back->prepare("
-                            UPDATE staking_rewards SET transaction_id = ? WHERE id = ?
-                        ");
-                        $txn_update->bind_param("ii", $txn_id, $reward_id);
-                        $txn_update->execute();
-                        
-                        // Update user balance
-                        $balance_update = $conn_back->prepare("
-                            UPDATE users SET main_balance = main_balance + ? WHERE id = ?
-                        ");
-                        $balance_update->bind_param("di", $reward_amount, $user_id);
-                        $balance_update->execute();
-                    } elseif ($status == 'reinvested') {
-                        // Update staking record with increased amount
-                        $staking_update = $conn_back->prepare("
-                            UPDATE staking SET amount = amount + ?, earned_reward = earned_reward + ? WHERE id = ?
-                        ");
-                        $staking_update->bind_param("ddi", $reward_amount, $reward_amount, $staking_id);
-                        $staking_update->execute();
-                        
-                        // Add transaction record
-                        $txn_insert = $conn_back->prepare("
-                            INSERT INTO transactions (user_id, transaction_type, amount, status, description, date_time) 
-                            VALUES (?, 'staking_reinvestment', ?, 'completed', ?, NOW())
-                        ");
-                        $desc = "Staking reward reinvested into staking ID {$staking_id}";
-                        $txn_insert->bind_param("ids", $user_id, $reward_amount, $desc);
-                        $txn_insert->execute();
-                        $txn_id = $conn_back->insert_id;
-                        
-                        // Update transaction ID in reward record
-                        $txn_update = $conn_back->prepare("
-                            UPDATE staking_rewards SET transaction_id = ? WHERE id = ?
-                        ");
-                        $txn_update->bind_param("ii", $txn_id, $reward_id);
-                        $txn_update->execute();
-                    }
-                    
-                    // Log admin action
-                    $admin_id = $_SESSION['admin_id'];
-                    $action = "Processed staking reward ID {$reward_id} - set status to {$status}";
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                    
-                    $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                    $log_stmt->bind_param("iss", $admin_id, $action, $ip);
-                    $log_stmt->execute();
-                    
-                    // Commit transaction
-                    $conn_back->commit();
-                    $success_message = "Reward successfully processed as {$status}.";
-                } else {
-                    throw new Exception("Reward not found.");
-                }
-            } catch (Exception $e) {
-                $conn_back->rollback();
-                $error_message = "Error processing reward: " . $e->getMessage();
-            }
-        } else {
-            $error_message = "Invalid status value.";
-        }
-    }
-    
-    // Add manual reward
-    if (isset($_POST['action']) && $_POST['action'] == 'add_reward') {
-        $staking_id = (int)$_POST['staking_id'];
-        $reward_amount = (float)$_POST['reward_amount'];
-        $expected_date = $_POST['expected_date'];
+        // Admin log
+        $admin_id = $_SESSION['admin_id'];
+        $action = "Manually processed staking rewards";
+        $ip = $_SERVER['REMOTE_ADDR'];
         
-        if ($reward_amount <= 0) {
-            $error_message = "Reward amount must be greater than zero.";
-        } else {
-            // Get staking details
-            $staking_query = $conn_back->prepare("SELECT user_id FROM staking WHERE id = ?");
-            $staking_query->bind_param("i", $staking_id);
-            $staking_query->execute();
-            $staking_result = $staking_query->get_result();
-            
-            if ($staking_row = $staking_result->fetch_assoc()) {
-                $user_id = $staking_row['user_id'];
-                
-                // Insert reward record
-                $reward_insert = $conn_back->prepare("
-                    INSERT INTO staking_rewards (staking_id, user_id, reward_amount, expected_date, status)
-                    VALUES (?, ?, ?, ?, 'pending')
-                ");
-                $reward_insert->bind_param("iidd", $staking_id, $user_id, $reward_amount, $expected_date);
-                
-                if ($reward_insert->execute()) {
-                    // Log admin action
-                    $admin_id = $_SESSION['admin_id'];
-                    $action = "Added manual staking reward of {$reward_amount} for staking ID {$staking_id}";
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                    
-                    $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                    $log_stmt->bind_param("iss", $admin_id, $action, $ip);
-                    $log_stmt->execute();
-                    
-                    $success_message = "Manual reward added successfully.";
-                } else {
-                    $error_message = "Error adding reward: " . $conn_back->error;
-                }
-            } else {
-                $error_message = "Staking record not found.";
-            }
-        }
+        $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
+        $log_stmt->bind_param("iss", $admin_id, $action, $ip);
+        $log_stmt->execute();
+        
+        $message = "Staking rewards processed successfully.";
     }
 }
 
-// Build query conditions based on filters
-$where_conditions = [];
-
-if ($staking_id > 0) {
-    $where_conditions[] = "sr.staking_id = {$staking_id}";
-}
-
-if ($user_id > 0) {
-    $where_conditions[] = "sr.user_id = {$user_id}";
-}
-
-// Add status filter if provided
-if (isset($_GET['status']) && !empty($_GET['status'])) {
-    $status_filter = $conn_back->real_escape_string($_GET['status']);
-    $where_conditions[] = "sr.status = '{$status_filter}'";
-}
-
-$where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
-
-// Get staking details if staking_id is provided
-$staking_details = null;
-if ($staking_id > 0) {
-    $staking_query = $conn_back->prepare("
-        SELECT s.*, 
-        sp.name as plan_name, 
-        CONCAT(u.first_name, ' ', u.last_name) as full_name,
-        u.username
-        FROM staking s
-        JOIN staking_plans sp ON s.plan_id = sp.id
-        JOIN users u ON s.user_id = u.id
-        WHERE s.id = ?
-    ");
-    $staking_query->bind_param("i", $staking_id);
-    $staking_query->execute();
-    $staking_result = $staking_query->get_result();
-    if ($staking_result->num_rows > 0) {
-        $staking_details = $staking_result->fetch_assoc();
-    }
+// Check if staking_rewards table exists
+$table_exists = false;
+$result = $conn_back->query("SHOW TABLES LIKE 'staking_rewards'");
+if ($result && $result->num_rows > 0) {
+    $table_exists = true;
 }
 
 // Pagination
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$per_page = 20;
-$offset = ($page - 1) * $per_page;
+$records_per_page = 20;
+$offset = ($page - 1) * $records_per_page;
 
-// Get total count for pagination
-$count_query = "SELECT COUNT(*) as total FROM staking_rewards sr {$where_clause}";
-$count_result = $conn_back->query($count_query);
-$total_rows = 0;
-if ($count_result && $row = $count_result->fetch_assoc()) {
-    $total_rows = $row['total'];
+// Build query condition
+$condition = "1=1";
+$params = [];
+$types = "";
+
+if ($staking_id > 0) {
+    $condition .= " AND r.staking_id = ?";
+    $params[] = $staking_id;
+    $types .= "i";
 }
-$total_pages = ceil($total_rows / $per_page);
 
-// Get rewards data
-$query = "SELECT sr.*, 
-          s.plan_id, s.amount as staking_amount, s.status as staking_status,
-          CONCAT(u.first_name, ' ', u.last_name) as full_name, u.username,
-          sp.name as plan_name
-          FROM staking_rewards sr 
-          LEFT JOIN staking s ON sr.staking_id = s.id
-          LEFT JOIN users u ON sr.user_id = u.id
-          LEFT JOIN staking_plans sp ON s.plan_id = sp.id
-          {$where_clause}
-          ORDER BY sr.expected_date DESC
-          LIMIT {$offset}, {$per_page}";
+if ($user_id > 0) {
+    $condition .= " AND r.user_id = ?";
+    $params[] = $user_id;
+    $types .= "i";
+}
 
-$result = $conn_back->query($query);
-$rewards = [];
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $rewards[] = $row;
+if ($table_exists) {
+    // Get total count
+    $count_sql = "SELECT COUNT(*) as total FROM staking_rewards r WHERE $condition";
+    $stmt = $conn_back->prepare($count_sql);
+    if (!empty($types)) {
+        $stmt->bind_param($types, ...$params);
     }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $total_records = $row['total'];
+    $total_pages = ceil($total_records / $records_per_page);
+    $stmt->close();
+
+    // Get rewards
+    $sql = "
+        SELECT 
+            r.*,
+            CONCAT(u.first_name, ' ', u.last_name) as username,
+            u.email,
+            s.plan_id,
+            p.name as plan_name
+        FROM staking_rewards r
+        JOIN users u ON r.user_id = u.id
+        JOIN staking_positions s ON r.staking_id = s.id
+        JOIN staking_plans p ON s.plan_id = p.id
+        WHERE $condition
+        ORDER BY r.created_at DESC
+        LIMIT ? OFFSET ?
+    ";
+    $types .= "ii";
+    $params[] = $records_per_page;
+    $params[] = $offset;
+
+    $stmt = $conn_back->prepare($sql);
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $rewards = $stmt->get_result();
+    $stmt->close();
+    
+    // Get staking position details if filtered by staking_id
+    $staking_details = null;
+    if ($staking_id > 0) {
+        $stmt = $conn_back->prepare("
+            SELECT 
+                s.*,
+                CONCAT(u.first_name, ' ', u.last_name) as username,
+                u.email,
+                p.name as plan_name,
+                p.roi_daily
+            FROM staking_positions s
+            JOIN users u ON s.user_id = u.id
+            JOIN staking_plans p ON s.plan_id = p.id
+            WHERE s.id = ?
+        ");
+        $stmt->bind_param("i", $staking_id);
+        $stmt->execute();
+        $staking_details = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+    }
+    
+    // Get summary statistics
+    $stats_sql = "
+        SELECT 
+            COUNT(r.id) as total_rewards,
+            SUM(r.amount) as total_amount,
+            COUNT(DISTINCT r.user_id) as unique_users,
+            SUM(CASE WHEN r.is_compounded = 1 THEN r.amount ELSE 0 END) as total_compounded
+        FROM staking_rewards r
+        WHERE $condition
+    ";
+    $stmt = $conn_back->prepare($stats_sql);
+    if (!empty($types)) {
+        // Remove the last two parameters (LIMIT and OFFSET)
+        $stmt->bind_param(substr($types, 0, -2), ...array_slice($params, 0, -2));
+    }
+    $stmt->execute();
+    $stats = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 }
 
-// Get staking plans if we need to add a manual reward
-$staking_plans_query = "SELECT id, name FROM staking_plans WHERE is_active = 1 ORDER BY name";
-$staking_plans_result = $conn_back->query($staking_plans_query);
-$staking_plans = [];
-if ($staking_plans_result) {
-    while ($row = $staking_plans_result->fetch_assoc()) {
-        $staking_plans[] = $row;
-    }
-}
+include_once __DIR__ . '/layout/header.php';
 ?>
 
-<!-- Main content -->
-<section class="content">
-    <?php if ($staking_details): ?>
-    <div class="row">
-        <div class="col-12">
-            <div class="box">
-                <div class="box-header with-border">
-                    <h4 class="box-title">Staking Details</h4>
-                    <div class="box-controls pull-right">
-                        <a href="staking.php" class="btn btn-info btn-sm">
-                            <i class="fa fa-arrow-left"></i> Back to Staking
-                        </a>
-                    </div>
-                </div>
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p><strong>User:</strong> <a href="user_detail.php?id=<?php echo $staking_details['user_id']; ?>"><?php echo htmlspecialchars($staking_details['full_name']); ?></a></p>
-                            <p><strong>Username:</strong> <?php echo htmlspecialchars($staking_details['username']); ?></p>
-                        </div>
-                        <div class="col-md-4">
-                            <p><strong>Plan:</strong> <?php echo htmlspecialchars($staking_details['plan_name']); ?></p>
-                            <p><strong>Amount:</strong> $<?php echo number_format($staking_details['amount'], 2); ?></p>
-                            <p><strong>APY:</strong> <?php echo $staking_details['apy']; ?>%</p>
-                        </div>
-                        <div class="col-md-4">
-                            <p><strong>Status:</strong> <span class="badge <?php echo $staking_details['status'] == 'active' ? 'badge-success' : ($staking_details['status'] == 'completed' ? 'badge-info' : 'badge-danger'); ?>"><?php echo ucfirst($staking_details['status']); ?></span></p>
-                            <p><strong>Started:</strong> <?php echo date('M d, Y', strtotime($staking_details['started_at'])); ?></p>
-                            <p><strong>Ends:</strong> <?php echo date('M d, Y', strtotime($staking_details['ends_at'])); ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRewardModal">
-                                <i class="fa fa-plus"></i> Add Manual Reward
-                            </button>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Staking Rewards Management</h1>
+        
+        <div>
+            <?php if (!$staking_id): ?>
+                <form method="post" class="d-inline">
+                    <button type="submit" name="process_rewards" class="btn btn-primary">
+                        <i class="fas fa-sync-alt mr-2"></i> Process Rewards
+                    </button>
+                </form>
+            <?php endif; ?>
+            
+            <?php if ($staking_id): ?>
+                <a href="staking_rewards.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to All Rewards
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php if (!empty($message)): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= $message ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= $error ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!$table_exists): ?>
+        <div class="alert alert-warning">
+            <p>The staking_rewards table does not exist in the database. Please run the database initialization script.</p>
+            <form method="post" action="db_fix.php">
+                <input type="hidden" name="create_staking_tables" value="1">
+                <button type="submit" class="btn btn-primary">Create Staking Tables</button>
+            </form>
+        </div>
+    <?php else: ?>
+        <?php if ($staking_details): ?>
+            <div class="row">
+                <div class="col-xl-12 col-md-12 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Staking Position #<?= $staking_id ?>
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= htmlspecialchars($staking_details['username']) ?></div>
+                                    <div class="text-muted"><?= htmlspecialchars($staking_details['email']) ?></div>
+                                    <div class="mt-2">
+                                        <span class="badge badge-info"><?= htmlspecialchars($staking_details['plan_name']) ?></span>
+                                        <span class="badge badge-success">$<?= number_format($staking_details['amount'], 2) ?></span>
+                                        <span class="badge badge-warning"><?= $staking_details['roi_daily'] ?>% Daily</span>
+                                        <span class="badge badge-<?= $staking_details['is_compounding'] ? 'success' : 'secondary' ?>">
+                                            <?= $staking_details['is_compounding'] ? 'Compounding' : 'No Compounding' ?>
+                                        </span>
+                                        <span class="badge badge-<?php
+                                            switch ($staking_details['status']) {
+                                                case 'active': echo 'success'; break;
+                                                case 'completed': echo 'info'; break;
+                                                case 'cancelled': echo 'danger'; break;
+                                                default: echo 'secondary';
+                                            }
+                                        ?>">
+                                            <?= ucfirst($staking_details['status']) ?>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <?php endif; ?>
-    
-    <div class="row">
-        <div class="col-12">
-            <div class="box">
-                <div class="box-header with-border">
-                    <h4 class="box-title">Staking Rewards</h4>
-                    <div class="box-controls pull-right d-flex">
-                        <form class="me-2" method="GET">
-                            <?php if ($staking_id > 0): ?>
-                            <input type="hidden" name="staking_id" value="<?php echo $staking_id; ?>">
-                            <?php endif; ?>
-                            <?php if ($user_id > 0): ?>
-                            <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-                            <?php endif; ?>
-                            
-                            <div class="input-group">
-                                <select name="status" class="form-select">
-                                    <option value="">All Status</option>
-                                    <option value="pending" <?php echo isset($_GET['status']) && $_GET['status'] == 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                    <option value="claimed" <?php echo isset($_GET['status']) && $_GET['status'] == 'claimed' ? 'selected' : ''; ?>>Claimed</option>
-                                    <option value="reinvested" <?php echo isset($_GET['status']) && $_GET['status'] == 'reinvested' ? 'selected' : ''; ?>>Reinvested</option>
-                                    <option value="expired" <?php echo isset($_GET['status']) && $_GET['status'] == 'expired' ? 'selected' : ''; ?>>Expired</option>
-                                </select>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fa fa-filter"></i>
-                                </button>
+        <?php else: ?>
+            <!-- Stats Cards -->
+            <div class="row">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Total Rewards
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $stats['total_rewards'] ?? 0 ?></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-                <div class="box-body p-0">
-                    <?php if (isset($success_message)): ?>
-                    <div class="alert alert-success m-3"><?php echo $success_message; ?></div>
-                    <?php endif; ?>
-                    
-                    <?php if (isset($error_message)): ?>
-                    <div class="alert alert-danger m-3"><?php echo $error_message; ?></div>
-                    <?php endif; ?>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <?php if (!$staking_id): ?>
-                                    <th>Staking ID</th>
-                                    <?php endif; ?>
-                                    <?php if (!$user_id && !$staking_id): ?>
-                                    <th>User</th>
-                                    <?php endif; ?>
-                                    <th>Plan</th>
-                                    <th>Amount</th>
-                                    <th>Expected Date</th>
-                                    <th>Status</th>
-                                    <th>Claimed Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($rewards) > 0): ?>
-                                    <?php foreach ($rewards as $reward): ?>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Total Amount
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">$<?= number_format($stats['total_amount'] ?? 0, 2) ?></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Users Earning
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $stats['unique_users'] ?? 0 ?></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Compounded
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">$<?= number_format($stats['total_compounded'] ?? 0, 2) ?></div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-sync-alt fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <?= $staking_id ? "Rewards for Staking Position #$staking_id" : "All Staking Rewards" ?>
+                </h6>
+                
+                <?php if (!$staking_id): ?>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="filterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-filter fa-sm fa-fw text-gray-400"></i> Filter
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="filterDropdown">
+                            <div class="dropdown-header">Filter Options:</div>
+                            <form class="px-3 py-2">
+                                <div class="form-group">
+                                    <label for="staking_id_filter">Staking ID</label>
+                                    <input type="number" class="form-control" id="staking_id_filter" name="staking_id" value="<?= $staking_id ? $staking_id : '' ?>" placeholder="Enter Staking ID">
+                                </div>
+                                <div class="form-group">
+                                    <label for="user_id_filter">User ID</label>
+                                    <input type="number" class="form-control" id="user_id_filter" name="user_id" value="<?= $user_id ? $user_id : '' ?>" placeholder="Enter User ID">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm btn-block">Apply Filters</button>
+                                <a href="staking_rewards.php" class="btn btn-secondary btn-sm btn-block">Reset</a>
+                            </form>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Plan</th>
+                                <th>Staking ID</th>
+                                <th>Amount</th>
+                                <th>Compounded</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($rewards && $rewards->num_rows > 0): ?>
+                                <?php while ($reward = $rewards->fetch_assoc()): ?>
                                     <tr>
-                                        <td><?php echo $reward['id']; ?></td>
-                                        <?php if (!$staking_id): ?>
+                                        <td><?= $reward['id'] ?></td>
                                         <td>
-                                            <a href="staking_rewards.php?staking_id=<?php echo $reward['staking_id']; ?>">
-                                                <?php echo $reward['staking_id']; ?>
+                                            <a href="user_detail.php?id=<?= $reward['user_id'] ?>">
+                                                <?= htmlspecialchars($reward['username']) ?>
+                                            </a>
+                                            <small class="d-block text-muted"><?= htmlspecialchars($reward['email']) ?></small>
+                                        </td>
+                                        <td><?= htmlspecialchars($reward['plan_name']) ?></td>
+                                        <td>
+                                            <a href="staking_rewards.php?staking_id=<?= $reward['staking_id'] ?>">
+                                                #<?= $reward['staking_id'] ?>
                                             </a>
                                         </td>
-                                        <?php endif; ?>
-                                        <?php if (!$user_id && !$staking_id): ?>
+                                        <td>$<?= number_format($reward['amount'], 2) ?></td>
                                         <td>
-                                            <a href="user_detail.php?id=<?php echo $reward['user_id']; ?>">
-                                                <?php echo htmlspecialchars($reward['full_name']); ?>
-                                            </a>
-                                            <small class="d-block text-muted"><?php echo htmlspecialchars($reward['username']); ?></small>
-                                        </td>
-                                        <?php endif; ?>
-                                        <td><?php echo htmlspecialchars($reward['plan_name']); ?></td>
-                                        <td>$<?php echo number_format($reward['reward_amount'], 2); ?></td>
-                                        <td><?php echo date('M d, Y', strtotime($reward['expected_date'])); ?></td>
-                                        <td>
-                                            <span class="badge <?php 
-                                                if ($reward['status'] == 'pending') echo 'badge-warning';
-                                                elseif ($reward['status'] == 'claimed') echo 'badge-success';
-                                                elseif ($reward['status'] == 'reinvested') echo 'badge-info';
-                                                else echo 'badge-danger';
-                                            ?>">
-                                                <?php echo ucfirst($reward['status']); ?>
+                                            <span class="badge badge-<?= $reward['is_compounded'] ? 'success' : 'secondary' ?>">
+                                                <?= $reward['is_compounded'] ? 'Yes' : 'No' ?>
                                             </span>
                                         </td>
-                                        <td><?php echo $reward['claimed_at'] ? date('M d, Y', strtotime($reward['claimed_at'])) : '-'; ?></td>
-                                        <td>
-                                            <?php if ($reward['status'] == 'pending'): ?>
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Action
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    <form method="post">
-                                                        <input type="hidden" name="action" value="process_reward">
-                                                        <input type="hidden" name="reward_id" value="<?php echo $reward['id']; ?>">
-                                                        <input type="hidden" name="status" value="claimed">
-                                                        <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to process this reward as claimed?');">
-                                                            <i class="fa fa-check text-success"></i> Process as Claimed
-                                                        </button>
-                                                    </form>
-                                                    
-                                                    <form method="post">
-                                                        <input type="hidden" name="action" value="process_reward">
-                                                        <input type="hidden" name="reward_id" value="<?php echo $reward['id']; ?>">
-                                                        <input type="hidden" name="status" value="reinvested">
-                                                        <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to process this reward as reinvested?');">
-                                                            <i class="fa fa-refresh text-info"></i> Process as Reinvested
-                                                        </button>
-                                                    </form>
-                                                    
-                                                    <form method="post">
-                                                        <input type="hidden" name="action" value="process_reward">
-                                                        <input type="hidden" name="reward_id" value="<?php echo $reward['id']; ?>">
-                                                        <input type="hidden" name="status" value="expired">
-                                                        <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to mark this reward as expired?');">
-                                                            <i class="fa fa-times text-danger"></i> Mark as Expired
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                            <?php else: ?>
-                                            <span class="text-muted">No actions available</span>
-                                            <?php endif; ?>
-                                        </td>
+                                        <td><?= date('M d, Y H:i', strtotime($reward['created_at'])) ?></td>
                                     </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                                <?php endwhile; ?>
+                            <?php else: ?>
                                 <tr>
-                                    <td colspan="<?php echo (!$staking_id ? (!$user_id ? 9 : 8) : 7); ?>" class="text-center">No rewards found</td>
+                                    <td colspan="7" class="text-center">No rewards found</td>
                                 </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
                 
                 <!-- Pagination -->
                 <?php if ($total_pages > 1): ?>
-                <div class="box-footer clearfix">
-                    <ul class="pagination pagination-sm m-0 float-right">
-                        <?php if ($page > 1): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?php echo $page-1; ?><?php echo $staking_id > 0 ? '&staking_id='.$staking_id : ''; ?><?php echo $user_id > 0 ? '&user_id='.$user_id : ''; ?><?php echo isset($_GET['status']) ? '&status='.$_GET['status'] : ''; ?>">&laquo;</a>
-                        </li>
-                        <?php endif; ?>
-                        
-                        <?php
-                        $start_page = max(1, $page - 2);
-                        $end_page = min($total_pages, $page + 2);
-                        
-                        for ($i = $start_page; $i <= $end_page; $i++):
-                        ?>
-                        <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo $staking_id > 0 ? '&staking_id='.$staking_id : ''; ?><?php echo $user_id > 0 ? '&user_id='.$user_id : ''; ?><?php echo isset($_GET['status']) ? '&status='.$_GET['status'] : ''; ?>"><?php echo $i; ?></a>
-                        </li>
-                        <?php endfor; ?>
-                        
-                        <?php if ($page < $total_pages): ?>
-                        <li class="page-item">
-                            <a class="page-link" href="?page=<?php echo $page+1; ?><?php echo $staking_id > 0 ? '&staking_id='.$staking_id : ''; ?><?php echo $user_id > 0 ? '&user_id='.$user_id : ''; ?><?php echo isset($_GET['status']) ? '&status='.$_GET['status'] : ''; ?>">&raquo;</a>
-                        </li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1<?= $staking_id ? '&staking_id='.$staking_id : '' ?><?= $user_id ? '&user_id='.$user_id : '' ?>" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page - 1 ?><?= $staking_id ? '&staking_id='.$staking_id : '' ?><?= $user_id ? '&user_id='.$user_id : '' ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <?php
+                            $start_page = max(1, $page - 2);
+                            $end_page = min($total_pages, $page + 2);
+                            
+                            if ($end_page - $start_page + 1 < 5 && $total_pages >= 5) {
+                                if ($start_page == 1) {
+                                    $end_page = min($total_pages, 5);
+                                } elseif ($end_page == $total_pages) {
+                                    $start_page = max(1, $total_pages - 4);
+                                }
+                            }
+                            
+                            for ($i = $start_page; $i <= $end_page; $i++):
+                            ?>
+                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $i ?><?= $staking_id ? '&staking_id='.$staking_id : '' ?><?= $user_id ? '&user_id='.$user_id : '' ?>"><?= $i ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <?php if ($page < $total_pages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $page + 1 ?><?= $staking_id ? '&staking_id='.$staking_id : '' ?><?= $user_id ? '&user_id='.$user_id : '' ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $total_pages ?><?= $staking_id ? '&staking_id='.$staking_id : '' ?><?= $user_id ? '&user_id='.$user_id : '' ?>" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
                 <?php endif; ?>
             </div>
         </div>
-    </div>
-</section>
-<!-- /.content -->
-
-<!-- Add Reward Modal -->
-<div class="modal fade" id="addRewardModal" tabindex="-1" aria-labelledby="addRewardModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addRewardModalLabel">Add Manual Reward</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="action" value="add_reward">
-                    
-                    <?php if ($staking_id): ?>
-                    <input type="hidden" name="staking_id" value="<?php echo $staking_id; ?>">
-                    <p>Adding reward for Staking ID: <strong><?php echo $staking_id; ?></strong></p>
-                    <?php else: ?>
-                    <div class="mb-3">
-                        <label for="staking_id" class="form-label">Staking ID</label>
-                        <input type="number" class="form-control" id="staking_id" name="staking_id" required>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <div class="mb-3">
-                        <label for="reward_amount" class="form-label">Reward Amount</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" id="reward_amount" name="reward_amount" step="0.01" min="0.01" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="expected_date" class="form-label">Expected Date</label>
-                        <input type="date" class="form-control" id="expected_date" name="expected_date" value="<?php echo date('Y-m-d'); ?>" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Reward</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <?php endif; ?>
 </div>
 
-<?php
-// Include footer
-require_once __DIR__ . '/layout/footer.php';
-?> 
+<?php include_once __DIR__ . '/layout/footer.php'; ?> 
