@@ -13,6 +13,9 @@ function debug_to_console($data) {
     echo "<script>console.log('Debug: " . addslashes($output) . "');</script>";
 }
 
+// Start a buffer to catch any unexpected output
+ob_start();
+
 session_start();
 
 // Check if the admin is logged in
@@ -28,10 +31,18 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 }
 
 $user_id = (int)$_GET['id'];
+debug_to_console("Loading user ID: " . $user_id);
 
 // Include necessary files
 try {
     require_once __DIR__ . '/include/config.php';
+    
+    // Verify database connection
+    if (!isset($conn_back) || !$conn_back) {
+        throw new Exception("Database connection not established. Please check configuration.");
+    }
+    
+    debug_to_console("Database connection established");
     
     // Set current page for menu highlighting
     $current_page = 'users.php';
@@ -39,9 +50,27 @@ try {
     require_once __DIR__ . '/layout/header.php';
     require_once __DIR__ . '/layout/breadcrumb.php';
 } catch (Exception $e) {
+    ob_end_clean(); // Clear the buffer
     echo "Error loading required files: " . $e->getMessage();
+    debug_to_console("Error: " . $e->getMessage());
+    include_once __DIR__ . '/layout/footer.php';
     exit;
 }
+
+// Output a loading indicator to confirm page is rendering
+echo '
+<div id="loading-indicator" class="alert alert-info">
+    Loading user details. If this message persists, please check the browser console for errors.
+    <script>
+        setTimeout(function() {
+            document.getElementById("loading-indicator").style.display = "none";
+        }, 1000);
+    </script>
+</div>
+';
+
+// Discard any previous output that might have occurred from includes
+ob_clean();
 
 // Process form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -90,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $balance_query->bind_param("i", $user_id);
                 $balance_query->execute();
                 $balance_result = $balance_query->get_result();
-                $current_balance = $balance_result->fetch_assoc()['main_balance'];
+                $current_balance = (float)$balance_result->fetch_assoc()['main_balance'];
                 
                 // Calculate new balance
                 $new_balance = $current_balance;
@@ -107,9 +136,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $description = "Admin debit: $reason";
                 }
                 
+                // Convert to integer for database update (since the users table stores balances as integers)
+                $new_balance_int = (int)$new_balance;
+                
                 // Update user balance
                 $balance_update = $conn_back->prepare("UPDATE users SET main_balance = ? WHERE id = ?");
-                $balance_update->bind_param("di", $new_balance, $user_id);
+                $balance_update->bind_param("ii", $new_balance_int, $user_id);
                 $balance_update->execute();
                 
                 // Create transaction record
@@ -132,10 +164,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Commit transaction
                 $conn_back->commit();
                 $success_message = "User balance adjusted successfully.";
+                
+                // Debug success
+                debug_to_console("Balance adjusted successfully: {$current_balance} -> {$new_balance}");
             } catch (Exception $e) {
                 // Rollback on error
                 $conn_back->rollback();
                 $error_message = "Error: " . $e->getMessage();
+                
+                // Debug error
+                debug_to_console("Balance adjustment error: " . $e->getMessage());
             }
         }
     }
@@ -143,37 +181,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Get user data
 try {
+    debug_to_console("Starting user query for ID: " . $user_id);
+    
     $user_query = $conn_back->prepare("
         SELECT u.*, 
         (SELECT COUNT(*) FROM investments WHERE user_id = u.id) as total_investments,
-        (SELECT SUM(amount) FROM transactions WHERE user_id = u.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposits,
-        (SELECT SUM(amount) FROM transactions WHERE user_id = u.id AND transaction_type = 'withdrawal' AND status = 'completed') as total_withdrawals,
-        (SELECT SUM(roi_received) FROM investments WHERE user_id = u.id) as total_earnings
+        (SELECT IFNULL(SUM(amount), 0) FROM transactions WHERE user_id = u.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposits,
+        (SELECT IFNULL(SUM(amount), 0) FROM transactions WHERE user_id = u.id AND transaction_type = 'withdrawal' AND status = 'completed') as total_withdrawals,
+        (SELECT IFNULL(SUM(roi_received), 0) FROM investments WHERE user_id = u.id) as total_earnings
         FROM users u 
         WHERE u.id = ?
     ");
+    
+    if (!$user_query) {
+        throw new Exception("Database error: " . $conn_back->error);
+    }
+    
     $user_query->bind_param("i", $user_id);
-    $user_query->execute();
+    
+    if (!$user_query->execute()) {
+        throw new Exception("Query execution failed: " . $user_query->error);
+    }
+    
     $user_result = $user_query->get_result();
+    debug_to_console("User query executed, found rows: " . $user_result->num_rows);
 
     if ($user_result->num_rows == 0) {
-        header("Location: users.php");
+        debug_to_console("User not found with ID: " . $user_id);
+        echo '<div class="alert alert-danger">User with ID ' . $user_id . ' not found.</div>';
+        require_once __DIR__ . '/layout/footer.php';
         exit();
     }
 
     $user = $user_result->fetch_assoc();
+    debug_to_console("User data fetched successfully");
     
-    // Debug output
-    debug_to_console("User data loaded successfully");
+    // Convert integer balance fields to decimal format for display
+    $user['main_balance'] = isset($user['main_balance']) ? (float)$user['main_balance'] : 0;
+    $user['investment_balance'] = isset($user['investment_balance']) ? (float)$user['investment_balance'] : 0;
+    $user['staking_balance'] = isset($user['staking_balance']) ? (float)$user['staking_balance'] : 0;
+    
+    // Debug output of available user fields
+    debug_to_console("User data fields: " . json_encode(array_keys($user)));
+    debug_to_console("Main balance: " . $user['main_balance']);
     
 } catch (Exception $e) {
     echo '<div class="alert alert-danger">Error loading user: ' . $e->getMessage() . '</div>';
     debug_to_console("Error: " . $e->getMessage());
+    require_once __DIR__ . '/layout/footer.php';
     exit;
 }
 
 // Get recent transactions
 try {
+    debug_to_console("Starting transactions query for user ID: " . $user_id);
+    
     $transactions_query = $conn_back->prepare("
         SELECT transaction_type, amount, status, description, date_time
         FROM transactions 
@@ -181,15 +243,27 @@ try {
         ORDER BY date_time DESC 
         LIMIT 10
     ");
-    $transactions_query->bind_param("i", $user_id);
-    $transactions_query->execute();
-    $transactions_result = $transactions_query->get_result();
-    $transactions = [];
-    while ($tx = $transactions_result->fetch_assoc()) {
-        $transactions[] = $tx;
+    
+    if (!$transactions_query) {
+        throw new Exception("Transactions query error: " . $conn_back->error);
     }
     
-    debug_to_console("Transactions loaded successfully: " . count($transactions));
+    $transactions_query->bind_param("i", $user_id);
+    
+    if (!$transactions_query->execute()) {
+        throw new Exception("Transactions query execution failed: " . $transactions_query->error);
+    }
+    
+    $transactions_result = $transactions_query->get_result();
+    $transactions = [];
+    $count = 0;
+    
+    while ($tx = $transactions_result->fetch_assoc()) {
+        $transactions[] = $tx;
+        $count++;
+    }
+    
+    debug_to_console("Transactions loaded: {$count}");
 } catch (Exception $e) {
     echo '<div class="alert alert-danger">Error loading transactions: ' . $e->getMessage() . '</div>';
     debug_to_console("Error loading transactions: " . $e->getMessage());
@@ -198,6 +272,8 @@ try {
 
 // Get investments
 try {
+    debug_to_console("Starting investments query for user ID: " . $user_id);
+    
     $investments_query = $conn_back->prepare("
         SELECT i.*, p.name as plan_name
         FROM investments i
@@ -206,19 +282,35 @@ try {
         ORDER BY i.created_at DESC
         LIMIT 10
     ");
-    $investments_query->bind_param("i", $user_id);
-    $investments_query->execute();
-    $investments_result = $investments_query->get_result();
-    $investments = [];
-    while ($inv = $investments_result->fetch_assoc()) {
-        $investments[] = $inv;
+    
+    if (!$investments_query) {
+        throw new Exception("Investments query error: " . $conn_back->error);
     }
     
-    debug_to_console("Investments loaded successfully: " . count($investments));
+    $investments_query->bind_param("i", $user_id);
+    
+    if (!$investments_query->execute()) {
+        throw new Exception("Investments query execution failed: " . $investments_query->error);
+    }
+    
+    $investments_result = $investments_query->get_result();
+    $investments = [];
+    $count = 0;
+    
+    while ($inv = $investments_result->fetch_assoc()) {
+        $investments[] = $inv;
+        $count++;
+    }
+    
+    debug_to_console("Investments loaded: {$count}");
 } catch (Exception $e) {
     echo '<div class="alert alert-danger">Error loading investments: ' . $e->getMessage() . '</div>';
     debug_to_console("Error loading investments: " . $e->getMessage());
     $investments = [];
+}
+// End any open output buffering to make sure content is displayed
+if (ob_get_level() > 0) {
+    ob_end_flush();
 }
 ?>
 
@@ -344,7 +436,7 @@ try {
                                             <tr>
                                                 <th>Current Balance</th>
                                                 <td>
-                                                    <strong>$<?php echo isset($user['main_balance']) ? number_format($user['main_balance'], 2) : '0.00'; ?></strong>
+                                                    <strong>$<?php echo number_format($user['main_balance'], 2); ?></strong>
                                                     <button type="button" class="btn btn-xs btn-primary ml-2" data-bs-toggle="modal" data-bs-target="#adjustBalanceModal">
                                                         Adjust
                                                     </button>
@@ -352,19 +444,19 @@ try {
                                             </tr>
                                             <tr>
                                                 <th>Total Deposits</th>
-                                                <td>$<?php echo isset($user['total_deposits']) ? number_format($user['total_deposits'] ?? 0, 2) : '0.00'; ?></td>
+                                                <td>$<?php echo number_format($user['total_deposits'] ?? 0, 2); ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Total Withdrawals</th>
-                                                <td>$<?php echo isset($user['total_withdrawals']) ? number_format($user['total_withdrawals'] ?? 0, 2) : '0.00'; ?></td>
+                                                <td>$<?php echo number_format($user['total_withdrawals'] ?? 0, 2); ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Total Investments</th>
-                                                <td><?php echo isset($user['total_investments']) ? ($user['total_investments'] ?? 0) : '0'; ?></td>
+                                                <td><?php echo $user['total_investments'] ?? 0; ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Total Earnings</th>
-                                                <td>$<?php echo isset($user['total_earnings']) ? number_format($user['total_earnings'] ?? 0, 2) : '0.00'; ?></td>
+                                                <td>$<?php echo number_format($user['total_earnings'] ?? 0, 2); ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Referrer</th>
