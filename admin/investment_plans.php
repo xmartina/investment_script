@@ -172,7 +172,7 @@ include_once __DIR__ . '/layout/header.php';
         <?php foreach ($plans as $plan): ?>
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #f8f9fc;">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                         <h6 class="m-0 font-weight-bold text-primary text-truncate" style="max-width: 70%;" title="<?= htmlspecialchars($plan['name']) ?>"><?= htmlspecialchars($plan['name']) ?></h6>
                         <div>
                             <?php if ($plan['featured']): ?>
@@ -185,7 +185,7 @@ include_once __DIR__ . '/layout/header.php';
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="card-body" style="min-height: 350px; overflow: hidden;">
+                    <div class="card-body" style="min-height: 350px; overflow: hidden; background-color: #4e73df; color: #ffffff;">
                         <!-- Plan Type and Category Info -->
                         <div class="d-flex justify-content-between mb-3">
                             <span class="badge badge-info"><?= htmlspecialchars($plan['plan_type']) ?></span>
@@ -195,25 +195,25 @@ include_once __DIR__ . '/layout/header.php';
                         <!-- ROI Info with Icon -->
                         <div class="row no-gutters align-items-center mb-3">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Return Rate</div>
-                                <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $plan['roi_percent'] ?>%</div>
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Return Rate</div>
+                                <div class="h4 mb-0 font-weight-bold text-white"><?= $plan['roi_percent'] ?>%</div>
                             </div>
                             <div class="col-auto">
-                                <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                                <i class="fas fa-chart-line fa-2x text-white"></i>
                             </div>
                         </div>
                         
-                        <hr class="my-2">
+                        <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
                         
                         <!-- Duration and Risk Level -->
                         <div class="row mb-3">
                             <div class="col-6">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
-                                <div class="font-weight-bold"><?= $plan['duration_days'] ?? 0 ?> Days</div>
+                                <div class="font-weight-bold text-white"><?= $plan['duration_days'] ?? 0 ?> Days</div>
                             </div>
                             <div class="col-6">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Risk Level</div>
-                                <div class="font-weight-bold text-truncate" title="<?= htmlspecialchars($plan['risk_level']) ?>"><?= htmlspecialchars($plan['risk_level']) ?></div>
+                                <div class="font-weight-bold text-white text-truncate" title="<?= htmlspecialchars($plan['risk_level']) ?>"><?= htmlspecialchars($plan['risk_level']) ?></div>
                             </div>
                         </div>
                         
@@ -221,11 +221,11 @@ include_once __DIR__ . '/layout/header.php';
                         <div class="row mb-3">
                             <div class="col-6">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Min Investment</div>
-                                <div class="font-weight-bold">$<?= number_format($plan['min_amount'], 2) ?></div>
+                                <div class="font-weight-bold text-white">$<?= number_format($plan['min_amount'], 2) ?></div>
                             </div>
                             <div class="col-6">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Max Investment</div>
-                                <div class="font-weight-bold">
+                                <div class="font-weight-bold text-white">
                                     <?php if ($plan['max_amount'] > 0): ?>
                                         $<?= number_format($plan['max_amount'], 2) ?>
                                     <?php else: ?>
@@ -238,18 +238,20 @@ include_once __DIR__ . '/layout/header.php';
                         <!-- Return Interval -->
                         <div class="mb-3">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Return Interval</div>
-                            <div class="font-weight-bold"><?= htmlspecialchars($plan['return_interval']) ?></div>
+                            <div class="font-weight-bold text-white"><?= htmlspecialchars($plan['return_interval']) ?></div>
                         </div>
                         
                         <?php if (!empty($plan['description'])): ?>
-                            <hr class="my-2">
+                            <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
                             <div class="mb-0">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
-                                <p class="mb-0 text-muted" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"><?= nl2br(htmlspecialchars($plan['description'] ?? '')) ?></p>
+                                <div class="description-container mt-2 mb-2">
+                                    <p class="mb-0" style="color: #ffffff; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"><?= nl2br(htmlspecialchars($plan['description'] ?? '')) ?></p>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
-                    <div class="card-footer py-2" style="background-color: #f8f9fc;">
+                    <div class="card-footer py-2">
                         <div class="d-flex justify-content-between">
                             <button class="btn btn-primary btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" 
                                     data-id="<?= $plan['id'] ?>"
