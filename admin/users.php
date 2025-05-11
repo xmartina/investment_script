@@ -26,34 +26,6 @@ try {
     exit;
 }
 
-// Process user status change if requested
-if (isset($_POST['action']) && $_POST['action'] == 'change_status' && isset($_POST['user_id'])) {
-    $user_id = (int)$_POST['user_id'];
-    $new_status = $conn_back->real_escape_string($_POST['status']);
-    
-    if (in_array($new_status, ['active', 'suspended', 'blocked'])) {
-        $stmt = $conn_back->prepare("UPDATE users SET status = ? WHERE id = ?");
-        $stmt->bind_param("si", $new_status, $user_id);
-        
-        if ($stmt->execute()) {
-            // Log the action
-            $admin_id = $_SESSION['admin_id'];
-            $action = "Changed user ID {$user_id} status to {$new_status}";
-            $ip = $_SERVER['REMOTE_ADDR'];
-            
-            $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-            $log_stmt->bind_param("iss", $admin_id, $action, $ip);
-            $log_stmt->execute();
-            
-            $success_message = "User status updated successfully.";
-        } else {
-            $error_message = "Failed to update user status: " . $conn_back->error;
-        }
-    } else {
-        $error_message = "Invalid status value.";
-    }
-}
-
 // Handle search and pagination
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -67,8 +39,7 @@ if (!empty($search)) {
     $where_clause = "WHERE 
                     first_name LIKE '%{$search_term}%' OR 
                     last_name LIKE '%{$search_term}%' OR 
-                    email LIKE '%{$search_term}%' OR 
-                    username LIKE '%{$search_term}%'";
+                    email LIKE '%{$search_term}%'";
 }
 
 // Get total count for pagination
@@ -81,8 +52,9 @@ if ($count_result && $row = $count_result->fetch_assoc()) {
 $total_pages = ceil($total_rows / $per_page);
 
 // Get users data with pagination
-$query = "SELECT id, username, email, CONCAT(first_name, ' ', last_name) as full_name, 
-          phone, status, created_at, (SELECT SUM(amount) FROM transactions 
+$query = "SELECT id, email, CONCAT(first_name, ' ', last_name) as full_name, 
+          phone, created_at, main_balance, investment_balance, staking_balance,
+          (SELECT SUM(amount) FROM transactions 
           WHERE user_id = users.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposit
           FROM users {$where_clause}
           ORDER BY created_at DESC
@@ -134,7 +106,7 @@ if ($result) {
                                     <th>User</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Status</th>
+                                    <th>Balance</th>
                                     <th>Total Deposit</th>
                                     <th>Registered On</th>
                                     <th>Actions</th>
@@ -149,19 +121,14 @@ if ($result) {
                                             <a href="user_detail.php?id=<?php echo $user['id']; ?>">
                                                 <?php echo htmlspecialchars($user['full_name']); ?>
                                             </a>
-                                            <small class="d-block text-muted"><?php echo htmlspecialchars($user['username']); ?></small>
                                         </td>
                                         <td><?php echo htmlspecialchars($user['email']); ?></td>
                                         <td><?php echo htmlspecialchars($user['phone'] ?? 'N/A'); ?></td>
                                         <td>
-                                            <span class="badge 
-                                                <?php 
-                                                if ($user['status'] == 'active') echo 'badge-success';
-                                                elseif ($user['status'] == 'pending') echo 'badge-warning';
-                                                else echo 'badge-danger';
-                                                ?>">
-                                                <?php echo ucfirst($user['status']); ?>
-                                            </span>
+                                            <?php
+                                            // Display account balance instead of status
+                                            echo '$' . number_format($user['main_balance'], 2);
+                                            ?>
                                         </td>
                                         <td>$<?php echo number_format($user['total_deposit'], 2); ?></td>
                                         <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
@@ -174,38 +141,9 @@ if ($result) {
                                                     <a class="dropdown-item" href="user_detail.php?id=<?php echo $user['id']; ?>">
                                                         <i class="fa fa-eye"></i> View Details
                                                     </a>
-                                                    <?php if ($user['status'] != 'active'): ?>
-                                                    <form method="post" style="display:inline;">
-                                                        <input type="hidden" name="action" value="change_status">
-                                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                                        <input type="hidden" name="status" value="active">
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fa fa-check"></i> Activate
-                                                        </button>
-                                                    </form>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if ($user['status'] != 'suspended'): ?>
-                                                    <form method="post" style="display:inline;">
-                                                        <input type="hidden" name="action" value="change_status">
-                                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                                        <input type="hidden" name="status" value="suspended">
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fa fa-pause"></i> Suspend
-                                                        </button>
-                                                    </form>
-                                                    <?php endif; ?>
-                                                    
-                                                    <?php if ($user['status'] != 'blocked'): ?>
-                                                    <form method="post" style="display:inline;">
-                                                        <input type="hidden" name="action" value="change_status">
-                                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                                        <input type="hidden" name="status" value="blocked">
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fa fa-ban"></i> Block
-                                                        </button>
-                                                    </form>
-                                                    <?php endif; ?>
+                                                    <a class="dropdown-item" href="edit_user.php?id=<?php echo $user['id']; ?>">
+                                                        <i class="fa fa-edit"></i> Edit
+                                                    </a>
                                                 </div>
                                             </div>
                                         </td>
