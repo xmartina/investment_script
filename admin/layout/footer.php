@@ -265,6 +265,56 @@
             // Remove the old attribute to prevent conflicts
             // button.removeAttribute('data-dismiss');
         });
+        
+        // Handle dropdowns - convert Bootstrap 4 dropdowns to Bootstrap 5
+        const dropdownTriggers = document.querySelectorAll('[data-toggle="dropdown"]');
+        dropdownTriggers.forEach(trigger => {
+            trigger.setAttribute('data-bs-toggle', 'dropdown');
+            // Remove the old attribute to prevent conflicts
+            // trigger.removeAttribute('data-toggle');
+            
+            // Initialize Bootstrap 5 dropdown
+            if (typeof bootstrap !== 'undefined') {
+                try {
+                    new bootstrap.Dropdown(trigger);
+                } catch (e) {
+                    console.error('Error initializing dropdown:', e);
+                }
+            }
+        });
+        
+        // Fix for dropdown buttons that need manual initialization
+        document.querySelectorAll('.dropdown-toggle').forEach(function(dropdown) {
+            // Check if already has an instance
+            if (typeof bootstrap !== 'undefined') {
+                try {
+                    if (!bootstrap.Dropdown.getInstance(dropdown)) {
+                        const instance = new bootstrap.Dropdown(dropdown);
+                        
+                        // Add click event listener to ensure it works
+                        dropdown.addEventListener('click', function(e) {
+                            if (!dropdown.classList.contains('show')) {
+                                instance.show();
+                            } else {
+                                instance.hide();
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error with dropdown:', e);
+                }
+            }
+        });
+        
+        // Handle push-menu
+        const pushMenuTriggers = document.querySelectorAll('[data-toggle="push-menu"]');
+        pushMenuTriggers.forEach(trigger => {
+            trigger.setAttribute('data-bs-toggle', 'push-menu');
+            // Remove the old attribute after a small delay to prevent conflicts
+            setTimeout(() => {
+                trigger.removeAttribute('data-toggle');
+            }, 1000);
+        });
     });
 </script>
 

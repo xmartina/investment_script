@@ -134,17 +134,17 @@ if ($result) {
                                         <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
                                         <td>
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <button type="button" class="btn btn-info btn-sm dropdown-toggle" id="actionDropdown-<?php echo $user['id']; ?>" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Action
                                                 </button>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="user_detail.php?id=<?php echo $user['id']; ?>">
+                                                <ul class="dropdown-menu" aria-labelledby="actionDropdown-<?php echo $user['id']; ?>">
+                                                    <li><a class="dropdown-item" href="user_detail.php?id=<?php echo $user['id']; ?>">
                                                         <i class="fa fa-eye"></i> View Details
-                                                    </a>
-                                                    <a class="dropdown-item" href="edit_user.php?id=<?php echo $user['id']; ?>">
+                                                    </a></li>
+                                                    <li><a class="dropdown-item" href="edit_user.php?id=<?php echo $user['id']; ?>">
                                                         <i class="fa fa-edit"></i> Edit
-                                                    </a>
-                                                </div>
+                                                    </a></li>
+                                                </ul>
                                             </div>
                                         </td>
                                     </tr>
@@ -193,6 +193,35 @@ if ($result) {
     </div>
 </section>
 <!-- /.content -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap 5 dropdowns specifically for this page
+    var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+    dropdownElementList.forEach(function(dropdownToggleEl) {
+        try {
+            new bootstrap.Dropdown(dropdownToggleEl);
+        } catch (e) {
+            console.error('Error initializing dropdown:', e);
+        }
+    });
+    
+    // Add click event listeners to ensure dropdowns open on click
+    document.querySelectorAll('.dropdown-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var dropdown = bootstrap.Dropdown.getInstance(this);
+            if (dropdown) {
+                dropdown.toggle();
+            } else {
+                var newDropdown = new bootstrap.Dropdown(this);
+                newDropdown.toggle();
+            }
+        });
+    });
+});
+</script>
 
 <?php
 // Include footer

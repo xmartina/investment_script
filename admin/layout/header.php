@@ -70,7 +70,7 @@
             <div class="app-menu">
                 <ul class="header-megamenu nav">
                     <li class="btn-group nav-item">
-                        <a href="#" class="waves-effect waves-light nav-link push-btn btn-primary-light" data-toggle="push-menu" role="button">
+                        <a href="#" class="waves-effect waves-light nav-link push-btn btn-primary-light" data-bs-toggle="push-menu" role="button">
                             <i data-feather="align-left"></i>
                         </a>
                     </li>
