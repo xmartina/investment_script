@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Debug output function
+// Debug function - will be displayed inline in the page
 function debug_to_console($data) {
     $output = $data;
     if (is_array($output)) {
@@ -34,22 +34,6 @@ require_once __DIR__ . '/include/config.php';
 
 // Set current page for menu highlighting
 $current_page = 'users.php';
-
-// Include the header and breadcrumb before any output
-require_once __DIR__ . '/layout/header.php';
-require_once __DIR__ . '/layout/breadcrumb.php';
-
-// Output a loading indicator to confirm page is rendering
-echo '
-<div id="loading-indicator" class="alert alert-info">
-    Loading user details. If this message persists, please check the browser console for errors.
-    <script>
-        setTimeout(function() {
-            document.getElementById("loading-indicator").style.display = "none";
-        }, 1000);
-    </script>
-</div>
-';
 
 // Process form submissions
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -83,11 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 } else {
                     // Status column doesn't exist, update the interface to reflect this
                     $error_message = "Status column does not exist in the users table. This feature is not available.";
-                    debug_to_console("Status column not found in users table");
                 }
             } catch (Exception $e) {
                 $error_message = "Error checking status column: " . $e->getMessage();
-                debug_to_console("Error: " . $e->getMessage());
             }
         } else {
             $error_message = "Invalid status value.";
@@ -158,15 +140,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $conn_back->commit();
                 $success_message = "User balance adjusted successfully.";
                 
-                // Debug success
-                debug_to_console("Balance adjusted successfully: {$current_balance} -> {$new_balance}");
             } catch (Exception $e) {
                 // Rollback on error
                 $conn_back->rollback();
                 $error_message = "Error: " . $e->getMessage();
-                
-                // Debug error
-                debug_to_console("Balance adjustment error: " . $e->getMessage());
             }
         }
     }
@@ -174,8 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 // Get user data
 try {
-    debug_to_console("Starting user query for ID: " . $user_id);
-    
     $user_query = $conn_back->prepare("
         SELECT u.id, u.first_name, u.last_name, u.email, u.phone, 
                u.profile_photo, u.pin, u.main_balance, u.investment_balance, 
@@ -200,41 +175,39 @@ try {
     }
     
     $user_result = $user_query->get_result();
-    debug_to_console("User query executed, found rows: " . $user_result->num_rows);
 
     if ($user_result->num_rows == 0) {
-        debug_to_console("User not found with ID: " . $user_id);
-        echo '<div class="alert alert-danger">User with ID ' . $user_id . ' not found.</div>';
-        include_once __DIR__ . '/layout/footer.php';
+        // No user found
+        $error_message = "User with ID " . $user_id . " not found.";
+        
+        // Include header and breadcrumb
+        require_once __DIR__ . '/layout/header.php';
+        require_once __DIR__ . '/layout/breadcrumb.php';
+        
+        echo '<div class="alert alert-danger">' . $error_message . '</div>';
+        require_once __DIR__ . '/layout/footer.php';
         exit();
     }
 
     $user = $user_result->fetch_assoc();
-    debug_to_console("User data fetched successfully");
-    
-    // Print all available user fields for debugging
-    debug_to_console("User data array keys: " . implode(", ", array_keys($user)));
     
     // Convert integer balance fields to decimal format for display
     $user['main_balance'] = isset($user['main_balance']) ? (float)$user['main_balance'] : 0;
     $user['investment_balance'] = isset($user['investment_balance']) ? (float)$user['investment_balance'] : 0;
     $user['staking_balance'] = isset($user['staking_balance']) ? (float)$user['staking_balance'] : 0;
     
-    // Debug output of available user fields
-    debug_to_console("User data fields: " . json_encode(array_keys($user)));
-    debug_to_console("Main balance: " . $user['main_balance']);
-    
 } catch (Exception $e) {
+    // Include header and breadcrumb
+    require_once __DIR__ . '/layout/header.php';
+    require_once __DIR__ . '/layout/breadcrumb.php';
+    
     echo '<div class="alert alert-danger">Error loading user: ' . $e->getMessage() . '</div>';
-    debug_to_console("Error: " . $e->getMessage());
-    include_once __DIR__ . '/layout/footer.php';
+    require_once __DIR__ . '/layout/footer.php';
     exit;
 }
 
 // Get recent transactions
 try {
-    debug_to_console("Starting transactions query for user ID: " . $user_id);
-    
     $transactions_query = $conn_back->prepare("
         SELECT transaction_type, amount, status, description, date_time
         FROM transactions 
@@ -255,24 +228,17 @@ try {
     
     $transactions_result = $transactions_query->get_result();
     $transactions = [];
-    $count = 0;
     
     while ($tx = $transactions_result->fetch_assoc()) {
         $transactions[] = $tx;
-        $count++;
     }
     
-    debug_to_console("Transactions loaded: {$count}");
 } catch (Exception $e) {
-    echo '<div class="alert alert-danger">Error loading transactions: ' . $e->getMessage() . '</div>';
-    debug_to_console("Error loading transactions: " . $e->getMessage());
     $transactions = [];
 }
 
 // Get investments
 try {
-    debug_to_console("Starting investments query for user ID: " . $user_id);
-    
     $investments_query = $conn_back->prepare("
         SELECT i.id, i.user_id, i.plan_id, i.amount, i.expected_returns, 
                i.roi_percentage, i.created_at, i.status, i.started_at, i.ends_at,
@@ -296,21 +262,18 @@ try {
     
     $investments_result = $investments_query->get_result();
     $investments = [];
-    $count = 0;
     
     while ($inv = $investments_result->fetch_assoc()) {
         $investments[] = $inv;
-        $count++;
     }
     
-    debug_to_console("Investments loaded: {$count}");
 } catch (Exception $e) {
-    echo '<div class="alert alert-danger">Error loading investments: ' . $e->getMessage() . '</div>';
-    debug_to_console("Error loading investments: " . $e->getMessage());
     $investments = [];
 }
-// End of page
-debug_to_console("Page rendering complete");
+
+// Include header and breadcrumb AFTER fetching data but before rendering content
+require_once __DIR__ . '/layout/header.php';
+require_once __DIR__ . '/layout/breadcrumb.php';
 ?>
 
 <!-- Main content -->
@@ -359,7 +322,7 @@ debug_to_console("Page rendering complete");
                                             <tr>
                                                 <th>Status</th>
                                                 <td>
-                                                    <?php
+                                                    <?php 
                                                     // Check if status column exists in the users table 
                                                     $status_feature_available = false;
                                                     $status = 'unknown';
@@ -373,7 +336,6 @@ debug_to_console("Page rendering complete");
                                                             $status = $user['status'];
                                                         }
                                                     } catch (Exception $e) {
-                                                        debug_to_console("Error checking status column: " . $e->getMessage());
                                                         $status_feature_available = false;
                                                     }
                                                     
@@ -711,6 +673,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <?php
-// Include footer - must be the last PHP code section
+// Include footer
 require_once __DIR__ . '/layout/footer.php';
 ?> 
