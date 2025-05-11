@@ -142,6 +142,23 @@ if ($result->num_rows > 0) {
 include_once __DIR__ . '/layout/header.php';
 ?>
 
+<style>
+.plan-card-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+    height: 100%;
+}
+.plan-card {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.2s;
+}
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
+
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Investment Plans Management</h1>
@@ -170,110 +187,112 @@ include_once __DIR__ . '/layout/header.php';
 
     <div class="row gy-4">
         <?php foreach ($plans as $plan): ?>
-            <div class="col-lg-4 col-md-6 mb-5">
-                <div class="card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary text-truncate" style="max-width: 70%;" title="<?= htmlspecialchars($plan['name']) ?>"><?= htmlspecialchars($plan['name']) ?></h6>
-                        <div>
-                            <?php if ($plan['featured']): ?>
-                                <span class="badge badge-primary">Featured</span>
-                            <?php endif; ?>
-                            <?php if ($plan['is_active']): ?>
-                                <span class="badge badge-success">Active</span>
-                            <?php else: ?>
-                                <span class="badge badge-secondary">Inactive</span>
-                            <?php endif; ?>
+            <div class="col-lg-4 col-md-6">
+                <div class="plan-card-wrapper">
+                    <div class="card plan-card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary text-truncate" style="max-width: 70%;" title="<?= htmlspecialchars($plan['name']) ?>"><?= htmlspecialchars($plan['name']) ?></h6>
+                            <div>
+                                <?php if ($plan['featured']): ?>
+                                    <span class="badge badge-primary">Featured</span>
+                                <?php endif; ?>
+                                <?php if ($plan['is_active']): ?>
+                                    <span class="badge badge-success">Active</span>
+                                <?php else: ?>
+                                    <span class="badge badge-secondary">Inactive</span>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-body" style="min-height: 350px; overflow: hidden; background-color: #4e73df; color: #ffffff;">
-                        <!-- Plan Type and Category Info -->
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="badge badge-info"><?= htmlspecialchars($plan['plan_type']) ?></span>
-                            <span class="badge badge-secondary"><?= htmlspecialchars($plan['category']) ?></span>
-                        </div>
+                        <div class="card-body" style="min-height: 350px; overflow: hidden; background-color: #4e73df; color: #ffffff;">
+                            <!-- Plan Type and Category Info -->
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="badge badge-info"><?= htmlspecialchars($plan['plan_type']) ?></span>
+                                <span class="badge badge-secondary"><?= htmlspecialchars($plan['category']) ?></span>
+                            </div>
 
-                        <!-- ROI Info with Icon -->
-                        <div class="row no-gutters align-items-center mb-3">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Return Rate</div>
-                                <div class="h4 mb-0 font-weight-bold text-white"><?= $plan['roi_percent'] ?>%</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-chart-line fa-2x text-white"></i>
-                            </div>
-                        </div>
-                        
-                        <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
-                        
-                        <!-- Duration and Risk Level -->
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
-                                <div class="font-weight-bold text-white"><?= $plan['duration_days'] ?? 0 ?> Days</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Risk Level</div>
-                                <div class="font-weight-bold text-white text-truncate" title="<?= htmlspecialchars($plan['risk_level']) ?>"><?= htmlspecialchars($plan['risk_level']) ?></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Investment Range -->
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Min Investment</div>
-                                <div class="font-weight-bold text-white">$<?= number_format($plan['min_amount'], 2) ?></div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Max Investment</div>
-                                <div class="font-weight-bold text-white">
-                                    <?php if ($plan['max_amount'] > 0): ?>
-                                        $<?= number_format($plan['max_amount'], 2) ?>
-                                    <?php else: ?>
-                                        Unlimited
-                                    <?php endif; ?>
+                            <!-- ROI Info with Icon -->
+                            <div class="row no-gutters align-items-center mb-3">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Return Rate</div>
+                                    <div class="h4 mb-0 font-weight-bold text-white"><?= $plan['roi_percent'] ?>%</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-chart-line fa-2x text-white"></i>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Return Interval -->
-                        <div class="mb-3">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Return Interval</div>
-                            <div class="font-weight-bold text-white"><?= htmlspecialchars($plan['return_interval']) ?></div>
-                        </div>
-                        
-                        <?php if (!empty($plan['description'])): ?>
+                            
                             <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
-                            <div class="mb-0">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
-                                <div class="description-container mt-2 mb-2">
-                                    <p class="mb-0" style="color: #ffffff; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"><?= nl2br(htmlspecialchars($plan['description'] ?? '')) ?></p>
+                            
+                            <!-- Duration and Risk Level -->
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
+                                    <div class="font-weight-bold text-white"><?= $plan['duration_days'] ?? 0 ?> Days</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Risk Level</div>
+                                    <div class="font-weight-bold text-white text-truncate" title="<?= htmlspecialchars($plan['risk_level']) ?>"><?= htmlspecialchars($plan['risk_level']) ?></div>
                                 </div>
                             </div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="card-footer py-2">
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-primary btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" 
-                                    data-id="<?= $plan['id'] ?>"
-                                    data-name="<?= htmlspecialchars($plan['name']) ?>"
-                                    data-description="<?= htmlspecialchars($plan['description'] ?? '') ?>"
-                                    data-min="<?= $plan['min_amount'] ?>"
-                                    data-max="<?= $plan['max_amount'] ?>"
-                                    data-rate="<?= $plan['roi_percent'] ?>"
-                                    data-duration="<?= $plan['duration_days'] ?>"
-                                    data-status="<?= $plan['is_active'] ?? 0 ?>"
-                                    data-featured="<?= $plan['featured'] ?>"
-                                    data-plan-type="<?= htmlspecialchars($plan['plan_type']) ?>"
-                                    data-category="<?= htmlspecialchars($plan['category']) ?>"
-                                    data-risk-level="<?= htmlspecialchars($plan['risk_level']) ?>"
-                                    data-return-interval="<?= htmlspecialchars($plan['return_interval']) ?>">
-                                <i class="fas fa-edit mr-1"></i> Edit
-                            </button>
-                            <button class="btn btn-danger btn-sm delete-plan" data-toggle="modal" data-target="#deletePlanModal" 
-                                    data-id="<?= $plan['id'] ?>" 
-                                    data-name="<?= htmlspecialchars($plan['name']) ?>">
-                                <i class="fas fa-trash mr-1"></i> Delete
-                            </button>
+                            
+                            <!-- Investment Range -->
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Min Investment</div>
+                                    <div class="font-weight-bold text-white">$<?= number_format($plan['min_amount'], 2) ?></div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Max Investment</div>
+                                    <div class="font-weight-bold text-white">
+                                        <?php if ($plan['max_amount'] > 0): ?>
+                                            $<?= number_format($plan['max_amount'], 2) ?>
+                                        <?php else: ?>
+                                            Unlimited
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Return Interval -->
+                            <div class="mb-3">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Return Interval</div>
+                                <div class="font-weight-bold text-white"><?= htmlspecialchars($plan['return_interval']) ?></div>
+                            </div>
+                            
+                            <?php if (!empty($plan['description'])): ?>
+                                <hr class="my-2" style="border-color: rgba(255,255,255,0.2);">
+                                <div class="mb-0">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
+                                    <div class="description-container mt-2 mb-2">
+                                        <p class="mb-0" style="color: #ffffff; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"><?= nl2br(htmlspecialchars($plan['description'] ?? '')) ?></p>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="card-footer py-2">
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-primary btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" 
+                                        data-id="<?= $plan['id'] ?>"
+                                        data-name="<?= htmlspecialchars($plan['name']) ?>"
+                                        data-description="<?= htmlspecialchars($plan['description'] ?? '') ?>"
+                                        data-min="<?= $plan['min_amount'] ?>"
+                                        data-max="<?= $plan['max_amount'] ?>"
+                                        data-rate="<?= $plan['roi_percent'] ?>"
+                                        data-duration="<?= $plan['duration_days'] ?>"
+                                        data-status="<?= $plan['is_active'] ?? 0 ?>"
+                                        data-featured="<?= $plan['featured'] ?>"
+                                        data-plan-type="<?= htmlspecialchars($plan['plan_type']) ?>"
+                                        data-category="<?= htmlspecialchars($plan['category']) ?>"
+                                        data-risk-level="<?= htmlspecialchars($plan['risk_level']) ?>"
+                                        data-return-interval="<?= htmlspecialchars($plan['return_interval']) ?>">
+                                    <i class="fas fa-edit mr-1"></i> Edit
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-plan" data-toggle="modal" data-target="#deletePlanModal" 
+                                        data-id="<?= $plan['id'] ?>" 
+                                        data-name="<?= htmlspecialchars($plan['name']) ?>">
+                                    <i class="fas fa-trash mr-1"></i> Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
