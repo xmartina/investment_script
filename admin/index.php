@@ -14,9 +14,9 @@ if (!isset($_SESSION['admin_id'])) {
 
 // Include necessary files - using try/catch for minimal error handling
 try {
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/include/config.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/header.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
+    require_once __DIR__ . '/include/config.php';
+    require_once __DIR__ . '/layout/header.php';
+    require_once __DIR__ . '/layout/breadcrumb.php';
 } catch (Exception $e) {
     echo "Error loading required files: " . $e->getMessage();
     exit;
@@ -256,5 +256,5 @@ if (isset($conn_back) && $conn_back) {
 
 <?php
 // Include footer
-require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/footer.php';
+require_once __DIR__ . '/layout/footer.php';
 ?>

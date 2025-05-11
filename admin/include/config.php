@@ -4,9 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Include the main configuration file
+// Include the main configuration file using relative path
 try {
-    include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
+    include_once __DIR__ . '/../../include/config.php';
 } catch (Exception $e) {
     die("Error including main config file: " . $e->getMessage());
 }
@@ -15,18 +15,24 @@ try {
 if (!isset($conn_back) || !$conn_back) {
     // Try to re-establish the database connection
     try {
-        // Database credentials
-        $back_host = 'localhost';
-        $back_user = 'summitgu_exodusaipro_back';
-        $back_password = 'exodusaipro_back';
-        $back_database = 'summitgu_exodusaipro_back';
+        // Include database connection file
+        include_once __DIR__ . '/../../include/db.php';
         
-        // Create connection
-        $conn_back = new mysqli($back_host, $back_user, $back_password, $back_database);
-        
-        // Check connection
-        if ($conn_back->connect_error) {
-            die("Database connection failed: " . $conn_back->connect_error);
+        // If still no connection, try to create one directly
+        if (!isset($conn_back) || !$conn_back) {
+            // Database credentials
+            $back_host = 'localhost';
+            $back_user = 'summitgu_exodusaipro_back';
+            $back_password = 'exodusaipro_back';
+            $back_database = 'summitgu_exodusaipro_back';
+            
+            // Create connection
+            $conn_back = new mysqli($back_host, $back_user, $back_password, $back_database);
+            
+            // Check connection
+            if ($conn_back->connect_error) {
+                die("Database connection failed: " . $conn_back->connect_error);
+            }
         }
     } catch (Exception $e) {
         die("Error establishing database connection: " . $e->getMessage());

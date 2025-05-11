@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Admin Panel for Investment Platform">
     <meta name="author" content="">
+    
+    <?php 
+    // Make sure siteLink and site_name are defined
+    if (!isset($siteLink) || empty($siteLink)) {
+        // Attempt to get site URL from server variables
+        $siteLink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+    }
+    
+    if (!isset($site_name) || empty($site_name)) {
+        $site_name = "Investment Platform";
+    }
+    ?>
+    
     <link rel="icon" href="<?=$siteLink?>/admin/images/favicon.ico">
 
     <title>Admin Dashboard - <?=$site_name?></title>

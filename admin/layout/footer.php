@@ -11,6 +11,17 @@
             </li>
         </ul>
     </div>
+    <?php 
+    // Make sure siteLink and site_name are defined
+    if (!isset($siteLink) || empty($siteLink)) {
+        // Attempt to get site URL from server variables
+        $siteLink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+    }
+    
+    if (!isset($site_name) || empty($site_name)) {
+        $site_name = "Investment Platform";
+    }
+    ?>
     &copy; <?php echo date('Y'); ?> <a href="<?=$siteLink?>"><?=$site_name?></a>. All Rights Reserved.
 </footer>
 

@@ -3,6 +3,12 @@
 $page_title = '';
 $breadcrumbs = [];
 
+// Make sure siteLink is defined
+if (!isset($siteLink) || empty($siteLink)) {
+    // Attempt to get site URL from server variables
+    $siteLink = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+}
+
 // Try to determine the current page
 try {
     switch (basename($_SERVER['PHP_SELF'])) {
