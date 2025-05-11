@@ -19,26 +19,26 @@
     }
     ?>
     
-    <link rel="icon" href="<?=$siteLink?>/admin/images/favicon.ico">
-
-    <title>Admin Dashboard - <?=$site_name?></title>
-
-    <!-- Vendors Style-->
-    <link rel="stylesheet" href="<?=$siteLink?>/admin/css/vendors_css.css">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-
-    <!--amcharts -->
-    <link href="https://www.amcharts.com/lib/3/plugins/export/export.css" rel="stylesheet" type="text/css" />
-
-    <!-- Style-->
-    <link rel="stylesheet" href="<?=$siteLink?>/admin/css/style.css">
-    <link rel="stylesheet" href="<?=$siteLink?>/admin/css/skin_color.css">
-    <link rel="stylesheet" href="<?=$siteLink?>/admin/css/custom.css">
+<!--    <link rel="icon" href="--><?php //=$siteLink?><!--/admin/images/favicon.ico">-->
+<!---->
+<!--    <title>Admin Dashboard - --><?php //=$site_name?><!--</title>-->
+<!---->
+<!--    <!-- Vendors Style-->-->
+<!--    <link rel="stylesheet" href="--><?php //=$siteLink?><!--/admin/css/vendors_css.css">-->
+<!--    -->
+<!--    <!-- Font Awesome -->-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">-->
+<!---->
+<!--    <!-- Bootstrap -->-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">-->
+<!---->
+<!--    <!--amcharts -->-->
+<!--    <link href="https://www.amcharts.com/lib/3/plugins/export/export.css" rel="stylesheet" type="text/css" />-->
+<!---->
+<!--    <!-- Style-->-->
+<!--    <link rel="stylesheet" href="--><?php //=$siteLink?><!--/admin/css/style.css">-->
+<!--    <link rel="stylesheet" href="--><?php //=$siteLink?><!--/admin/css/skin_color.css">-->
+<!--    <link rel="stylesheet" href="--><?php //=$siteLink?><!--/admin/css/custom.css">-->
 
 </head>
 
