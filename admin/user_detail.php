@@ -79,22 +79,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $new_status = $conn_back->real_escape_string($_POST['status']);
         
         if (in_array($new_status, ['active', 'suspended', 'blocked'])) {
-            $stmt = $conn_back->prepare("UPDATE users SET status = ? WHERE id = ?");
-            $stmt->bind_param("si", $new_status, $user_id);
-            
-            if ($stmt->execute()) {
-                // Log the action
-                $admin_id = $_SESSION['admin_id'];
-                $action = "Changed user ID {$user_id} status to {$new_status}";
-                $ip = $_SERVER['REMOTE_ADDR'];
+            // Check if status column exists in database
+            try {
+                $check_column = $conn_back->query("SHOW COLUMNS FROM users LIKE 'status'");
                 
-                $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                $log_stmt->bind_param("iss", $admin_id, $action, $ip);
-                $log_stmt->execute();
-                
-                $success_message = "User status updated successfully.";
-            } else {
-                $error_message = "Failed to update user status: " . $conn_back->error;
+                if ($check_column->num_rows > 0) {
+                    $stmt = $conn_back->prepare("UPDATE users SET status = ? WHERE id = ?");
+                    $stmt->bind_param("si", $new_status, $user_id);
+                    
+                    if ($stmt->execute()) {
+                        // Log the action
+                        $admin_id = $_SESSION['admin_id'];
+                        $action = "Changed user ID {$user_id} status to {$new_status}";
+                        $ip = $_SERVER['REMOTE_ADDR'];
+                        
+                        $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
+                        $log_stmt->bind_param("iss", $admin_id, $action, $ip);
+                        $log_stmt->execute();
+                        
+                        $success_message = "User status updated successfully.";
+                    } else {
+                        $error_message = "Failed to update user status: " . $conn_back->error;
+                    }
+                } else {
+                    // Status column doesn't exist, update the interface to reflect this
+                    $error_message = "Status column does not exist in the users table. This feature is not available.";
+                    debug_to_console("Status column not found in users table");
+                }
+            } catch (Exception $e) {
+                $error_message = "Error checking status column: " . $e->getMessage();
+                debug_to_console("Error: " . $e->getMessage());
             }
         } else {
             $error_message = "Invalid status value.";
@@ -184,7 +198,10 @@ try {
     debug_to_console("Starting user query for ID: " . $user_id);
     
     $user_query = $conn_back->prepare("
-        SELECT u.*, 
+        SELECT u.id, u.first_name, u.last_name, u.email, u.phone, 
+               u.profile_photo, u.pin, u.main_balance, u.investment_balance, 
+               u.staking_balance, u.currency, u.created_at, u.referral_code, u.referred_by,
+               u.referral_bonus_earned,
         (SELECT COUNT(*) FROM investments WHERE user_id = u.id) as total_investments,
         (SELECT IFNULL(SUM(amount), 0) FROM transactions WHERE user_id = u.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposits,
         (SELECT IFNULL(SUM(amount), 0) FROM transactions WHERE user_id = u.id AND transaction_type = 'withdrawal' AND status = 'completed') as total_withdrawals,
@@ -215,6 +232,9 @@ try {
 
     $user = $user_result->fetch_assoc();
     debug_to_console("User data fetched successfully");
+    
+    // Print all available user fields for debugging
+    debug_to_console("User data array keys: " . implode(", ", array_keys($user)));
     
     // Convert integer balance fields to decimal format for display
     $user['main_balance'] = isset($user['main_balance']) ? (float)$user['main_balance'] : 0;
@@ -349,7 +369,7 @@ if (ob_get_level() > 0) {
                                             </tr>
                                             <tr>
                                                 <th>Username</th>
-                                                <td><?php echo htmlspecialchars($user['username']); ?></td>
+                                                <td><?php echo isset($user['username']) ? htmlspecialchars($user['username']) : 'N/A'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Email</th>
@@ -362,21 +382,43 @@ if (ob_get_level() > 0) {
                                             <tr>
                                                 <th>Status</th>
                                                 <td>
-                                                    <span class="badge 
-                                                        <?php 
-                                                        if ($user['status'] == 'active') echo 'bg-success';
-                                                        elseif ($user['status'] == 'pending') echo 'bg-warning';
-                                                        else echo 'bg-danger';
-                                                        ?>">
-                                                        <?php echo ucfirst($user['status']); ?>
+                                                    <?php
+                                                    // Check if status column exists in the users table 
+                                                    $status_feature_available = false;
+                                                    $status = 'unknown';
+                                                    $statusClass = 'bg-secondary';
+                                                    
+                                                    try {
+                                                        $check_column = $conn_back->query("SHOW COLUMNS FROM users LIKE 'status'");
+                                                        $status_feature_available = ($check_column->num_rows > 0);
+                                                        
+                                                        if ($status_feature_available && isset($user['status'])) {
+                                                            $status = $user['status'];
+                                                        }
+                                                    } catch (Exception $e) {
+                                                        debug_to_console("Error checking status column: " . $e->getMessage());
+                                                        $status_feature_available = false;
+                                                    }
+                                                    
+                                                    if ($status == 'active') {
+                                                        $statusClass = 'bg-success';
+                                                    } elseif ($status == 'pending') {
+                                                        $statusClass = 'bg-warning';
+                                                    } elseif ($status == 'suspended' || $status == 'blocked') {
+                                                        $statusClass = 'bg-danger';
+                                                    }
+                                                    ?>
+                                                    <span class="badge <?php echo $statusClass; ?>">
+                                                        <?php echo ucfirst($status); ?>
                                                     </span>
                                                     
+                                                    <?php if ($status_feature_available): ?>
                                                     <div class="btn-group dropdown ml-2">
                                                         <button type="button" class="btn btn-xs btn-info dropdown-toggle" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                             Change Status
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="statusDropdown">
-                                                            <?php if ($user['status'] != 'active'): ?>
+                                                            <?php if ($status != 'active'): ?>
                                                             <li>
                                                                 <form method="post">
                                                                     <input type="hidden" name="action" value="change_status">
@@ -388,7 +430,7 @@ if (ob_get_level() > 0) {
                                                             </li>
                                                             <?php endif; ?>
                                                             
-                                                            <?php if ($user['status'] != 'suspended'): ?>
+                                                            <?php if ($status != 'suspended'): ?>
                                                             <li>
                                                                 <form method="post">
                                                                     <input type="hidden" name="action" value="change_status">
@@ -400,7 +442,7 @@ if (ob_get_level() > 0) {
                                                             </li>
                                                             <?php endif; ?>
                                                             
-                                                            <?php if ($user['status'] != 'blocked'): ?>
+                                                            <?php if ($status != 'blocked'): ?>
                                                             <li>
                                                                 <form method="post">
                                                                     <input type="hidden" name="action" value="change_status">
@@ -413,6 +455,9 @@ if (ob_get_level() > 0) {
                                                             <?php endif; ?>
                                                         </ul>
                                                     </div>
+                                                    <?php else: ?>
+                                                    <small class="text-muted ml-2">(Status management not available)</small>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -421,7 +466,7 @@ if (ob_get_level() > 0) {
                                             </tr>
                                             <tr>
                                                 <th>Last Login</th>
-                                                <td><?php echo $user['last_login'] ? date('M d, Y H:i', strtotime($user['last_login'])) : 'Never'; ?></td>
+                                                <td><?php echo isset($user['last_login']) && $user['last_login'] ? date('M d, Y H:i', strtotime($user['last_login'])) : 'Never'; ?></td>
                                             </tr>
                                         </table>
                                     </div>
@@ -438,7 +483,7 @@ if (ob_get_level() > 0) {
                                             <tr>
                                                 <th>Current Balance</th>
                                                 <td>
-                                                    <strong>$<?php echo number_format($user['main_balance'], 2); ?></strong>
+                                                    <strong>$<?php echo number_format($user['main_balance'] ?? 0, 2); ?></strong>
                                                     <button type="button" class="btn btn-xs btn-primary ml-2" data-bs-toggle="modal" data-bs-target="#adjustBalanceModal">
                                                         Adjust
                                                     </button>
@@ -464,7 +509,7 @@ if (ob_get_level() > 0) {
                                                 <th>Referrer</th>
                                                 <td>
                                                     <?php 
-                                                    if (!empty($user['referred_by'])) {
+                                                    if (isset($user['referred_by']) && !empty($user['referred_by'])) {
                                                         echo '<a href="user_detail.php?id='.$user['referred_by'].'">';
                                                         echo 'ID: '.$user['referred_by'].' (View)';
                                                         echo '</a>';
