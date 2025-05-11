@@ -408,7 +408,7 @@ if ($table_exists) {
     }
 }
 
-include_once __DIR__ . '/admin/layout/header.php';
+include_once __DIR__ . '/layout/header.php';
 ?>
 
 <div class="container-fluid">
@@ -813,4 +813,4 @@ $(document).ready(function() {
 });
 </script>
 
-<?php include_once __DIR__ . '/admin/layout/footer.php'; ?> 
+<?php include_once __DIR__ . '/layout/footer.php'; ?> 
