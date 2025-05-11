@@ -46,25 +46,26 @@ if (isset($conn_back) && $conn_back) {
     }
 
     // Sum deposits
-    $result = $conn_back->query("SELECT SUM(amount) as total FROM deposits");
+    // Using deposit_requests table since deposits table doesn't have much data
+    $result = $conn_back->query("SELECT SUM(amount) as total FROM deposit_requests");
     if ($result && $row = $result->fetch_assoc()) {
         $total_deposits = $row['total'] ?: 0;
     }
 
     // Count pending withdrawals
-    $result = $conn_back->query("SELECT COUNT(*) as total FROM withdrawals WHERE status = 'pending'");
+    $result = $conn_back->query("SELECT COUNT(*) as total FROM withdrawal WHERE status = 'pending'");
     if ($result && $row = $result->fetch_assoc()) {
         $pending_withdrawals = $row['total'];
     }
 
-    // Sum profit
-    $result = $conn_back->query("SELECT SUM(profit) as total FROM investments");
+    // Sum profit from investments
+    $result = $conn_back->query("SELECT SUM(roi_expected) as total FROM investments");
     if ($result && $row = $result->fetch_assoc()) {
         $total_profit = $row['total'] ?: 0;
     }
 
     // Get recent users
-    $result = $conn_back->query("SELECT id, username, email, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+    $result = $conn_back->query("SELECT id, CONCAT(first_name, ' ', last_name) as username, email, created_at FROM users ORDER BY created_at DESC LIMIT 5");
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $recent_users[] = $row;
@@ -72,21 +73,33 @@ if (isset($conn_back) && $conn_back) {
     }
 
     // Get recent transactions
-    $result = $conn_back->query("
-        SELECT 'deposit' as type, d.amount, 'completed' as status, d.created_at, u.username 
-        FROM deposits d 
-        JOIN users u ON d.user_id = u.id 
-        UNION ALL 
-        SELECT 'withdrawal' as type, w.amount, w.status, w.created_at, u.username 
-        FROM withdrawals w 
-        JOIN users u ON w.user_id = u.id 
-        ORDER BY created_at DESC 
-        LIMIT 5
-    ");
-    if ($result) {
-        while ($row = $result->fetch_assoc()) {
-            $recent_transactions[] = $row;
+    try {
+        $result = $conn_back->query("
+            SELECT 
+                transaction_type as type, 
+                amount, 
+                status, 
+                date_time as created_at, 
+                (SELECT CONCAT(first_name, ' ', last_name) FROM users WHERE users.id = transactions.user_id) as username 
+            FROM transactions 
+            ORDER BY date_time DESC 
+            LIMIT 5
+        ");
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                // Ensure all required fields have values
+                $row['type'] = $row['type'] ?: 'unknown';
+                $row['amount'] = $row['amount'] ?: 0;
+                $row['status'] = $row['status'] ?: 'unknown';
+                $row['created_at'] = $row['created_at'] ?: date('Y-m-d H:i:s');
+                $row['username'] = $row['username'] ?: 'Unknown User';
+                
+                $recent_transactions[] = $row;
+            }
         }
+    } catch (Exception $e) {
+        // Log the error but don't break the page
+        error_log("Error fetching transactions: " . $e->getMessage());
     }
 }
 ?>
@@ -179,8 +192,8 @@ if (isset($conn_back) && $conn_back) {
                                     <?php foreach ($recent_transactions as $tx): ?>
                                     <tr>
                                         <td>
-                                            <span class="badge <?php echo $tx['type'] == 'deposit' ? 'badge-success' : 'badge-info'; ?>">
-                                                <?php echo ucfirst($tx['type']); ?>
+                                            <span class="badge <?php echo $tx['type'] == 'deposit' || $tx['type'] == 'investment_return' ? 'badge-success' : 'badge-info'; ?>">
+                                                <?php echo ucfirst(str_replace('_', ' ', $tx['type'])); ?>
                                             </span>
                                         </td>
                                         <td><?php echo htmlspecialchars($tx['username']); ?></td>
@@ -188,7 +201,7 @@ if (isset($conn_back) && $conn_back) {
                                         <td>
                                             <span class="badge 
                                                 <?php 
-                                                if ($tx['status'] == 'completed') echo 'badge-success';
+                                                if ($tx['status'] == 'completed' || $tx['status'] == 'active') echo 'badge-success';
                                                 elseif ($tx['status'] == 'pending') echo 'badge-warning';
                                                 else echo 'badge-danger';
                                                 ?>">
