@@ -196,6 +196,14 @@
         if (typeof feather !== 'undefined') {
             feather.replace();
         }
+        
+        // Initialize sidebar toggle
+        document.querySelectorAll('[data-bs-toggle="sidebar"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('sidebar-collapse');
+            });
+        });
     });
     
     // Disable form resubmission on page refresh
@@ -309,11 +317,8 @@
         // Handle push-menu
         const pushMenuTriggers = document.querySelectorAll('[data-toggle="push-menu"]');
         pushMenuTriggers.forEach(trigger => {
-            trigger.setAttribute('data-bs-toggle', 'push-menu');
-            // Remove the old attribute after a small delay to prevent conflicts
-            setTimeout(() => {
-                trigger.removeAttribute('data-toggle');
-            }, 1000);
+            // Remove the old attribute to prevent conflicts with our new sidebar toggle
+            trigger.removeAttribute('data-toggle');
         });
     });
 
