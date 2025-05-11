@@ -186,6 +186,11 @@ include_once __DIR__ . '/layout/header.php';
     <?php endif; ?>
 
     <div class="row gy-4">
+    <style>
+                .plan-card-wrapper {
+                    height: 450px !important;
+                }
+            </style>
         <?php foreach ($plans as $plan): ?>
             <div class="col-lg-4 col-md-6">
                 <div class="plan-card-wrapper">

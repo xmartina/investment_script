@@ -283,11 +283,7 @@ include_once __DIR__ . '/layout/header.php';
         </div>
     <?php else: ?>
         <div class="row mb-4">
-            <style>
-                .card.shadow.h-100 {
-                    height: 450px !important;
-                }
-            </style>
+           
             <?php 
             $count = 0;
             foreach ($plans as $plan): 
