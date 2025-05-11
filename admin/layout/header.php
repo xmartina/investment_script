@@ -49,16 +49,28 @@
 <div class="wrapper">
     <div id="loader"></div>
 
+    <style>
+        .main-header .logo .logo-lg {
+            width: 210px;
+        }
+        .main-header .logo {
+            width: 240px;
+        }
+        .dark-skin .main-header .logo-box {
+            width: 210px;
+        }
+    </style>
+
     <header class="main-header">
         <div class="d-flex align-items-center logo-box justify-content-center">
             <!-- Logo -->
-            <a href="<?=$siteLink?>/admin" class="logo w-100">
+            <a href="<?=$siteLink?>/admin" class="logo d-flex justify-content-center align-items-center">
                 <!-- logo-->
                 <!-- <div class="logo-mini w-30">
                     <span class="light-logo"><img src="<?=$siteLink?>/front_assets/images/favicon.png" alt="logo"></span>
                     <span class="dark-logo"><img src="<?=$siteLink?>/front_assets/images/favicon.png" alt="logo"></span>
                 </div> -->
-                <div class="logo-lg bg-white rounded w-100">
+                <div class="logo-lg bg-white d-flex justify-content-center align-items-center rounded ">
                     <span class="light-logo"><img src="<?=$siteLink?>/front_assets/images/logo.png" alt="logo"></span>
                     <span class="dark-logo"><img src="<?=$siteLink?>/front_assets/images/logo.png" alt="logo"></span>
                 </div>
