@@ -210,6 +210,30 @@ get('/admin/profile', function() {
 get('/admin/profile.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
 });
+get('/admin/staking', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking.php';
+});
+get('/admin/staking.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking.php';
+});
+get('/admin/staking_plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_plans.php';
+});
+get('/admin/staking_plans.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_plans.php';
+});
+get('/admin/staking_rewards', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_rewards.php';
+});
+get('/admin/staking_rewards.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_rewards.php';
+});
+get('/admin/withdrawal_methods', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
+});
+get('/admin/withdrawal_methods.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
+});
 
 // Add these to your index.php
 post('/user/login', function() {
@@ -361,54 +385,30 @@ post('/admin/profile', function() {
 post('/admin/profile.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
 });
+post('/admin/staking', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking.php';
+});
+post('/admin/staking.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking.php';
+});
+post('/admin/staking_plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_plans.php';
+});
+post('/admin/staking_plans.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_plans.php';
+});
+post('/admin/staking_rewards', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_rewards.php';
+});
+post('/admin/staking_rewards.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/staking_rewards.php';
+});
+post('/admin/withdrawal_methods', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
+});
+post('/admin/withdrawal_methods.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
+});
 
-// Get parts of URL
-$parsed_url = parse_url($_SERVER['REQUEST_URI']);
-
-// Get path from URL, or root as a fallback
-$path = isset($parsed_url['path']) ? $parsed_url['path'] : '/';
-
-// Remove trailing slashes from path and convert to lowercase
-$path = strtolower(rtrim($path, '/'));
-
-// Add root back if path is empty
-if ($path == '') {
-    $path = '/';
-}
-
-// Get array of URL parameters
-$parameters = [];
-if (isset($parsed_url['query'])) {
-    parse_str($parsed_url['query'], $parameters);
-}
-
-// Check if the requested URL has a valid route
-$route_found = false;
-foreach (Route::$routes as $route) {
-    // Check if the request method matches the route's method
-    if ($route['method'] === $_SERVER['REQUEST_METHOD'] || $route['method'] === 'ANY') {
-        // Convert route path to regex pattern for matching
-        $pattern = Route::convertPatternToRegex($route['path']);
-        
-        // Check if the requested path matches the route pattern
-        if (preg_match($pattern, $path, $matches)) {
-            // Remove the first match (the full path)
-            array_shift($matches);
-            
-            // Store matched route parameters
-            $route_parameters = $matches;
-            
-            // Call the route's callback function
-            call_user_func_array($route['callback'], $route_parameters);
-            
-            $route_found = true;
-            break;
-        }
-    }
-}
-
-// Return 404 if no route matches
-if (!$route_found) {
-    http_response_code(404);
-    echo '404 - Page Not Found';
-}
+// Dispatch the routes
+dispatch();
