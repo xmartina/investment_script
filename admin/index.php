@@ -46,7 +46,7 @@ if (isset($conn_back) && $conn_back) {
     }
 
     // Sum deposits
-    $result = $conn_back->query("SELECT SUM(amount) as total FROM deposits WHERE status = 'completed'");
+    $result = $conn_back->query("SELECT SUM(amount) as total FROM deposits");
     if ($result && $row = $result->fetch_assoc()) {
         $total_deposits = $row['total'] ?: 0;
     }
@@ -73,7 +73,7 @@ if (isset($conn_back) && $conn_back) {
 
     // Get recent transactions
     $result = $conn_back->query("
-        SELECT 'deposit' as type, d.amount, d.status, d.created_at, u.username 
+        SELECT 'deposit' as type, d.amount, 'completed' as status, d.created_at, u.username 
         FROM deposits d 
         JOIN users u ON d.user_id = u.id 
         UNION ALL 
