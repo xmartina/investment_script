@@ -105,8 +105,98 @@ get('/update_referral_tables', function() {
 });
 
 // Admin routes
+get('/admin', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/index.php';
+});
+get('/admin/', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/index.php';
+});
+get('/admin/index.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/index.php';
+});
+get('/admin/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/login.php';
+});
+get('/admin/login.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/login.php';
+});
+get('/admin/logout', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/logout.php';
+});
+get('/admin/logout.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/logout.php';
+});
+get('/admin/setup', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/setup.php';
+});
+get('/admin/setup.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/setup.php';
+});
+get('/admin/users', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/users.php';
+});
+get('/admin/users.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/users.php';
+});
 get('/admin/withdrawals', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';
+});
+get('/admin/withdrawals.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';
+});
+get('/admin/deposits', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/deposits.php';
+});
+get('/admin/deposits.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/deposits.php';
+});
+get('/admin/investments', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investments.php';
+});
+get('/admin/investments.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investments.php';
+});
+get('/admin/investment_plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investment_plans.php';
+});
+get('/admin/investment_plans.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investment_plans.php';
+});
+get('/admin/transactions', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/transactions.php';
+});
+get('/admin/transactions.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/transactions.php';
+});
+get('/admin/referrals', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/referrals.php';
+});
+get('/admin/referrals.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/referrals.php';
+});
+get('/admin/settings', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/settings.php';
+});
+get('/admin/settings.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/settings.php';
+});
+get('/admin/admins', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/admins.php';
+});
+get('/admin/admins.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/admins.php';
+});
+get('/admin/logs', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/logs.php';
+});
+get('/admin/logs.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/logs.php';
+});
+get('/admin/profile', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
+});
+get('/admin/profile.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
 });
 
 // Add these to your index.php
@@ -191,8 +281,73 @@ post('/update_withdrawal_tables', function() {
 post('/update_referral_tables', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/update_referral_tables.php';
 });
+
+// Admin POST routes
+post('/admin/login', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/login.php';
+});
+post('/admin/login.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/login.php';
+});
+post('/admin/users', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/users.php';
+});
+post('/admin/users.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/users.php';
+});
 post('/admin/withdrawals', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';
+});
+post('/admin/withdrawals.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';
+});
+post('/admin/deposits', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/deposits.php';
+});
+post('/admin/deposits.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/deposits.php';
+});
+post('/admin/investments', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investments.php';
+});
+post('/admin/investments.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investments.php';
+});
+post('/admin/investment_plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investment_plans.php';
+});
+post('/admin/investment_plans.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/investment_plans.php';
+});
+post('/admin/transactions', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/transactions.php';
+});
+post('/admin/transactions.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/transactions.php';
+});
+post('/admin/referrals', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/referrals.php';
+});
+post('/admin/referrals.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/referrals.php';
+});
+post('/admin/settings', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/settings.php';
+});
+post('/admin/settings.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/settings.php';
+});
+post('/admin/admins', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/admins.php';
+});
+post('/admin/admins.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/admins.php';
+});
+post('/admin/profile', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
+});
+post('/admin/profile.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
 });
 
 dispatch();

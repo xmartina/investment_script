@@ -169,57 +169,27 @@
 <!-- Vendor JS -->
 <script src="<?=$siteLink?>/admin/js/vendors.min.js"></script>
 <script src="<?=$siteLink?>/admin/js/pages/chat-popup.js"></script>
-<script src="<?=$siteLink?>/admin/js/demo.js"></script>
 <script src="<?=$siteLink?>/admin/assets/icons/feather-icons/feather.min.js"></script>
-<script src="<?=$siteLink?>/admin/assets/vendor_plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js"></script>
-<script src="<?=$siteLink?>/admin/assets/vendor_components/Flot/jquery.flot.js"></script>
-<script src="<?=$siteLink?>/admin/assets/vendor_components/Flot/jquery.flot.resize.js"></script>
-<script src="<?=$siteLink?>/admin/assets/vendor_components/Flot/jquery.flot.pie.js"></script>
-<script src="<?=$siteLink?>/admin/assets/vendor_components/Flot/jquery.flot.categories.js"></script>
-<script src="https://www.amcharts.com/lib/3/amcharts.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/gauge.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/serial.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/amstock.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/pie.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/plugins/dataloader/dataloader.min.js"></script>
-<script src="https://www.amcharts.com/lib/3/plugins/animate/animate.min.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/themes/patterns.js" type="text/javascript"></script>
-<script src="https://www.amcharts.com/lib/3/themes/light.js" type="text/javascript"></script>
-<script src="<?=$siteLink?>/admin/assets/vendor_components/Web-Ticker-master/jquery.webticker.min.js"></script>
 
 <!-- Crypto Admin App -->
 <script src="<?=$siteLink?>/admin/js/template.js"></script>
-<script src="<?=$siteLink?>/admin/js/pages/dashboard32.js"></script>
-<script src="<?=$siteLink?>/admin/js/pages/dashboard32-chart.js"></script>
-<script src="<?=$siteLink?>/admin/js/pages/widget-flot-charts.js"></script>
+<script src="<?=$siteLink?>/admin/js/pages/dashboard.js"></script>
 
+<!-- Custom JS -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    let count = 0;
-
-    function hideElements() {
-      const chatBox = document.getElementById('chat-box-body');
-      const toolbar = document.querySelector('.sticky-toolbar');
-
-      if (chatBox) chatBox.style.display = 'none';
-      if (toolbar) toolbar.style.display = 'none';
+    // Initialize feather icons
+    feather.replace();
+    
+    // Disable form resubmission on page refresh
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
     }
-
-    // Hide on page load
-    hideElements();
-
-    // Repeat every 3 seconds, up to 6 times
-    const interval = setInterval(() => {
-      hideElements();
-      count++;
-      if (count >= 6) {
-        clearInterval(interval);
-      }
-    }, 3000);
-  });
+    
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        $('.alert-dismissible').fadeOut('slow');
+    }, 5000);
 </script>
-
 
 </body>
 </html>
