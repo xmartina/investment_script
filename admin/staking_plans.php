@@ -285,7 +285,7 @@ include_once __DIR__ . '/layout/header.php';
         <div class="row mb-4">
             <style>
                 .plan-card-wrapper {
-                    height: 450px;
+                    height: 450px !important;
                 }
             </style>
             <?php 
