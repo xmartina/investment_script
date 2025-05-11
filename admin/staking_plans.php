@@ -223,7 +223,7 @@ include_once __DIR__ . '/layout/header.php';
                                 <?php if ($plan['featured']): ?>
                                     <span class="badge badge-primary">Featured</span>
                                 <?php endif; ?>
-                                <?php if ($plan['status']): ?>
+                                <?php if (isset($plan['status']) && $plan['status']): ?>
                                     <span class="badge badge-success">Active</span>
                                 <?php else: ?>
                                     <span class="badge badge-secondary">Inactive</span>
