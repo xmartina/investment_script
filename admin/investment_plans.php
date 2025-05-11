@@ -19,23 +19,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add_plan'])) {
         $name = $_POST['name'];
         $description = $_POST['description'];
+        $plan_type = $_POST['plan_type'];
+        $category = $_POST['category'];
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
         $roi_percent = floatval($_POST['roi_percent']);
         $duration_days = intval($_POST['duration_days']);
+        $risk_level = $_POST['risk_level'];
+        $return_interval = $_POST['return_interval'];
         $is_active = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration_days <= 0) {
+        if (empty($name) || empty($plan_type) || empty($category) || $min_amount <= 0 || $roi_percent <= 0 || $duration_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Insert new plan
             $stmt = $conn_back->prepare("
-                INSERT INTO investment_plans (name, description, min_amount, max_amount, roi_percent, duration_days, is_active, featured, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                INSERT INTO investment_plans (
+                    name, description, plan_type, category, min_amount, max_amount, 
+                    roi_percent, duration_days, risk_level, return_interval, 
+                    is_active, featured, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
-            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $is_active, $featured);
+            $stmt->bind_param("ssssdddssii", $name, $description, $plan_type, $category, $min_amount, $max_amount, $roi_percent, $duration_days, $risk_level, $return_interval, $is_active, $featured);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Add Investment Plan', "Added new plan: $name");
@@ -53,26 +60,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $plan_id = $_POST['plan_id'];
         $name = $_POST['name'];
         $description = $_POST['description'];
+        $plan_type = $_POST['plan_type'];
+        $category = $_POST['category'];
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
         $roi_percent = floatval($_POST['roi_percent']);
         $duration_days = intval($_POST['duration_days']);
+        $risk_level = $_POST['risk_level'];
+        $return_interval = $_POST['return_interval'];
         $is_active = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration_days <= 0) {
+        if (empty($name) || empty($plan_type) || empty($category) || $min_amount <= 0 || $roi_percent <= 0 || $duration_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Update plan
             $stmt = $conn_back->prepare("
                 UPDATE investment_plans 
-                SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
-                    roi_percent = ?, duration_days = ?,
-                    is_active = ?, featured = ?, updated_at = NOW() 
+                SET name = ?, description = ?, plan_type = ?, category = ?,
+                    min_amount = ?, max_amount = ?, roi_percent = ?, duration_days = ?,
+                    risk_level = ?, return_interval = ?, is_active = ?, featured = ?,
+                    updated_at = NOW() 
                 WHERE id = ?
             ");
-            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $is_active, $featured, $plan_id);
+            $stmt->bind_param("ssssdddssiii", $name, $description, $plan_type, $category, $min_amount, $max_amount, $roi_percent, $duration_days, $risk_level, $return_interval, $is_active, $featured, $plan_id);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Update Investment Plan', "Updated plan #$plan_id: $name");
@@ -160,7 +172,7 @@ include_once __DIR__ . '/layout/header.php';
         <?php foreach ($plans as $plan): ?>
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #f8f9fc;">
                         <h6 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($plan['name']) ?></h6>
                         <div>
                             <?php if ($plan['featured']): ?>
@@ -174,31 +186,46 @@ include_once __DIR__ . '/layout/header.php';
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row no-gutters align-items-center">
+                        <!-- Plan Type and Category Info -->
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="badge badge-info"><?= htmlspecialchars($plan['plan_type']) ?></span>
+                            <span class="badge badge-secondary"><?= htmlspecialchars($plan['category']) ?></span>
+                        </div>
+
+                        <!-- ROI Info with Icon -->
+                        <div class="row no-gutters align-items-center mb-3">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-uppercase mb-1">Return Rate</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $plan['roi_percent'] ?>%</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Return Rate</div>
+                                <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $plan['roi_percent'] ?>%</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-chart-line fa-2x text-gray-300"></i>
                             </div>
                         </div>
                         
-                        <hr>
+                        <hr class="my-2">
                         
-                        <div class="mb-2">
-                            <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
-                            <div><?= $plan['duration_days'] ?? 0 ?> Days</div>
+                        <!-- Duration and Risk Level -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
+                                <div class="font-weight-bold"><?= $plan['duration_days'] ?? 0 ?> Days</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Risk Level</div>
+                                <div class="font-weight-bold"><?= htmlspecialchars($plan['risk_level']) ?></div>
+                            </div>
                         </div>
                         
-                        <div class="row">
+                        <!-- Investment Range -->
+                        <div class="row mb-3">
                             <div class="col-6">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Min Investment</div>
-                                <div>$<?= number_format($plan['min_amount'], 2) ?></div>
+                                <div class="font-weight-bold">$<?= number_format($plan['min_amount'], 2) ?></div>
                             </div>
                             <div class="col-6">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Max Investment</div>
-                                <div>
+                                <div class="font-weight-bold">
                                     <?php if ($plan['max_amount'] > 0): ?>
                                         $<?= number_format($plan['max_amount'], 2) ?>
                                     <?php else: ?>
@@ -208,15 +235,21 @@ include_once __DIR__ . '/layout/header.php';
                             </div>
                         </div>
                         
+                        <!-- Return Interval -->
+                        <div class="mb-3">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Return Interval</div>
+                            <div class="font-weight-bold"><?= htmlspecialchars($plan['return_interval']) ?></div>
+                        </div>
+                        
                         <?php if (!empty($plan['description'])): ?>
-                            <hr>
+                            <hr class="my-2">
                             <div class="mb-0">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
-                                <p class="mb-0"><?= nl2br(htmlspecialchars($plan['description'])) ?></p>
+                                <p class="mb-0 text-muted"><?= nl2br(htmlspecialchars($plan['description'] ?? '')) ?></p>
                             </div>
                         <?php endif; ?>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer py-2" style="background-color: #f8f9fc;">
                         <div class="d-flex justify-content-between">
                             <button class="btn btn-primary btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" 
                                     data-id="<?= $plan['id'] ?>"
@@ -228,7 +261,10 @@ include_once __DIR__ . '/layout/header.php';
                                     data-duration="<?= $plan['duration_days'] ?>"
                                     data-status="<?= $plan['is_active'] ?? 0 ?>"
                                     data-featured="<?= $plan['featured'] ?>"
-                                    >
+                                    data-plan-type="<?= htmlspecialchars($plan['plan_type']) ?>"
+                                    data-category="<?= htmlspecialchars($plan['category']) ?>"
+                                    data-risk-level="<?= htmlspecialchars($plan['risk_level']) ?>"
+                                    data-return-interval="<?= htmlspecialchars($plan['return_interval']) ?>">
                                 <i class="fas fa-edit mr-1"></i> Edit
                             </button>
                             <button class="btn btn-danger btn-sm delete-plan" data-toggle="modal" data-target="#deletePlanModal" 
@@ -256,9 +292,9 @@ include_once __DIR__ . '/layout/header.php';
 <div class="modal fade" id="addPlanModal" tabindex="-1" role="dialog" aria-labelledby="addPlanModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="addPlanModalLabel">Add New Investment Plan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -268,10 +304,37 @@ include_once __DIR__ . '/layout/header.php';
                         <label for="name">Plan Name *</label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="plan_type">Plan Type *</label>
+                                <select class="form-control" id="plan_type" name="plan_type" required>
+                                    <option value="MF">Mutual Fund (MF)</option>
+                                    <option value="ETF">Exchange Traded Fund (ETF)</option>
+                                    <option value="SIP">Systematic Investment Plan (SIP)</option>
+                                    <option value="NFO">New Fund Offer (NFO)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="category">Category *</label>
+                                <select class="form-control" id="category" name="category" required>
+                                    <option value="Direct">Direct</option>
+                                    <option value="Regular">Regular</option>
+                                    <option value="Thematic">Thematic</option>
+                                    <option value="Index">Index</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="description">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="3"></textarea>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -287,6 +350,7 @@ include_once __DIR__ . '/layout/header.php';
                             </div>
                         </div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -302,6 +366,33 @@ include_once __DIR__ . '/layout/header.php';
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="risk_level">Risk Level *</label>
+                                <select class="form-control" id="risk_level" name="risk_level" required>
+                                    <option value="Low">Low</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="High">High</option>
+                                    <option value="Thematic">Thematic</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="return_interval">Return Interval *</label>
+                                <select class="form-control" id="return_interval" name="return_interval" required>
+                                    <option value="Daily">Daily</option>
+                                    <option value="Weekly">Weekly</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Annually">Annually</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -334,9 +425,9 @@ include_once __DIR__ . '/layout/header.php';
 <div class="modal fade" id="editPlanModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="editPlanModalLabel">Edit Investment Plan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -347,10 +438,37 @@ include_once __DIR__ . '/layout/header.php';
                         <label for="edit_name">Plan Name *</label>
                         <input type="text" class="form-control" id="edit_name" name="name" required>
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_plan_type">Plan Type *</label>
+                                <select class="form-control" id="edit_plan_type" name="plan_type" required>
+                                    <option value="MF">Mutual Fund (MF)</option>
+                                    <option value="ETF">Exchange Traded Fund (ETF)</option>
+                                    <option value="SIP">Systematic Investment Plan (SIP)</option>
+                                    <option value="NFO">New Fund Offer (NFO)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_category">Category *</label>
+                                <select class="form-control" id="edit_category" name="category" required>
+                                    <option value="Direct">Direct</option>
+                                    <option value="Regular">Regular</option>
+                                    <option value="Thematic">Thematic</option>
+                                    <option value="Index">Index</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="edit_description">Description</label>
                         <textarea class="form-control" id="edit_description" name="description" rows="3"></textarea>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -366,6 +484,7 @@ include_once __DIR__ . '/layout/header.php';
                             </div>
                         </div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -381,6 +500,33 @@ include_once __DIR__ . '/layout/header.php';
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_risk_level">Risk Level *</label>
+                                <select class="form-control" id="edit_risk_level" name="risk_level" required>
+                                    <option value="Low">Low</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="High">High</option>
+                                    <option value="Thematic">Thematic</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_return_interval">Return Interval *</label>
+                                <select class="form-control" id="edit_return_interval" name="return_interval" required>
+                                    <option value="Daily">Daily</option>
+                                    <option value="Weekly">Weekly</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Annually">Annually</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -447,6 +593,10 @@ $(document).ready(function() {
         var duration = $(this).data('duration');
         var status = $(this).data('status');
         var featured = $(this).data('featured');
+        var plan_type = $(this).data('plan-type');
+        var category = $(this).data('category');
+        var risk_level = $(this).data('risk-level');
+        var return_interval = $(this).data('return-interval');
         
         $('#edit_plan_id').val(id);
         $('#edit_name').val(name);
@@ -455,6 +605,10 @@ $(document).ready(function() {
         $('#edit_max_amount').val(max);
         $('#edit_roi_percent').val(rate);
         $('#edit_duration_days').val(duration);
+        $('#edit_plan_type').val(plan_type);
+        $('#edit_category').val(category);
+        $('#edit_risk_level').val(risk_level);
+        $('#edit_return_interval').val(return_interval);
         $('#edit_status').prop('checked', status == 1);
         $('#edit_featured').prop('checked', featured == 1);
     });
