@@ -195,7 +195,7 @@ if ($table_exists) {
             CONCAT(u.first_name, ' ', u.last_name) as username,
             u.email,
             p.name as plan_name,
-            p.roi_daily,
+            p.reward_percent,
             p.lockup_period
         FROM staking_positions s
         JOIN users u ON s.user_id = u.id
@@ -317,7 +317,7 @@ include_once __DIR__ . '/layout/header.php';
                                         </td>
                                         <td><?= htmlspecialchars($staking['plan_name']) ?></td>
                                         <td>$<?= number_format($staking['amount'], 2) ?></td>
-                                        <td>$<?= number_format($staking['daily_reward'], 2) ?> (<?= number_format($staking['roi_daily'], 2) ?>%)</td>
+                                        <td>$<?= number_format($staking['daily_reward'], 2) ?> (<?= number_format($staking['reward_percent'], 2) ?>%)</td>
                                         <td>$<?= number_format($staking['total_rewards'], 2) ?></td>
                                         <td><?= date('M d, Y', strtotime($staking['created_at'])) ?></td>
                                         <td>
@@ -353,7 +353,7 @@ include_once __DIR__ . '/layout/header.php';
                                                     data-plan="<?= htmlspecialchars($staking['plan_name']) ?>"
                                                     data-amount="<?= $staking['amount'] ?>"
                                                     data-daily="<?= $staking['daily_reward'] ?>"
-                                                    data-rate="<?= $staking['roi_daily'] ?>"
+                                                    data-rate="<?= $staking['reward_percent'] ?>"
                                                     data-lockup="<?= $staking['lockup_period'] ?>"
                                                     data-created="<?= date('M d, Y', strtotime($staking['created_at'])) ?>"
                                                     data-rewards="<?= $staking['total_rewards'] ?>"

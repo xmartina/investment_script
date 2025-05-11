@@ -59,8 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $conn_back->begin_transaction();
                 
                 try {
-                    // Calculate staking details
-                    $roi_daily = $plan['roi_daily'];
+                    // Calculate daily reward
+                    $roi_daily = isset($plan['roi_daily']) ? $plan['roi_daily'] : $plan['reward_percent'];
                     $daily_reward = $amount * ($roi_daily / 100);
                     
                     // Create staking record
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Commit transaction
                     $conn_back->commit();
                     
-                    $message = "Staking position created successfully for " . $user['username'] . " in " . $plan['name'] . " plan.";
+                    $message = "Staking position created successfully for " . $user['first_name'] . " " . $user['last_name'] . " in " . $plan['name'] . " plan.";
                 } catch (Exception $e) {
                     // Rollback transaction on error
                     $conn_back->rollback();
@@ -126,9 +126,9 @@ if ($result && $result->num_rows > 0) {
     $table_exists = true;
     
     // Get staking plans
-    $plans_result = $conn_back->query("SELECT * FROM staking_plans WHERE status = 1 ORDER BY name");
+    $plans_result = $conn_back->query("SELECT * FROM staking_plans WHERE is_active = 1 ORDER BY name");
     $plans = [];
-    if ($plans_result->num_rows > 0) {
+    if ($plans_result && $plans_result->num_rows > 0) {
         while ($row = $plans_result->fetch_assoc()) {
             $plans[] = $row;
         }
@@ -207,8 +207,12 @@ include_once __DIR__ . '/layout/header.php';
                                         <select class="form-control" id="plan_id" name="plan_id" required>
                                             <option value="">Select Plan</option>
                                             <?php foreach ($plans as $plan): ?>
-                                            <option value="<?= $plan['id'] ?>" data-min="<?= $plan['min_amount'] ?>" data-max="<?= $plan['max_amount'] ?>" data-roi="<?= $plan['roi_daily'] ?>" data-lockup="<?= $plan['lockup_period'] ?>">
-                                                <?= htmlspecialchars($plan['name']) ?> (<?= $plan['roi_daily'] ?>% daily / <?= $plan['lockup_period'] ?> days lockup)
+                                            <?php 
+                                                $roi = isset($plan['roi_daily']) ? $plan['roi_daily'] : $plan['reward_percent'];
+                                                $lockup = isset($plan['lockup_period']) ? $plan['lockup_period'] : $plan['lock_period_days'];
+                                            ?>
+                                            <option value="<?= $plan['id'] ?>" data-min="<?= $plan['min_amount'] ?>" data-max="<?= $plan['max_amount'] ?>" data-roi="<?= $roi ?>" data-lockup="<?= $lockup ?>">
+                                                <?= htmlspecialchars($plan['name']) ?> (<?= $roi ?>% daily / <?= $lockup ?> days lockup)
                                             </option>
                                             <?php endforeach; ?>
                                         </select>

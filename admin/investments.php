@@ -449,4 +449,8 @@ $(document).ready(function() {
 });
 </script>
 
+<a href="create_investment.php" class="btn btn-primary">
+    <i class="fas fa-plus mr-2"></i> Create Investment
+</a>
+
 <?php include_once __DIR__ . '/layout/footer.php'; ?> 

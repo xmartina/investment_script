@@ -43,6 +43,21 @@ if ($result->num_rows == 0) {
     }
 }
 
+// Check if investment_plans table has featured column
+$check_query = "SHOW COLUMNS FROM investment_plans LIKE 'featured'";
+$result = $conn_back->query($check_query);
+if ($result->num_rows == 0) {
+    $fixes_needed[] = "investment_plans table is missing featured column";
+    
+    // Add featured column
+    $sql = "ALTER TABLE investment_plans ADD COLUMN featured TINYINT(1) NOT NULL DEFAULT 0 AFTER is_active";
+    if ($conn_back->query($sql)) {
+        $fixes_applied[] = "Added column featured to investment_plans table";
+    } else {
+        echo "<p>Error: " . $conn_back->error . "</p>";
+    }
+}
+
 // Check if investments table has correct date columns
 $check_query = "SHOW COLUMNS FROM investments LIKE 'started_at'";
 $result = $conn_back->query($check_query);
@@ -139,6 +154,131 @@ if ($result->num_rows == 0) {
     }
 }
 
+// Check if payment_methods table exists
+$check_query = "SHOW TABLES LIKE 'payment_methods'";
+$result = $conn_back->query($check_query);
+if ($result->num_rows == 0) {
+    $fixes_needed[] = "payment_methods table is missing";
+    
+    // Create payment_methods table
+    $sql = "CREATE TABLE IF NOT EXISTS `payment_methods` (
+        `id` int NOT NULL AUTO_INCREMENT,
+        `name` varchar(100) NOT NULL,
+        `description` text,
+        `instructions` text,
+        `min_amount` decimal(15,2) DEFAULT '10.00',
+        `max_amount` decimal(15,2) DEFAULT '10000.00',
+        `fixed_fee` decimal(15,2) DEFAULT '0.00',
+        `percentage_fee` decimal(5,2) DEFAULT '0.00',
+        `is_active` tinyint(1) DEFAULT '1',
+        `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    
+    if ($conn_back->query($sql)) {
+        $fixes_applied[] = "Created payment_methods table";
+        
+        // Add default payment methods
+        $methods = [
+            ['Bank Transfer', 'Direct bank transfer payment method', 'Please transfer to our bank account.', 50, 10000, 5, 0],
+            ['Bitcoin', 'Bitcoin cryptocurrency payment', 'Send BTC to our wallet address.', 20, 5000, 0, 1.5],
+            ['Ethereum', 'Ethereum cryptocurrency payment', 'Send ETH to our wallet address.', 20, 5000, 0, 1.5],
+            ['USDT (TRC20)', 'USDT on Tron network', 'Send USDT to our TRC20 wallet address.', 10, 10000, 0, 1],
+            ['USDT (ERC20)', 'USDT on Ethereum network', 'Send USDT to our ERC20 wallet address.', 10, 10000, 0, 2]
+        ];
+        
+        $insert_sql = "INSERT INTO payment_methods (name, description, instructions, min_amount, max_amount, fixed_fee, percentage_fee) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn_back->prepare($insert_sql);
+        
+        foreach ($methods as $method) {
+            $stmt->bind_param("sssdddd", $method[0], $method[1], $method[2], $method[3], $method[4], $method[5], $method[6]);
+            $stmt->execute();
+        }
+        
+        $fixes_applied[] = "Added default payment methods";
+    } else {
+        echo "<p>Error: " . $conn_back->error . "</p>";
+    }
+}
+
+// Check staking_plans table for featured column
+$check_query = "SHOW COLUMNS FROM staking_plans LIKE 'featured'";
+$result = $conn_back->query($check_query);
+if ($result->num_rows == 0) {
+    $fixes_needed[] = "staking_plans table is missing featured column";
+    
+    // Add featured column
+    $sql = "ALTER TABLE staking_plans ADD COLUMN featured TINYINT(1) NOT NULL DEFAULT 0 AFTER is_active";
+    if ($conn_back->query($sql)) {
+        $fixes_applied[] = "Added column featured to staking_plans table";
+    } else {
+        echo "<p>Error: " . $conn_back->error . "</p>";
+    }
+}
+
+// Check staking_plans for roi_daily column
+$check_query = "SHOW COLUMNS FROM staking_plans LIKE 'roi_daily'";
+$result = $conn_back->query($check_query);
+if ($result->num_rows == 0) {
+    $fixes_needed[] = "staking_plans table is missing roi_daily column";
+    
+    // Check if reward_percent column exists
+    $check_reward = "SHOW COLUMNS FROM staking_plans LIKE 'reward_percent'";
+    $reward_result = $conn_back->query($check_reward);
+    
+    if ($reward_result->num_rows > 0) {
+        // Add roi_daily column as a copy of reward_percent
+        $sql = "ALTER TABLE staking_plans ADD COLUMN roi_daily DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER max_amount;
+                UPDATE staking_plans SET roi_daily = reward_percent";
+        if ($conn_back->multi_query($sql)) {
+            $conn_back->next_result(); // move past the first result set
+            $fixes_applied[] = "Added column roi_daily to staking_plans table and copied data from reward_percent";
+        } else {
+            echo "<p>Error: " . $conn_back->error . "</p>";
+        }
+    } else {
+        // Add roi_daily column
+        $sql = "ALTER TABLE staking_plans ADD COLUMN roi_daily DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER max_amount";
+        if ($conn_back->query($sql)) {
+            $fixes_applied[] = "Added column roi_daily to staking_plans table";
+        } else {
+            echo "<p>Error: " . $conn_back->error . "</p>";
+        }
+    }
+}
+
+// Check staking_plans for lockup_period column
+$check_query = "SHOW COLUMNS FROM staking_plans LIKE 'lockup_period'";
+$result = $conn_back->query($check_query);
+if ($result->num_rows == 0) {
+    $fixes_needed[] = "staking_plans table is missing lockup_period column";
+    
+    // Check if lock_period_days column exists
+    $check_lockperiod = "SHOW COLUMNS FROM staking_plans LIKE 'lock_period_days'";
+    $lockperiod_result = $conn_back->query($check_lockperiod);
+    
+    if ($lockperiod_result->num_rows > 0) {
+        // Add lockup_period column as a copy of lock_period_days
+        $sql = "ALTER TABLE staking_plans ADD COLUMN lockup_period INT NOT NULL DEFAULT 0 AFTER duration_days;
+                UPDATE staking_plans SET lockup_period = lock_period_days";
+        if ($conn_back->multi_query($sql)) {
+            $conn_back->next_result(); // move past the first result set
+            $fixes_applied[] = "Added column lockup_period to staking_plans table and copied data from lock_period_days";
+        } else {
+            echo "<p>Error: " . $conn_back->error . "</p>";
+        }
+    } else {
+        // Add lockup_period column
+        $sql = "ALTER TABLE staking_plans ADD COLUMN lockup_period INT NOT NULL DEFAULT 0 AFTER duration_days";
+        if ($conn_back->query($sql)) {
+            $fixes_applied[] = "Added column lockup_period to staking_plans table";
+        } else {
+            echo "<p>Error: " . $conn_back->error . "</p>";
+        }
+    }
+}
+
 // Add code to create staking tables when requested
 if (isset($_POST['create_staking_tables'])) {
     // Create staking_plans table
@@ -149,6 +289,7 @@ if (isset($_POST['create_staking_tables'])) {
         `min_amount` decimal(20,8) NOT NULL,
         `max_amount` decimal(20,8) DEFAULT NULL,
         `roi_daily` decimal(10,4) NOT NULL,
+        `duration_days` int NOT NULL,
         `lockup_period` int NOT NULL,
         `status` tinyint(1) NOT NULL DEFAULT '1',
         `featured` tinyint(1) NOT NULL DEFAULT '0',

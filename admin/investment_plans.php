@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get all investment plans
-$sql = "SELECT * FROM investment_plans ORDER BY featured DESC, id ASC";
+$sql = "SELECT * FROM investment_plans ORDER BY id ASC";
 $result = $conn_back->query($sql);
 $plans = [];
 

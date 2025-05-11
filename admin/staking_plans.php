@@ -151,7 +151,7 @@ if ($result && $result->num_rows > 0) {
     $table_exists = true;
     
     // Get all staking plans
-    $sql = "SELECT * FROM staking_plans ORDER BY featured DESC, id ASC";
+    $sql = "SELECT * FROM staking_plans ORDER BY id ASC";
     $result = $conn_back->query($sql);
     $plans = [];
 
