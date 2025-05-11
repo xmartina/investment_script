@@ -4,6 +4,15 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Debug output function
+function debug_to_console($data) {
+    $output = $data;
+    if (is_array($output)) {
+        $output = implode(',', $output);
+    }
+    echo "<script>console.log('Debug: " . addslashes($output) . "');</script>";
+}
+
 session_start();
 
 // Check if the admin is logged in
@@ -77,11 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             try {
                 // Get current balance
-                $balance_query = $conn_back->prepare("SELECT balance FROM users WHERE id = ?");
+                $balance_query = $conn_back->prepare("SELECT main_balance FROM users WHERE id = ?");
                 $balance_query->bind_param("i", $user_id);
                 $balance_query->execute();
                 $balance_result = $balance_query->get_result();
-                $current_balance = $balance_result->fetch_assoc()['balance'];
+                $current_balance = $balance_result->fetch_assoc()['main_balance'];
                 
                 // Calculate new balance
                 $new_balance = $current_balance;
@@ -99,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 
                 // Update user balance
-                $balance_update = $conn_back->prepare("UPDATE users SET balance = ? WHERE id = ?");
+                $balance_update = $conn_back->prepare("UPDATE users SET main_balance = ? WHERE id = ?");
                 $balance_update->bind_param("di", $new_balance, $user_id);
                 $balance_update->execute();
                 
@@ -133,57 +142,83 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Get user data
-$user_query = $conn_back->prepare("
-    SELECT u.*, 
-    (SELECT COUNT(*) FROM investments WHERE user_id = u.id) as total_investments,
-    (SELECT SUM(amount) FROM transactions WHERE user_id = u.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposits,
-    (SELECT SUM(amount) FROM transactions WHERE user_id = u.id AND transaction_type = 'withdrawal' AND status = 'completed') as total_withdrawals,
-    (SELECT SUM(roi_received) FROM investments WHERE user_id = u.id) as total_earnings
-    FROM users u 
-    WHERE u.id = ?
-");
-$user_query->bind_param("i", $user_id);
-$user_query->execute();
-$user_result = $user_query->get_result();
+try {
+    $user_query = $conn_back->prepare("
+        SELECT u.*, 
+        (SELECT COUNT(*) FROM investments WHERE user_id = u.id) as total_investments,
+        (SELECT SUM(amount) FROM transactions WHERE user_id = u.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposits,
+        (SELECT SUM(amount) FROM transactions WHERE user_id = u.id AND transaction_type = 'withdrawal' AND status = 'completed') as total_withdrawals,
+        (SELECT SUM(roi_received) FROM investments WHERE user_id = u.id) as total_earnings
+        FROM users u 
+        WHERE u.id = ?
+    ");
+    $user_query->bind_param("i", $user_id);
+    $user_query->execute();
+    $user_result = $user_query->get_result();
 
-if ($user_result->num_rows == 0) {
-    header("Location: users.php");
-    exit();
+    if ($user_result->num_rows == 0) {
+        header("Location: users.php");
+        exit();
+    }
+
+    $user = $user_result->fetch_assoc();
+    
+    // Debug output
+    debug_to_console("User data loaded successfully");
+    
+} catch (Exception $e) {
+    echo '<div class="alert alert-danger">Error loading user: ' . $e->getMessage() . '</div>';
+    debug_to_console("Error: " . $e->getMessage());
+    exit;
 }
 
-$user = $user_result->fetch_assoc();
-
 // Get recent transactions
-$transactions_query = $conn_back->prepare("
-    SELECT transaction_type, amount, status, description, date_time
-    FROM transactions 
-    WHERE user_id = ? 
-    ORDER BY date_time DESC 
-    LIMIT 10
-");
-$transactions_query->bind_param("i", $user_id);
-$transactions_query->execute();
-$transactions_result = $transactions_query->get_result();
-$transactions = [];
-while ($tx = $transactions_result->fetch_assoc()) {
-    $transactions[] = $tx;
+try {
+    $transactions_query = $conn_back->prepare("
+        SELECT transaction_type, amount, status, description, date_time
+        FROM transactions 
+        WHERE user_id = ? 
+        ORDER BY date_time DESC 
+        LIMIT 10
+    ");
+    $transactions_query->bind_param("i", $user_id);
+    $transactions_query->execute();
+    $transactions_result = $transactions_query->get_result();
+    $transactions = [];
+    while ($tx = $transactions_result->fetch_assoc()) {
+        $transactions[] = $tx;
+    }
+    
+    debug_to_console("Transactions loaded successfully: " . count($transactions));
+} catch (Exception $e) {
+    echo '<div class="alert alert-danger">Error loading transactions: ' . $e->getMessage() . '</div>';
+    debug_to_console("Error loading transactions: " . $e->getMessage());
+    $transactions = [];
 }
 
 // Get investments
-$investments_query = $conn_back->prepare("
-    SELECT i.*, p.name as plan_name
-    FROM investments i
-    JOIN investment_plans p ON i.plan_id = p.id
-    WHERE i.user_id = ?
-    ORDER BY i.created_at DESC
-    LIMIT 10
-");
-$investments_query->bind_param("i", $user_id);
-$investments_query->execute();
-$investments_result = $investments_query->get_result();
-$investments = [];
-while ($inv = $investments_result->fetch_assoc()) {
-    $investments[] = $inv;
+try {
+    $investments_query = $conn_back->prepare("
+        SELECT i.*, p.name as plan_name
+        FROM investments i
+        JOIN investment_plans p ON i.plan_id = p.id
+        WHERE i.user_id = ?
+        ORDER BY i.created_at DESC
+        LIMIT 10
+    ");
+    $investments_query->bind_param("i", $user_id);
+    $investments_query->execute();
+    $investments_result = $investments_query->get_result();
+    $investments = [];
+    while ($inv = $investments_result->fetch_assoc()) {
+        $investments[] = $inv;
+    }
+    
+    debug_to_console("Investments loaded successfully: " . count($investments));
+} catch (Exception $e) {
+    echo '<div class="alert alert-danger">Error loading investments: ' . $e->getMessage() . '</div>';
+    debug_to_console("Error loading investments: " . $e->getMessage());
+    $investments = [];
 }
 ?>
 
@@ -235,48 +270,54 @@ while ($inv = $investments_result->fetch_assoc()) {
                                                 <td>
                                                     <span class="badge 
                                                         <?php 
-                                                        if ($user['status'] == 'active') echo 'badge-success';
-                                                        elseif ($user['status'] == 'pending') echo 'badge-warning';
-                                                        else echo 'badge-danger';
+                                                        if ($user['status'] == 'active') echo 'bg-success';
+                                                        elseif ($user['status'] == 'pending') echo 'bg-warning';
+                                                        else echo 'bg-danger';
                                                         ?>">
                                                         <?php echo ucfirst($user['status']); ?>
                                                     </span>
                                                     
                                                     <div class="btn-group dropdown ml-2">
-                                                        <button type="button" class="btn btn-xs btn-info dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <button type="button" class="btn btn-xs btn-info dropdown-toggle" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                                             Change Status
                                                         </button>
-                                                        <div class="dropdown-menu">
+                                                        <ul class="dropdown-menu" aria-labelledby="statusDropdown">
                                                             <?php if ($user['status'] != 'active'): ?>
-                                                            <form method="post">
-                                                                <input type="hidden" name="action" value="change_status">
-                                                                <input type="hidden" name="status" value="active">
-                                                                <button type="submit" class="dropdown-item">
-                                                                    <i class="fa fa-check text-success"></i> Activate
-                                                                </button>
-                                                            </form>
+                                                            <li>
+                                                                <form method="post">
+                                                                    <input type="hidden" name="action" value="change_status">
+                                                                    <input type="hidden" name="status" value="active">
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-check text-success"></i> Activate
+                                                                    </button>
+                                                                </form>
+                                                            </li>
                                                             <?php endif; ?>
                                                             
                                                             <?php if ($user['status'] != 'suspended'): ?>
-                                                            <form method="post">
-                                                                <input type="hidden" name="action" value="change_status">
-                                                                <input type="hidden" name="status" value="suspended">
-                                                                <button type="submit" class="dropdown-item">
-                                                                    <i class="fa fa-pause text-warning"></i> Suspend
-                                                                </button>
-                                                            </form>
+                                                            <li>
+                                                                <form method="post">
+                                                                    <input type="hidden" name="action" value="change_status">
+                                                                    <input type="hidden" name="status" value="suspended">
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-pause text-warning"></i> Suspend
+                                                                    </button>
+                                                                </form>
+                                                            </li>
                                                             <?php endif; ?>
                                                             
                                                             <?php if ($user['status'] != 'blocked'): ?>
-                                                            <form method="post">
-                                                                <input type="hidden" name="action" value="change_status">
-                                                                <input type="hidden" name="status" value="blocked">
-                                                                <button type="submit" class="dropdown-item">
-                                                                    <i class="fa fa-ban text-danger"></i> Block
-                                                                </button>
-                                                            </form>
+                                                            <li>
+                                                                <form method="post">
+                                                                    <input type="hidden" name="action" value="change_status">
+                                                                    <input type="hidden" name="status" value="blocked">
+                                                                    <button type="submit" class="dropdown-item">
+                                                                        <i class="fa fa-ban text-danger"></i> Block
+                                                                    </button>
+                                                                </form>
+                                                            </li>
                                                             <?php endif; ?>
-                                                        </div>
+                                                        </ul>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -303,7 +344,7 @@ while ($inv = $investments_result->fetch_assoc()) {
                                             <tr>
                                                 <th>Current Balance</th>
                                                 <td>
-                                                    <strong>$<?php echo number_format($user['balance'], 2); ?></strong>
+                                                    <strong>$<?php echo isset($user['main_balance']) ? number_format($user['main_balance'], 2) : '0.00'; ?></strong>
                                                     <button type="button" class="btn btn-xs btn-primary ml-2" data-bs-toggle="modal" data-bs-target="#adjustBalanceModal">
                                                         Adjust
                                                     </button>
@@ -311,19 +352,19 @@ while ($inv = $investments_result->fetch_assoc()) {
                                             </tr>
                                             <tr>
                                                 <th>Total Deposits</th>
-                                                <td>$<?php echo number_format($user['total_deposits'] ?? 0, 2); ?></td>
+                                                <td>$<?php echo isset($user['total_deposits']) ? number_format($user['total_deposits'] ?? 0, 2) : '0.00'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Total Withdrawals</th>
-                                                <td>$<?php echo number_format($user['total_withdrawals'] ?? 0, 2); ?></td>
+                                                <td>$<?php echo isset($user['total_withdrawals']) ? number_format($user['total_withdrawals'] ?? 0, 2) : '0.00'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Total Investments</th>
-                                                <td><?php echo $user['total_investments'] ?? 0; ?></td>
+                                                <td><?php echo isset($user['total_investments']) ? ($user['total_investments'] ?? 0) : '0'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Total Earnings</th>
-                                                <td>$<?php echo number_format($user['total_earnings'] ?? 0, 2); ?></td>
+                                                <td>$<?php echo isset($user['total_earnings']) ? number_format($user['total_earnings'] ?? 0, 2) : '0.00'; ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Referrer</th>
@@ -382,11 +423,11 @@ while ($inv = $investments_result->fetch_assoc()) {
                                             <span class="badge 
                                                 <?php
                                                 if (in_array($tx['transaction_type'], ['deposit', 'investment_return', 'admin_credit', 'referral_bonus'])) {
-                                                    echo 'badge-success';
+                                                    echo 'bg-success';
                                                 } elseif (in_array($tx['transaction_type'], ['withdrawal', 'investment', 'admin_debit'])) {
-                                                    echo 'badge-info';
+                                                    echo 'bg-info';
                                                 } else {
-                                                    echo 'badge-secondary';
+                                                    echo 'bg-secondary';
                                                 }
                                                 ?>">
                                                 <?php echo ucfirst(str_replace('_', ' ', $tx['transaction_type'])); ?>
@@ -396,9 +437,9 @@ while ($inv = $investments_result->fetch_assoc()) {
                                         <td>
                                             <span class="badge 
                                                 <?php 
-                                                if ($tx['status'] == 'completed') echo 'badge-success';
-                                                elseif ($tx['status'] == 'pending') echo 'badge-warning';
-                                                else echo 'badge-danger';
+                                                if ($tx['status'] == 'completed') echo 'bg-success';
+                                                elseif ($tx['status'] == 'pending') echo 'bg-warning';
+                                                else echo 'bg-danger';
                                                 ?>">
                                                 <?php echo ucfirst($tx['status']); ?>
                                             </span>
@@ -448,10 +489,10 @@ while ($inv = $investments_result->fetch_assoc()) {
                                         <td>
                                             <span class="badge 
                                                 <?php 
-                                                if ($inv['status'] == 'active') echo 'badge-success';
-                                                elseif ($inv['status'] == 'completed') echo 'badge-info';
-                                                elseif ($inv['status'] == 'pending') echo 'badge-warning';
-                                                else echo 'badge-danger';
+                                                if ($inv['status'] == 'active') echo 'bg-success';
+                                                elseif ($inv['status'] == 'completed') echo 'bg-info';
+                                                elseif ($inv['status'] == 'pending') echo 'bg-warning';
+                                                else echo 'bg-danger';
                                                 ?>">
                                                 <?php echo ucfirst($inv['status']); ?>
                                             </span>
@@ -523,6 +564,35 @@ while ($inv = $investments_result->fetch_assoc()) {
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap 5 dropdowns specifically for this page
+    var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+    dropdownElementList.forEach(function(dropdownToggleEl) {
+        try {
+            new bootstrap.Dropdown(dropdownToggleEl);
+        } catch (e) {
+            console.error('Error initializing dropdown:', e);
+        }
+    });
+    
+    // Add click event listeners to ensure dropdowns open on click
+    document.querySelectorAll('.dropdown-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var dropdown = bootstrap.Dropdown.getInstance(this);
+            if (dropdown) {
+                dropdown.toggle();
+            } else {
+                var newDropdown = new bootstrap.Dropdown(this);
+                newDropdown.toggle();
+            }
+        });
+    });
+});
+</script>
 
 <?php
 // Include footer
