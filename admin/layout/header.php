@@ -19,7 +19,7 @@
     }
     ?>
     
-    <link rel="icon" href="<?=$siteLink?>/admin/images/favicon.ico">
+    <link rel="icon" href="<?=$siteLink?>/front_assets/images/favicon.png"> 
 
     <title>Admin Dashboard - <?=$site_name?></title>
 
