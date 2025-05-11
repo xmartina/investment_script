@@ -1,280 +1,222 @@
 <?php
-// Database Initialization Script
+session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Start session to access any session variables
-session_start();
+// Include database configuration
+try {
+    include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
+} catch (Exception $e) {
+    die("Error including config file: " . $e->getMessage());
+}
 
-// We'll allow running this script without login if no admin exists yet
-$admin_check_skipped = false;
+// Security check: Only allow access to super admins or if no admins exist yet
+$allow_access = false;
+$message = "";
+$success = false;
 
 try {
-    // Include database configuration
-    include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
-    
-    if (!$conn_back) {
-        die("<div class='alert alert-danger'>Database connection not available. Please check configuration.</div>");
+    // Check if admins table exists
+    $table_exists = false;
+    $tables_result = $conn_back->query("SHOW TABLES LIKE 'admins'");
+    if ($tables_result) {
+        $table_exists = $tables_result->num_rows > 0;
     }
     
-    // Check if any admin users exist
-    $admin_exists = false;
-    $result = $conn_back->query("SHOW TABLES LIKE 'admins'");
-    if ($result && $result->num_rows > 0) {
-        $admin_result = $conn_back->query("SELECT COUNT(*) as total FROM admins");
-        if ($admin_result && $admin_row = $admin_result->fetch_assoc()) {
-            $admin_exists = ($admin_row['total'] > 0);
-        }
+    // If admins table doesn't exist, allow access to set up initial admin
+    if (!$table_exists) {
+        $allow_access = true;
+    } 
+    // Otherwise check for admin login
+    else if (isset($_SESSION['admin_id']) && isset($_SESSION['admin_role']) && $_SESSION['admin_role'] == 'super_admin') {
+        $allow_access = true;
     }
-    
-    // Only require login if admins already exist
-    if ($admin_exists && !isset($_SESSION['admin_id'])) {
-        echo "<!DOCTYPE html>
-        <html lang='en'>
-        <head>
-            <meta charset='utf-8'>
-            <meta name='viewport' content='width=device-width, initial-scale=1'>
-            <title>Database Initialization</title>
-            <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css' rel='stylesheet'>
-        </head>
-        <body>
-            <div class='container mt-5'>
-                <div class='row'>
-                    <div class='col-md-6 offset-md-3'>
-                        <div class='card'>
-                            <div class='card-header bg-danger text-white'>
-                                <h4>Authentication Required</h4>
-                            </div>
-                            <div class='card-body'>
-                                <p>You must be logged in as an administrator to run this script since admin users already exist.</p>
-                                <a href='login.php' class='btn btn-primary'>Go to Login</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>";
-        exit;
-    } else if (!$admin_exists) {
-        $admin_check_skipped = true;
-    }
-    
-    // Output HTML header
-    echo "<!DOCTYPE html>
-    <html lang='en'>
-    <head>
-        <meta charset='utf-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <title>Database Initialization</title>
-        <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css' rel='stylesheet'>
-    </head>
-    <body>
-        <div class='container mt-5'>
-            <div class='row'>
-                <div class='col-md-8 offset-md-2'>
-                    <div class='card'>
-                        <div class='card-header bg-primary text-white'>
-                            <h4>Database Initialization Script</h4>
-                        </div>
-                        <div class='card-body'>";
-    
-    if ($admin_check_skipped) {
-        echo "<div class='alert alert-info'>Running in initial setup mode. No admin login required.</div>";
-    }
-    
-    echo "<p class='alert alert-success'>Database connection successful!</p>";
-    
-    // Tables to check/create
-    $tables = [
-        'users' => "
-            CREATE TABLE IF NOT EXISTS users (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(50) NOT NULL UNIQUE,
-                email VARCHAR(100) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
-                full_name VARCHAR(100),
-                phone VARCHAR(20),
-                balance DECIMAL(15, 2) DEFAULT 0.00,
-                status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ",
-        
-        'investments' => "
-            CREATE TABLE IF NOT EXISTS investments (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                user_id INT UNSIGNED NOT NULL,
-                plan_id INT UNSIGNED NOT NULL,
-                amount DECIMAL(15, 2) NOT NULL,
-                profit DECIMAL(15, 2) DEFAULT 0.00,
-                status ENUM('active', 'completed', 'cancelled') DEFAULT 'active',
-                start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                end_date TIMESTAMP NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX (user_id),
-                INDEX (plan_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ",
-        
-        'deposits' => "
-            CREATE TABLE IF NOT EXISTS deposits (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                user_id INT UNSIGNED NOT NULL,
-                amount DECIMAL(15, 2) NOT NULL,
-                fee_amount DECIMAL(15, 2) DEFAULT 0.00,
-                payment_method VARCHAR(50) NOT NULL,
-                transaction_id VARCHAR(100),
-                status ENUM('pending', 'completed', 'failed', 'cancelled') DEFAULT 'pending',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX (user_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ",
-        
-        'withdrawals' => "
-            CREATE TABLE IF NOT EXISTS withdrawals (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                user_id INT UNSIGNED NOT NULL,
-                amount DECIMAL(15, 2) NOT NULL,
-                fee_amount DECIMAL(15, 2) DEFAULT 0.00,
-                withdrawal_method_id INT UNSIGNED NOT NULL,
-                withdrawal_address TEXT NOT NULL,
-                transaction_id VARCHAR(100),
-                user_balance_before_withdrawal DECIMAL(15, 2) NOT NULL,
-                user_balance_after_withdrawal DECIMAL(15, 2) NOT NULL,
-                status ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT 'pending',
-                approved_at TIMESTAMP NULL,
-                rejected_at TIMESTAMP NULL,
-                rejection_reason TEXT,
-                payment_proof VARCHAR(255),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX (user_id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ",
-        
-        'admins' => "
+
+    // Process initialization if allowed and form is submitted
+    if ($allow_access && isset($_POST['initialize'])) {
+        // Create admins table
+        $conn_back->query("
             CREATE TABLE IF NOT EXISTS admins (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(50) NOT NULL UNIQUE,
                 password VARCHAR(255) NOT NULL,
                 email VARCHAR(100) NOT NULL UNIQUE,
                 full_name VARCHAR(100) NOT NULL,
-                role ENUM('admin', 'super_admin', 'editor') NOT NULL DEFAULT 'admin',
+                role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin',
                 status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
-                last_login TIMESTAMP NULL,
+                last_login DATETIME,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ",
+            )
+        ");
         
-        'admin_activity_logs' => "
-            CREATE TABLE IF NOT EXISTS admin_activity_logs (
-                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                admin_id INT UNSIGNED NOT NULL,
+        // Check if we should create default admin
+        if (isset($_POST['create_admin']) && $_POST['create_admin'] == 1) {
+            $admin_username = $conn_back->real_escape_string($_POST['admin_username'] ?? 'admin');
+            $admin_password = password_hash($_POST['admin_password'] ?? 'admin123', PASSWORD_DEFAULT);
+            $admin_email = $conn_back->real_escape_string($_POST['admin_email'] ?? 'admin@example.com');
+            $admin_name = $conn_back->real_escape_string($_POST['admin_name'] ?? 'Super Admin');
+            
+            // Check if admin exists
+            $check_admin = $conn_back->query("SELECT id FROM admins WHERE username = '{$admin_username}' OR email = '{$admin_email}'");
+            
+            if ($check_admin->num_rows == 0) {
+                $conn_back->query("
+                    INSERT INTO admins (username, password, email, full_name, role) 
+                    VALUES ('{$admin_username}', '{$admin_password}', '{$admin_email}', '{$admin_name}', 'super_admin')
+                ");
+                
+                $message .= "Default admin account created successfully.<br>";
+            } else {
+                $message .= "Admin with that username or email already exists.<br>";
+            }
+        }
+        
+        // Create admin_settings table
+        $conn_back->query("
+            CREATE TABLE IF NOT EXISTS admin_settings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                setting_key VARCHAR(50) NOT NULL UNIQUE,
+                setting_value TEXT,
+                setting_description VARCHAR(255),
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        ");
+        
+        // Create admin_logs table
+        $conn_back->query("
+            CREATE TABLE IF NOT EXISTS admin_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                admin_id INT,
                 action VARCHAR(255) NOT NULL,
                 details TEXT,
-                ip_address VARCHAR(45) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        "
-    ];
-    
-    // Create tables if they don't exist
-    echo "<h5>Checking Tables</h5>";
-    echo "<ul class='list-group mb-4'>";
-    
-    foreach ($tables as $table => $sql) {
-        // Check if table exists
-        $check_result = $conn_back->query("SHOW TABLES LIKE '$table'");
+                ip_address VARCHAR(45),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE SET NULL
+            )
+        ");
         
-        if ($check_result->num_rows == 0) {
-            // Create table
-            if ($conn_back->query($sql)) {
-                echo "<li class='list-group-item list-group-item-success'>Created table '$table' ✅</li>";
-            } else {
-                echo "<li class='list-group-item list-group-item-danger'>Failed to create table '$table': " . $conn_back->error . " ❌</li>";
-            }
-        } else {
-            echo "<li class='list-group-item list-group-item-info'>Table '$table' already exists ✓</li>";
-        }
+        $success = true;
+        $message .= "Database initialization completed successfully!";
     }
-    
-    echo "</ul>";
-    
-    // Check if we need to create a default admin user
-    $admin_result = $conn_back->query("SELECT COUNT(*) as total FROM admins");
-    $admin_row = $admin_result->fetch_assoc();
-    
-    if ($admin_row['total'] == 0) {
-        echo "<h5 class='card-title'>Creating Default Admin User</h5>";
-        
-        // Create default admin with password 'admin123'
-        $username = 'admin';
-        $password = password_hash('admin123', PASSWORD_DEFAULT);
-        $email = 'admin@example.com';
-        $full_name = 'System Administrator';
-        $role = 'super_admin';
-        
-        $stmt = $conn_back->prepare("INSERT INTO admins (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $username, $password, $email, $full_name, $role);
-        
-        if ($stmt->execute()) {
-            echo "<div class='alert alert-success'>
-                <p>Default admin account created successfully!</p>
-                <ul>
-                    <li><strong>Username:</strong> admin</li>
-                    <li><strong>Password:</strong> admin123</li>
-                </ul>
-                <p class='text-danger'><strong>Please change this password immediately after login!</strong></p>
-            </div>";
-        } else {
-            echo "<div class='alert alert-danger'>Error creating default admin: " . $stmt->error . "</div>";
-        }
-        
-        $stmt->close();
-    } else {
-        echo "<div class='alert alert-info'>Admin users already exist in the database.</div>";
-    }
-    
-    echo "<div class='mt-4'>
-            <a href='/admin/login.php' class='btn btn-primary'>Go to Admin Login</a>
-            <a href='/admin/index.php' class='btn btn-secondary'>Go to Admin Dashboard</a>
-        </div>";
-    
-    // Close HTML
-    echo "</div></div></div></div></div></body></html>";
-    
 } catch (Exception $e) {
-    echo "<!DOCTYPE html>
-    <html lang='en'>
-    <head>
-        <meta charset='utf-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <title>Database Initialization Error</title>
-        <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css' rel='stylesheet'>
-    </head>
-    <body>
-        <div class='container mt-5'>
-            <div class='row'>
-                <div class='col-md-6 offset-md-3'>
-                    <div class='card'>
-                        <div class='card-header bg-danger text-white'>
-                            <h4>Error</h4>
+    $message = "Error: " . $e->getMessage();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="<?=$siteLink?>/admin/images/favicon.ico">
+
+    <title>Database Initialization - <?=$site_name?></title>
+  
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Style-->  
+    <link rel="stylesheet" href="<?=$siteLink?>/admin/css/style.css">
+    <link rel="stylesheet" href="<?=$siteLink?>/admin/css/skin_color.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body class="hold-transition theme-primary bg-img" style="background-image: url(<?=$siteLink?>/admin/images/auth-bg/bg-1.jpg)">
+    <div class="container h-p100">
+        <div class="row align-items-center justify-content-md-center h-p100">    
+            <div class="col-12">
+                <div class="row justify-content-center g-0">
+                    <div class="col-lg-6 col-md-8 col-12">
+                        <div class="bg-white rounded10 shadow-lg">
+                            <div class="content-top-agile p-20 pb-0">
+                                <h2 class="text-primary">Database Initialization</h2>
+                                <p class="mb-0">Setup the admin panel database tables</p>                            
+                            </div>
+                            <div class="p-40">
+                                <?php if (!empty($message)): ?>
+                                <div class="alert alert-<?php echo $success ? 'success' : 'danger'; ?>"><?php echo $message; ?></div>
+                                <?php endif; ?>
+                                
+                                <?php if (!$allow_access): ?>
+                                <div class="alert alert-warning">
+                                    <p>Access to this page is restricted to super administrators.</p>
+                                    <p>Please <a href="login.php">login</a> with super admin credentials to continue.</p>
+                                </div>
+                                <?php elseif (!$success): ?>
+                                <form action="" method="post">
+                                    <div class="form-group mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="create_admin" name="create_admin" value="1" checked>
+                                            <label class="form-check-label" for="create_admin">
+                                                Create default super admin account
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="admin_details">
+                                        <div class="form-group mb-3">
+                                            <label for="admin_username">Admin Username</label>
+                                            <input type="text" class="form-control" id="admin_username" name="admin_username" value="admin">
+                                        </div>
+                                        
+                                        <div class="form-group mb-3">
+                                            <label for="admin_password">Admin Password</label>
+                                            <input type="password" class="form-control" id="admin_password" name="admin_password" value="admin123">
+                                        </div>
+                                        
+                                        <div class="form-group mb-3">
+                                            <label for="admin_email">Admin Email</label>
+                                            <input type="email" class="form-control" id="admin_email" name="admin_email" value="admin@example.com">
+                                        </div>
+                                        
+                                        <div class="form-group mb-3">
+                                            <label for="admin_name">Admin Full Name</label>
+                                            <input type="text" class="form-control" id="admin_name" name="admin_name" value="Super Admin">
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" name="initialize" class="btn btn-primary btn-block mt-3">Initialize Database</button>
+                                </form>
+                                
+                                <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const createAdminCheckbox = document.getElementById('create_admin');
+                                    const adminDetailsDiv = document.getElementById('admin_details');
+                                    
+                                    function toggleAdminDetails() {
+                                        adminDetailsDiv.style.display = createAdminCheckbox.checked ? 'block' : 'none';
+                                    }
+                                    
+                                    createAdminCheckbox.addEventListener('change', toggleAdminDetails);
+                                    toggleAdminDetails();
+                                });
+                                </script>
+                                <?php else: ?>
+                                <div class="text-center">
+                                    <p>Database initialization has been completed successfully.</p>
+                                    <a href="login.php" class="btn btn-primary">Proceed to Login</a>
+                                </div>
+                                <?php endif; ?>
+                            </div>                        
                         </div>
-                        <div class='card-body'>
-                            <p>" . htmlspecialchars($e->getMessage()) . "</p>
-                            <a href='/admin/login.php' class='btn btn-primary'>Return to Login</a>
+                        <div class="text-center mt-3">
+                            <p class="mt-20 text-white">&copy; <?php echo date('Y'); ?> <?=$site_name?> - All Rights Reserved</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </body>
-    </html>";
-}
-?> 
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+</html>

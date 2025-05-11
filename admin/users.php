@@ -1,6 +1,10 @@
 <?php
+// User management page
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/include/config.php';
 
 // Check if the admin is logged in
 if (!isset($_SESSION['admin_id'])) {
@@ -8,121 +12,91 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Process user actions
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Check for user status change
-    if (isset($_POST['change_status']) && isset($_POST['user_id'])) {
-        $user_id = (int)$_POST['user_id'];
-        $new_status = $_POST['status'] == 'active' ? 'inactive' : 'active';
-        
+// Include necessary files
+try {
+    require_once __DIR__ . '/include/config.php';
+    
+    // Set current page for menu highlighting
+    $current_page = 'users.php';
+    
+    require_once __DIR__ . '/layout/header.php';
+    require_once __DIR__ . '/layout/breadcrumb.php';
+} catch (Exception $e) {
+    echo "Error loading required files: " . $e->getMessage();
+    exit;
+}
+
+// Process user status change if requested
+if (isset($_POST['action']) && $_POST['action'] == 'change_status' && isset($_POST['user_id'])) {
+    $user_id = (int)$_POST['user_id'];
+    $new_status = $conn_back->real_escape_string($_POST['status']);
+    
+    if (in_array($new_status, ['active', 'suspended', 'blocked'])) {
         $stmt = $conn_back->prepare("UPDATE users SET status = ? WHERE id = ?");
         $stmt->bind_param("si", $new_status, $user_id);
         
         if ($stmt->execute()) {
-            logAdminActivity($_SESSION['admin_id'], 'Update User Status', "Changed user #$user_id status to $new_status");
-            showAlert("User status updated successfully", "success");
-        } else {
-            showAlert("Error updating user status", "danger");
-        }
-        $stmt->close();
-    }
-    
-    // Check for user deletion
-    if (isset($_POST['delete_user']) && isset($_POST['user_id'])) {
-        $user_id = (int)$_POST['user_id'];
-        
-        // Only allow deletion if user has no active investments or pending withdrawals
-        $stmt = $conn_back->prepare("SELECT 
-            (SELECT COUNT(*) FROM investments WHERE user_id = ? AND status = 'active') as active_investments,
-            (SELECT COUNT(*) FROM withdrawals WHERE user_id = ? AND status = 'pending') as pending_withdrawals");
-        $stmt->bind_param("ii", $user_id, $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        
-        if ($row['active_investments'] > 0 || $row['pending_withdrawals'] > 0) {
-            showAlert("Cannot delete user with active investments or pending withdrawals", "danger");
-        } else {
-            $stmt = $conn_back->prepare("DELETE FROM users WHERE id = ?");
-            $stmt->bind_param("i", $user_id);
+            // Log the action
+            $admin_id = $_SESSION['admin_id'];
+            $action = "Changed user ID {$user_id} status to {$new_status}";
+            $ip = $_SERVER['REMOTE_ADDR'];
             
-            if ($stmt->execute()) {
-                logAdminActivity($_SESSION['admin_id'], 'Delete User', "Deleted user #$user_id");
-                showAlert("User deleted successfully", "success");
-            } else {
-                showAlert("Error deleting user", "danger");
-            }
+            $log_stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
+            $log_stmt->bind_param("iss", $admin_id, $action, $ip);
+            $log_stmt->execute();
+            
+            $success_message = "User status updated successfully.";
+        } else {
+            $error_message = "Failed to update user status: " . $conn_back->error;
         }
-        $stmt->close();
+    } else {
+        $error_message = "Invalid status value.";
     }
 }
 
-// Pagination
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 20;
-$offset = ($page - 1) * $limit;
-
-// Search
+// Handle search and pagination
 $search = isset($_GET['search']) ? $_GET['search'] : '';
-$search_condition = '';
-$search_params = [];
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$per_page = 10;
+$offset = ($page - 1) * $per_page;
 
+// Build query with search condition
+$where_clause = "";
 if (!empty($search)) {
-    $search_condition = "WHERE first_name LIKE ? OR last_name LIKE ? OR email LIKE ?";
-    $search_params = ["%$search%", "%$search%", "%$search%"];
+    $search_term = $conn_back->real_escape_string($search);
+    $where_clause = "WHERE 
+                    first_name LIKE '%{$search_term}%' OR 
+                    last_name LIKE '%{$search_term}%' OR 
+                    email LIKE '%{$search_term}%' OR 
+                    username LIKE '%{$search_term}%'";
 }
 
-// Get total users count
-$total_users = 0;
-if (empty($search_condition)) {
-    $result = $conn_back->query("SELECT COUNT(*) as total FROM users");
-    if ($result && $row = $result->fetch_assoc()) {
-        $total_users = $row['total'];
-    }
-} else {
-    $stmt = $conn_back->prepare("SELECT COUNT(*) as total FROM users $search_condition");
-    if (count($search_params) > 0) {
-        $types = str_repeat("s", count($search_params));
-        $stmt->bind_param($types, ...$search_params);
-    }
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        $total_users = $row['total'];
-    }
-    $stmt->close();
+// Get total count for pagination
+$count_query = "SELECT COUNT(*) as total FROM users {$where_clause}";
+$count_result = $conn_back->query($count_query);
+$total_rows = 0;
+if ($count_result && $row = $count_result->fetch_assoc()) {
+    $total_rows = $row['total'];
 }
+$total_pages = ceil($total_rows / $per_page);
 
-$total_pages = ceil($total_users / $limit);
+// Get users data with pagination
+$query = "SELECT id, username, email, CONCAT(first_name, ' ', last_name) as full_name, 
+          phone, status, created_at, (SELECT SUM(amount) FROM transactions 
+          WHERE user_id = users.id AND transaction_type = 'deposit' AND status = 'completed') as total_deposit
+          FROM users {$where_clause}
+          ORDER BY created_at DESC
+          LIMIT {$offset}, {$per_page}";
 
-// Get users
+$result = $conn_back->query($query);
 $users = [];
-$sql = "SELECT u.*, 
-        (SELECT SUM(amount) FROM deposit_requests WHERE user_id = u.id) as total_deposits,
-        (SELECT SUM(amount) FROM withdrawal WHERE user_id = u.id) as total_withdrawals,
-        (SELECT COUNT(*) FROM investments WHERE user_id = u.id) as total_investments
-        FROM users u $search_condition ORDER BY u.created_at DESC LIMIT ? OFFSET ?";
-
-$stmt = $conn_back->prepare($sql);
-
-if (count($search_params) > 0) {
-    $search_params[] = $limit;
-    $search_params[] = $offset;
-    $types = str_repeat("s", count($search_params) - 2) . "ii";
-    $stmt->bind_param($types, ...$search_params);
-} else {
-    $stmt->bind_param("ii", $limit, $offset);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        // Format data
+        $row['total_deposit'] = $row['total_deposit'] ? $row['total_deposit'] : 0;
+        $users[] = $row;
+    }
 }
-
-$stmt->execute();
-$result = $stmt->get_result();
-while ($row = $result->fetch_assoc()) {
-    $users[] = $row;
-}
-$stmt->close();
-
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/header.php';
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
 ?>
 
 <!-- Main content -->
@@ -131,111 +105,151 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
         <div class="col-12">
             <div class="box">
                 <div class="box-header with-border">
-                    <h4 class="box-title">Users Management</h4>
+                    <h4 class="box-title">User Management</h4>
                     <div class="box-controls pull-right">
-                        <form class="d-flex" action="" method="GET">
-                            <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search" value="<?php echo htmlspecialchars($search); ?>">
-                            <button class="btn btn-primary" type="submit">Search</button>
-                            <?php if (!empty($search)): ?>
-                                <a href="users.php" class="btn btn-outline-secondary ms-2">Clear</a>
-                            <?php endif; ?>
+                        <form class="form-inline" method="GET">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="search" placeholder="Search users..." value="<?php echo htmlspecialchars($search); ?>">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
-                <div class="box-body">
+                <div class="box-body p-0">
+                    <?php if (isset($success_message)): ?>
+                    <div class="alert alert-success m-3"><?php echo $success_message; ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if (isset($error_message)): ?>
+                    <div class="alert alert-danger m-3"><?php echo $error_message; ?></div>
+                    <?php endif; ?>
+                    
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Full Name</th>
+                                    <th>User</th>
                                     <th>Email</th>
+                                    <th>Phone</th>
                                     <th>Status</th>
-                                    <th>Deposits</th>
-                                    <th>Withdrawals</th>
-                                    <th>Investments</th>
-                                    <th>Registered</th>
+                                    <th>Total Deposit</th>
+                                    <th>Registered On</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (count($users) > 0): ?>
                                     <?php foreach ($users as $user): ?>
-                                        <tr>
-                                            <td><?php echo $user['id']; ?></td>
-                                            <td><?php echo htmlspecialchars($user['username'] ? $user['username'] : $user['first_name'] . ' ' . $user['last_name']); ?></td>
-                                            <td><?php echo htmlspecialchars(($user['full_name'] ?? '') ? $user['full_name'] : $user['first_name'] . ' ' . $user['last_name']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                            <td>
-                                                <span class="badge badge-success">
-                                                    Active
-                                                </span>
-                                            </td>
-                                            <td>$<?php echo number_format($user['total_deposits'] ?? 0, 2); ?></td>
-                                            <td>$<?php echo number_format($user['total_withdrawals'] ?? 0, 2); ?></td>
-                                            <td><?php echo $user['total_investments'] ?? 0; ?></td>
-                                            <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a href="user_details.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-info" title="View Details">
-                                                        <i data-feather="eye"></i>
+                                    <tr>
+                                        <td><?php echo $user['id']; ?></td>
+                                        <td>
+                                            <a href="user_detail.php?id=<?php echo $user['id']; ?>">
+                                                <?php echo htmlspecialchars($user['full_name']); ?>
+                                            </a>
+                                            <small class="d-block text-muted"><?php echo htmlspecialchars($user['username']); ?></small>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['phone'] ?? 'N/A'); ?></td>
+                                        <td>
+                                            <span class="badge 
+                                                <?php 
+                                                if ($user['status'] == 'active') echo 'badge-success';
+                                                elseif ($user['status'] == 'pending') echo 'badge-warning';
+                                                else echo 'badge-danger';
+                                                ?>">
+                                                <?php echo ucfirst($user['status']); ?>
+                                            </span>
+                                        </td>
+                                        <td>$<?php echo number_format($user['total_deposit'], 2); ?></td>
+                                        <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Action
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="user_detail.php?id=<?php echo $user['id']; ?>">
+                                                        <i class="fa fa-eye"></i> View Details
                                                     </a>
-                                                    <form action="" method="POST" class="d-inline">
+                                                    <?php if ($user['status'] != 'active'): ?>
+                                                    <form method="post" style="display:inline;">
+                                                        <input type="hidden" name="action" value="change_status">
                                                         <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
-                                                        <button type="submit" name="delete_user" class="btn btn-sm btn-danger" title="Delete User" 
-                                                                onclick="return confirm('Are you sure you want to delete this user? This cannot be undone!')">
-                                                            <i data-feather="trash-2"></i>
+                                                        <input type="hidden" name="status" value="active">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fa fa-check"></i> Activate
                                                         </button>
                                                     </form>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if ($user['status'] != 'suspended'): ?>
+                                                    <form method="post" style="display:inline;">
+                                                        <input type="hidden" name="action" value="change_status">
+                                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                                        <input type="hidden" name="status" value="suspended">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fa fa-pause"></i> Suspend
+                                                        </button>
+                                                    </form>
+                                                    <?php endif; ?>
+                                                    
+                                                    <?php if ($user['status'] != 'blocked'): ?>
+                                                    <form method="post" style="display:inline;">
+                                                        <input type="hidden" name="action" value="change_status">
+                                                        <input type="hidden" name="user_id" value="<?php echo $user['id']; ?>">
+                                                        <input type="hidden" name="status" value="blocked">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fa fa-ban"></i> Block
+                                                        </button>
+                                                    </form>
+                                                    <?php endif; ?>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <tr>
-                                        <td colspan="10" class="text-center">No users found</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="8" class="text-center">No users found</td>
+                                </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
-                    
-                    <?php if ($total_pages > 1): ?>
-                    <div class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <?php if ($page > 1): ?>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=<?php echo $page - 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">
-                                        Previous
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-                            
-                            <?php 
-                            $start_page = max(1, $page - 2);
-                            $end_page = min($total_pages, $page + 2);
-                            
-                            for ($i = $start_page; $i <= $end_page; $i++): 
-                            ?>
-                                <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">
-                                        <?php echo $i; ?>
-                                    </a>
-                                </li>
-                            <?php endfor; ?>
-                            
-                            <?php if ($page < $total_pages): ?>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=<?php echo $page + 1; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>">
-                                        Next
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-                        </ul>
-                    </div>
-                    <?php endif; ?>
                 </div>
+                
+                <!-- Pagination -->
+                <?php if ($total_pages > 1): ?>
+                <div class="box-footer clearfix">
+                    <ul class="pagination pagination-sm m-0 float-right">
+                        <?php if ($page > 1): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?php echo $page-1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?>">&laquo;</a>
+                        </li>
+                        <?php endif; ?>
+                        
+                        <?php
+                        $start_page = max(1, $page - 2);
+                        $end_page = min($total_pages, $page + 2);
+                        
+                        for ($i = $start_page; $i <= $end_page; $i++):
+                        ?>
+                        <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
+                            <a class="page-link" href="?page=<?php echo $i; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?>"><?php echo $i; ?></a>
+                        </li>
+                        <?php endfor; ?>
+                        
+                        <?php if ($page < $total_pages): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?php echo $page+1; ?><?php echo !empty($search) ? '&search='.urlencode($search) : ''; ?>">&raquo;</a>
+                        </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -243,5 +257,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/breadcrumb.php';
 <!-- /.content -->
 
 <?php
-include_once $_SERVER['DOCUMENT_ROOT'] . '/admin/layout/footer.php';
+// Include footer
+require_once __DIR__ . '/layout/footer.php';
 ?> 

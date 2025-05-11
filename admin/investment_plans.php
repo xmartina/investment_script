@@ -1,0 +1,517 @@
+<?php
+// Admin Investment Plans Management Page
+session_start();
+require_once __DIR__ . '/include/config.php';
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: /admin/login");
+    exit();
+}
+
+$page_name = "Investment Plans";
+$message = "";
+$error = "";
+
+// Process form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Add new plan
+    if (isset($_POST['add_plan'])) {
+        $name = $_POST['name'];
+        $description = $_POST['description'];
+        $min_amount = floatval($_POST['min_amount']);
+        $max_amount = floatval($_POST['max_amount']);
+        $interest_rate = floatval($_POST['interest_rate']);
+        $duration = intval($_POST['duration']);
+        $duration_unit = $_POST['duration_unit'];
+        $status = isset($_POST['status']) ? 1 : 0;
+        $featured = isset($_POST['featured']) ? 1 : 0;
+        
+        // Validate inputs
+        if (empty($name) || $min_amount <= 0 || $interest_rate <= 0 || $duration <= 0) {
+            $error = "Please fill all required fields with valid values.";
+        } else {
+            // Calculate duration in days
+            $days = $duration;
+            if ($duration_unit === 'week') {
+                $days = $duration * 7;
+            } elseif ($duration_unit === 'month') {
+                $days = $duration * 30;
+            } elseif ($duration_unit === 'year') {
+                $days = $duration * 365;
+            }
+            
+            // Insert new plan
+            $stmt = $conn_back->prepare("
+                INSERT INTO investment_plans (name, description, min_amount, max_amount, interest_rate, duration, duration_unit, duration_days, status, featured, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->bind_param("ssdddiisii", $name, $description, $min_amount, $max_amount, $interest_rate, $duration, $duration_unit, $days, $status, $featured);
+            
+            if ($stmt->execute()) {
+                logAdminActivity($_SESSION['admin_id'], 'Add Investment Plan', "Added new plan: $name");
+                $message = "Investment plan added successfully.";
+            } else {
+                $error = "Error adding investment plan: " . $stmt->error;
+            }
+            
+            $stmt->close();
+        }
+    }
+    
+    // Update plan
+    if (isset($_POST['update_plan'])) {
+        $plan_id = $_POST['plan_id'];
+        $name = $_POST['name'];
+        $description = $_POST['description'];
+        $min_amount = floatval($_POST['min_amount']);
+        $max_amount = floatval($_POST['max_amount']);
+        $interest_rate = floatval($_POST['interest_rate']);
+        $duration = intval($_POST['duration']);
+        $duration_unit = $_POST['duration_unit'];
+        $status = isset($_POST['status']) ? 1 : 0;
+        $featured = isset($_POST['featured']) ? 1 : 0;
+        
+        // Validate inputs
+        if (empty($name) || $min_amount <= 0 || $interest_rate <= 0 || $duration <= 0) {
+            $error = "Please fill all required fields with valid values.";
+        } else {
+            // Calculate duration in days
+            $days = $duration;
+            if ($duration_unit === 'week') {
+                $days = $duration * 7;
+            } elseif ($duration_unit === 'month') {
+                $days = $duration * 30;
+            } elseif ($duration_unit === 'year') {
+                $days = $duration * 365;
+            }
+            
+            // Update plan
+            $stmt = $conn_back->prepare("
+                UPDATE investment_plans 
+                SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
+                    interest_rate = ?, duration = ?, duration_unit = ?, duration_days = ?,
+                    status = ?, featured = ?, updated_at = NOW() 
+                WHERE id = ?
+            ");
+            $stmt->bind_param("ssdddiisiii", $name, $description, $min_amount, $max_amount, $interest_rate, $duration, $duration_unit, $days, $status, $featured, $plan_id);
+            
+            if ($stmt->execute()) {
+                logAdminActivity($_SESSION['admin_id'], 'Update Investment Plan', "Updated plan #$plan_id: $name");
+                $message = "Investment plan updated successfully.";
+            } else {
+                $error = "Error updating investment plan: " . $stmt->error;
+            }
+            
+            $stmt->close();
+        }
+    }
+    
+    // Delete plan
+    if (isset($_POST['delete_plan'])) {
+        $plan_id = $_POST['plan_id'];
+        
+        // Check if plan is in use
+        $stmt = $conn_back->prepare("SELECT COUNT(*) as count FROM investments WHERE plan_id = ? AND status = 'active'");
+        $stmt->bind_param("i", $plan_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $active_investments = $row['count'];
+        $stmt->close();
+        
+        if ($active_investments > 0) {
+            $error = "Cannot delete plan with active investments. Deactivate it instead.";
+        } else {
+            $stmt = $conn_back->prepare("DELETE FROM investment_plans WHERE id = ?");
+            $stmt->bind_param("i", $plan_id);
+            
+            if ($stmt->execute()) {
+                logAdminActivity($_SESSION['admin_id'], 'Delete Investment Plan', "Deleted plan #$plan_id");
+                $message = "Investment plan deleted successfully.";
+            } else {
+                $error = "Error deleting investment plan: " . $stmt->error;
+            }
+            
+            $stmt->close();
+        }
+    }
+}
+
+// Get all investment plans
+$sql = "SELECT * FROM investment_plans ORDER BY featured DESC, id ASC";
+$result = $conn_back->query($sql);
+$plans = [];
+
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $plans[] = $row;
+    }
+}
+
+include_once __DIR__ . '/layout/header.php';
+?>
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Investment Plans Management</h1>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#addPlanModal">
+            <i class="fas fa-plus mr-2"></i> Add New Plan
+        </button>
+    </div>
+
+    <?php if (!empty($message)): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= $message ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= $error ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <?php endif; ?>
+
+    <div class="row">
+        <?php foreach ($plans as $plan): ?>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($plan['name']) ?></h6>
+                        <div>
+                            <?php if ($plan['featured']): ?>
+                                <span class="badge badge-primary">Featured</span>
+                            <?php endif; ?>
+                            <?php if ($plan['status']): ?>
+                                <span class="badge badge-success">Active</span>
+                            <?php else: ?>
+                                <span class="badge badge-secondary">Inactive</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Return Rate</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $plan['interest_rate'] ?>%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="mb-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
+                            <div><?= $plan['duration'] ?> <?= ucfirst($plan['duration_unit']) ?>(s)</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Min Investment</div>
+                                <div>$<?= number_format($plan['min_amount'], 2) ?></div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Max Investment</div>
+                                <div>
+                                    <?php if ($plan['max_amount'] > 0): ?>
+                                        $<?= number_format($plan['max_amount'], 2) ?>
+                                    <?php else: ?>
+                                        Unlimited
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <?php if (!empty($plan['description'])): ?>
+                            <hr>
+                            <div class="mb-0">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
+                                <p class="mb-0"><?= nl2br(htmlspecialchars($plan['description'])) ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-primary btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" 
+                                    data-id="<?= $plan['id'] ?>"
+                                    data-name="<?= htmlspecialchars($plan['name']) ?>"
+                                    data-description="<?= htmlspecialchars($plan['description']) ?>"
+                                    data-min="<?= $plan['min_amount'] ?>"
+                                    data-max="<?= $plan['max_amount'] ?>"
+                                    data-rate="<?= $plan['interest_rate'] ?>"
+                                    data-duration="<?= $plan['duration'] ?>"
+                                    data-unit="<?= $plan['duration_unit'] ?>"
+                                    data-status="<?= $plan['status'] ?>"
+                                    data-featured="<?= $plan['featured'] ?>">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-plan" data-toggle="modal" data-target="#deletePlanModal" 
+                                    data-id="<?= $plan['id'] ?>" 
+                                    data-name="<?= htmlspecialchars($plan['name']) ?>">
+                                <i class="fas fa-trash mr-1"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+        
+        <?php if (empty($plans)): ?>
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No investment plans found. Click the "Add New Plan" button to create your first plan.
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Add Plan Modal -->
+<div class="modal fade" id="addPlanModal" tabindex="-1" role="dialog" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPlanModalLabel">Add New Investment Plan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">Plan Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="min_amount">Minimum Investment Amount ($) *</label>
+                                <input type="number" class="form-control" id="min_amount" name="min_amount" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="max_amount">Maximum Investment Amount ($)</label>
+                                <input type="number" class="form-control" id="max_amount" name="max_amount" step="0.01" min="0">
+                                <small class="form-text text-muted">Enter 0 for unlimited</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="interest_rate">Interest Rate (%) *</label>
+                                <input type="number" class="form-control" id="interest_rate" name="interest_rate" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="duration">Duration *</label>
+                                <input type="number" class="form-control" id="duration" name="duration" min="1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="duration_unit">Unit *</label>
+                                <select class="form-control" id="duration_unit" name="duration_unit" required>
+                                    <option value="day">Day</option>
+                                    <option value="week">Week</option>
+                                    <option value="month">Month</option>
+                                    <option value="year">Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="status" name="status" checked>
+                                    <label class="custom-control-label" for="status">Active</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="featured" name="featured">
+                                    <label class="custom-control-label" for="featured">Featured</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" name="add_plan" class="btn btn-primary">Add Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Plan Modal -->
+<div class="modal fade" id="editPlanModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPlanModalLabel">Edit Investment Plan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="edit_plan_id" name="plan_id">
+                    <div class="form-group">
+                        <label for="edit_name">Plan Name *</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_description">Description</label>
+                        <textarea class="form-control" id="edit_description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_min_amount">Minimum Investment Amount ($) *</label>
+                                <input type="number" class="form-control" id="edit_min_amount" name="min_amount" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_max_amount">Maximum Investment Amount ($)</label>
+                                <input type="number" class="form-control" id="edit_max_amount" name="max_amount" step="0.01" min="0">
+                                <small class="form-text text-muted">Enter 0 for unlimited</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_interest_rate">Interest Rate (%) *</label>
+                                <input type="number" class="form-control" id="edit_interest_rate" name="interest_rate" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="edit_duration">Duration *</label>
+                                <input type="number" class="form-control" id="edit_duration" name="duration" min="1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="edit_duration_unit">Unit *</label>
+                                <select class="form-control" id="edit_duration_unit" name="duration_unit" required>
+                                    <option value="day">Day</option>
+                                    <option value="week">Week</option>
+                                    <option value="month">Month</option>
+                                    <option value="year">Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="edit_status" name="status">
+                                    <label class="custom-control-label" for="edit_status">Active</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="edit_featured" name="featured">
+                                    <label class="custom-control-label" for="edit_featured">Featured</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" name="update_plan" class="btn btn-primary">Update Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Plan Modal -->
+<div class="modal fade" id="deletePlanModal" tabindex="-1" role="dialog" aria-labelledby="deletePlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePlanModalLabel">Delete Investment Plan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="delete_plan_id" name="plan_id">
+                    <p>Are you sure you want to delete the investment plan: <strong id="delete_plan_name"></strong>?</p>
+                    <p class="text-danger">This action cannot be undone. Plans with active investments cannot be deleted.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" name="delete_plan" class="btn btn-danger">Delete Plan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Edit plan
+    $('.edit-plan').on('click', function() {
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        var description = $(this).data('description');
+        var min = $(this).data('min');
+        var max = $(this).data('max');
+        var rate = $(this).data('rate');
+        var duration = $(this).data('duration');
+        var unit = $(this).data('unit');
+        var status = $(this).data('status');
+        var featured = $(this).data('featured');
+        
+        $('#edit_plan_id').val(id);
+        $('#edit_name').val(name);
+        $('#edit_description').val(description);
+        $('#edit_min_amount').val(min);
+        $('#edit_max_amount').val(max);
+        $('#edit_interest_rate').val(rate);
+        $('#edit_duration').val(duration);
+        $('#edit_duration_unit').val(unit);
+        $('#edit_status').prop('checked', status == 1);
+        $('#edit_featured').prop('checked', featured == 1);
+    });
+    
+    // Delete plan
+    $('.delete-plan').on('click', function() {
+        var id = $(this).data('id');
+        var name = $(this).data('name');
+        
+        $('#delete_plan_id').val(id);
+        $('#delete_plan_name').text(name);
+    });
+});
+</script>
+
+<?php include_once __DIR__ . '/layout/footer.php'; ?> 

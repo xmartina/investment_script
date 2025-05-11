@@ -132,11 +132,23 @@ get('/admin/setup', function() {
 get('/admin/setup.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/setup.php';
 });
+get('/admin/db_init', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_init.php';
+});
+get('/admin/db_init.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_init.php';
+});
 get('/admin/users', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/users.php';
 });
 get('/admin/users.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/users.php';
+});
+get('/admin/user_detail', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/user_detail.php';
+});
+get('/admin/user_detail.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/user_detail.php';
 });
 get('/admin/withdrawals', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawals.php';
@@ -197,21 +209,6 @@ get('/admin/profile', function() {
 });
 get('/admin/profile.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
-});
-// Add database test route
-get('/admin/db_test', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_test.php';
-});
-get('/admin/db_test.php', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_test.php';
-});
-
-// Add database initialization route
-get('/admin/db_init', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_init.php';
-});
-get('/admin/db_init.php', function() {
-    include $_SERVER['DOCUMENT_ROOT'] . '/admin/db_init.php';
 });
 
 // Add these to your index.php
@@ -365,4 +362,53 @@ post('/admin/profile.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/profile.php';
 });
 
-dispatch();
+// Get parts of URL
+$parsed_url = parse_url($_SERVER['REQUEST_URI']);
+
+// Get path from URL, or root as a fallback
+$path = isset($parsed_url['path']) ? $parsed_url['path'] : '/';
+
+// Remove trailing slashes from path and convert to lowercase
+$path = strtolower(rtrim($path, '/'));
+
+// Add root back if path is empty
+if ($path == '') {
+    $path = '/';
+}
+
+// Get array of URL parameters
+$parameters = [];
+if (isset($parsed_url['query'])) {
+    parse_str($parsed_url['query'], $parameters);
+}
+
+// Check if the requested URL has a valid route
+$route_found = false;
+foreach (Route::$routes as $route) {
+    // Check if the request method matches the route's method
+    if ($route['method'] === $_SERVER['REQUEST_METHOD'] || $route['method'] === 'ANY') {
+        // Convert route path to regex pattern for matching
+        $pattern = Route::convertPatternToRegex($route['path']);
+        
+        // Check if the requested path matches the route pattern
+        if (preg_match($pattern, $path, $matches)) {
+            // Remove the first match (the full path)
+            array_shift($matches);
+            
+            // Store matched route parameters
+            $route_parameters = $matches;
+            
+            // Call the route's callback function
+            call_user_func_array($route['callback'], $route_parameters);
+            
+            $route_found = true;
+            break;
+        }
+    }
+}
+
+// Return 404 if no route matches
+if (!$route_found) {
+    http_response_code(404);
+    echo '404 - Page Not Found';
+}
