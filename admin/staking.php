@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Get staking details
         $stmt = $conn_back->prepare("
             SELECT s.*, p.name as plan_name 
-            FROM staking_positions s 
+            FROM staking s 
             JOIN staking_plans p ON s.plan_id = p.id 
             WHERE s.id = ? AND s.status = 'active'
         ");
@@ -39,9 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Update staking status
                 $stmt = $conn_back->prepare("
-                    UPDATE staking_positions 
-                    SET status = 'cancelled', 
-                        unstaked_at = NOW(),
+                    UPDATE staking 
+                    SET status = 'cancelled',
                         updated_at = NOW() 
                     WHERE id = ?
                 ");
@@ -101,169 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // Approve pending staking
-    if (isset($_POST['approve_staking'])) {
-        $staking_id = intval($_POST['staking_id']);
-        
-        // Get staking details
-        $stmt = $conn_back->prepare("
-            SELECT s.*, p.name as plan_name 
-            FROM staking_positions s 
-            JOIN staking_plans p ON s.plan_id = p.id 
-            WHERE s.id = ? AND s.status = 'pending'
-        ");
-        $stmt->bind_param("i", $staking_id);
-        $stmt->execute();
-        $staking = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-        
-        if ($staking) {
-            // Begin transaction
-            $conn_back->begin_transaction();
-            
-            try {
-                // Update staking status
-                $stmt = $conn_back->prepare("
-                    UPDATE staking_positions 
-                    SET status = 'active', 
-                        updated_at = NOW() 
-                    WHERE id = ?
-                ");
-                $stmt->bind_param("i", $staking_id);
-                $result = $stmt->execute();
-                $stmt->close();
-                
-                if (!$result) throw new Exception("Failed to update staking status");
-                
-                // Create transaction record
-                $description = "Staking position approved. Plan: " . $staking['plan_name'];
-                $stmt = $conn_back->prepare("
-                    INSERT INTO transactions (
-                        user_id, amount, transaction_type, status, 
-                        description, date_time
-                    ) VALUES (?, ?, 'staking_approval', 'completed', ?, NOW())
-                ");
-                $stmt->bind_param("ids", $staking['user_id'], $staking['amount'], $description);
-                $result = $stmt->execute();
-                $stmt->close();
-                
-                if (!$result) throw new Exception("Failed to create transaction record");
-                
-                // Log admin activity
-                $admin_id = $_SESSION['admin_id'];
-                $action = "Approved staking position #$staking_id for user #" . $staking['user_id'] . " with amount $" . number_format($staking['amount'], 2);
-                $ip = $_SERVER['REMOTE_ADDR'];
-                
-                $stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                $stmt->bind_param("iss", $admin_id, $action, $ip);
-                $stmt->execute();
-                $stmt->close();
-                
-                // Commit transaction
-                $conn_back->commit();
-                
-                $message = "Staking position #$staking_id has been approved successfully.";
-            } catch (Exception $e) {
-                // Rollback transaction on error
-                $conn_back->rollback();
-                $error = "Error approving staking position: " . $e->getMessage();
-            }
-        } else {
-            $error = "Staking position not found or not in pending status.";
-        }
-    }
-    
-    // Reject pending staking
-    if (isset($_POST['reject_staking'])) {
-        $staking_id = intval($_POST['staking_id']);
-        
-        // Get staking details
-        $stmt = $conn_back->prepare("
-            SELECT s.*, p.name as plan_name 
-            FROM staking_positions s 
-            JOIN staking_plans p ON s.plan_id = p.id 
-            WHERE s.id = ? AND s.status = 'pending'
-        ");
-        $stmt->bind_param("i", $staking_id);
-        $stmt->execute();
-        $staking = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-        
-        if ($staking) {
-            // Begin transaction
-            $conn_back->begin_transaction();
-            
-            try {
-                // Update staking status
-                $stmt = $conn_back->prepare("
-                    UPDATE staking_positions 
-                    SET status = 'rejected', 
-                        updated_at = NOW() 
-                    WHERE id = ?
-                ");
-                $stmt->bind_param("i", $staking_id);
-                $result = $stmt->execute();
-                $stmt->close();
-                
-                if (!$result) throw new Exception("Failed to update staking status");
-                
-                // Return staked amount to user
-                $stmt = $conn_back->prepare("
-                    UPDATE users 
-                    SET main_balance = main_balance + ? 
-                    WHERE id = ?
-                ");
-                $stmt->bind_param("di", $staking['amount'], $staking['user_id']);
-                $result = $stmt->execute();
-                $stmt->close();
-                
-                if (!$result) throw new Exception("Failed to update user balance");
-                
-                // Create transaction record
-                $description = "Staking position rejected. Funds returned. Plan: " . $staking['plan_name'];
-                $stmt = $conn_back->prepare("
-                    INSERT INTO transactions (
-                        user_id, amount, transaction_type, status, 
-                        description, date_time
-                    ) VALUES (?, ?, 'staking_rejected', 'completed', ?, NOW())
-                ");
-                $stmt->bind_param("ids", $staking['user_id'], $staking['amount'], $description);
-                $result = $stmt->execute();
-                $stmt->close();
-                
-                if (!$result) throw new Exception("Failed to create transaction record");
-                
-                // Log admin activity
-                $admin_id = $_SESSION['admin_id'];
-                $action = "Rejected staking position #$staking_id for user #" . $staking['user_id'] . " and returned $" . number_format($staking['amount'], 2);
-                $ip = $_SERVER['REMOTE_ADDR'];
-                
-                $stmt = $conn_back->prepare("INSERT INTO admin_logs (admin_id, action, ip_address) VALUES (?, ?, ?)");
-                $stmt->bind_param("iss", $admin_id, $action, $ip);
-                $stmt->execute();
-                $stmt->close();
-                
-                // Commit transaction
-                $conn_back->commit();
-                
-                $message = "Staking position #$staking_id has been rejected and $" . number_format($staking['amount'], 2) . " has been returned to the user.";
-            } catch (Exception $e) {
-                // Rollback transaction on error
-                $conn_back->rollback();
-                $error = "Error rejecting staking position: " . $e->getMessage();
-            }
-        } else {
-            $error = "Staking position not found or not in pending status.";
-        }
-    }
-    
     // Toggle compounding
     if (isset($_POST['toggle_compounding'])) {
         $staking_id = intval($_POST['staking_id']);
         $is_compounding = isset($_POST['is_compounding']) ? 1 : 0;
         
         $stmt = $conn_back->prepare("
-            UPDATE staking_positions 
+            UPDATE staking 
             SET is_compounding = ?,
                 updated_at = NOW()
             WHERE id = ? AND status = 'active'
@@ -292,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Check if staking_positions table exists
 $table_exists = false;
-$result = $conn_back->query("SHOW TABLES LIKE 'staking_positions'");
+$result = $conn_back->query("SHOW TABLES LIKE 'staking'");
 if ($result && $result->num_rows > 0) {
     $table_exists = true;
 }
@@ -345,10 +188,10 @@ if ($table_exists) {
         SELECT 
             COUNT(CASE WHEN status = 'active' THEN 1 END) as active_count,
             IFNULL(SUM(CASE WHEN status = 'active' THEN amount ELSE 0 END), 0) as active_amount,
-            COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_count,
+            0 as pending_count,
             COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_count,
-            IFNULL(SUM(total_rewards), 0) as total_rewards
-        FROM staking_positions
+            IFNULL(SUM(earned_reward), 0) as total_rewards
+        FROM staking
     ";
     $stats_result = $conn_back->query($stats_sql);
     if ($stats_result && $row = $stats_result->fetch_assoc()) {
@@ -360,7 +203,7 @@ if ($table_exists) {
     }
     
     // Get total count for pagination
-    $count_sql = "SELECT COUNT(*) as total FROM staking_positions s WHERE $condition";
+    $count_sql = "SELECT COUNT(*) as total FROM staking s WHERE $condition";
     $stmt = $conn_back->prepare($count_sql);
     if (!empty($types)) {
         $stmt->bind_param($types, ...$params);
@@ -380,8 +223,8 @@ if ($table_exists) {
             u.email,
             p.name as plan_name,
             p.roi_daily,
-            p.lockup_period
-        FROM staking_positions s
+            p.lock_period_days as lockup_period
+        FROM staking s
         JOIN users u ON s.user_id = u.id
         JOIN staking_plans p ON s.plan_id = p.id
         WHERE $condition
@@ -440,7 +283,7 @@ include_once __DIR__ . '/layout/header.php';
     <?php if (!$table_exists): ?>
         <div class="alert alert-warning">
             <h4 class="alert-heading">Staking tables not found!</h4>
-            <p>The staking_positions table does not exist in the database. Please run the database initialization script.</p>
+            <p>The staking table does not exist in the database. Please run the database initialization script.</p>
             <hr>
             <a href="db_init.php" class="btn btn-primary">Initialize Database</a>
         </div>
@@ -527,11 +370,9 @@ include_once __DIR__ . '/layout/header.php';
                         <label for="status" class="mr-2">Status:</label>
                         <select class="form-control" id="status" name="status">
                             <option value="">All Statuses</option>
-                            <option value="pending" <?= $status_filter == 'pending' ? 'selected' : '' ?>>Pending</option>
                             <option value="active" <?= $status_filter == 'active' ? 'selected' : '' ?>>Active</option>
                             <option value="completed" <?= $status_filter == 'completed' ? 'selected' : '' ?>>Completed</option>
                             <option value="cancelled" <?= $status_filter == 'cancelled' ? 'selected' : '' ?>>Cancelled</option>
-                            <option value="rejected" <?= $status_filter == 'rejected' ? 'selected' : '' ?>>Rejected</option>
                         </select>
                     </div>
                     <div class="form-group mb-2 mr-3">
@@ -567,7 +408,7 @@ include_once __DIR__ . '/layout/header.php';
                                 <th>User</th>
                                 <th>Plan</th>
                                 <th>Amount</th>
-                                <th>Daily ROI</th>
+                                <th>APY %</th>
                                 <th>Status</th>
                                 <th>Created</th>
                                 <th>Rewards</th>
@@ -593,66 +434,47 @@ include_once __DIR__ . '/layout/header.php';
                                         <td>
                                             <?php if ($staking['status'] == 'active'): ?>
                                                 <span class="badge badge-success">Active</span>
-                                            <?php elseif ($staking['status'] == 'pending'): ?>
-                                                <span class="badge badge-warning">Pending</span>
                                             <?php elseif ($staking['status'] == 'completed'): ?>
                                                 <span class="badge badge-primary">Completed</span>
                                             <?php elseif ($staking['status'] == 'cancelled'): ?>
                                                 <span class="badge badge-danger">Cancelled</span>
-                                            <?php elseif ($staking['status'] == 'rejected'): ?>
-                                                <span class="badge badge-dark">Rejected</span>
                                             <?php endif; ?>
                                         </td>
                                         <td><?= date('Y-m-d H:i', strtotime($staking['created_at'])) ?></td>
                                         <td>
-                                            <strong>$<?= number_format($staking['total_rewards'], 2) ?></strong>
+                                            <strong>$<?= number_format($staking['earned_reward'], 2) ?></strong>
                                             <?php if ($staking['status'] == 'active'): ?>
                                                 <br>
                                                 <small class="text-muted">
-                                                    Last: <?= $staking['last_reward_date'] ? date('Y-m-d', strtotime($staking['last_reward_date'])) : 'None' ?>
+                                                    Last: <?= $staking['last_compound_at'] ? date('Y-m-d', strtotime($staking['last_compound_at'])) : 'None' ?>
                                                 </small>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="text-center">
-                                            <?php if ($staking['status'] == 'active'): ?>
-                                                <form method="post" class="d-inline">
-                                                    <input type="hidden" name="staking_id" value="<?= $staking['id'] ?>">
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input" id="compounding_<?= $staking['id'] ?>" name="is_compounding" <?= $staking['is_compounding'] ? 'checked' : '' ?> onchange="this.form.submit()">
-                                                        <label class="custom-control-label" for="compounding_<?= $staking['id'] ?>"></label>
-                                                    </div>
-                                                    <input type="hidden" name="toggle_compounding" value="1">
-                                                </form>
+                                        <td>
+                                            <?php if($staking['is_compounding'] == 1): ?>
+                                                <span class="badge badge-success">Yes</span>
                                             <?php else: ?>
-                                                <span class="text-muted">N/A</span>
+                                                <span class="badge badge-secondary">No</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Actions
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="create_staking.php?edit=<?= $staking['id'] ?>">
-                                                        <i class="fas fa-edit fa-sm fa-fw mr-2 text-gray-400"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item" href="staking_rewards.php?staking_id=<?= $staking['id'] ?>">
-                                                        <i class="fas fa-trophy fa-sm fa-fw mr-2 text-gray-400"></i> View Rewards
+                                            <div class="dropdown no-arrow">
+                                                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                                    <div class="dropdown-header">Actions:</div>
+                                                    <a class="dropdown-item" href="user_detail.php?id=<?= $staking['user_id'] ?>">
+                                                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> View User
                                                     </a>
                                                     <div class="dropdown-divider"></div>
-                                                    
-                                                    <?php if ($staking['status'] == 'pending'): ?>
-                                                        <button class="dropdown-item text-success approve-staking" data-toggle="modal" data-target="#approveModal" data-id="<?= $staking['id'] ?>" data-user="<?= htmlspecialchars($staking['username']) ?>" data-amount="<?= number_format($staking['amount'], 2) ?>">
-                                                            <i class="fas fa-check fa-sm fa-fw mr-2 text-success"></i> Approve
-                                                        </button>
-                                                        <button class="dropdown-item text-danger reject-staking" data-toggle="modal" data-target="#rejectModal" data-id="<?= $staking['id'] ?>" data-user="<?= htmlspecialchars($staking['username']) ?>" data-amount="<?= number_format($staking['amount'], 2) ?>">
-                                                            <i class="fas fa-times fa-sm fa-fw mr-2 text-danger"></i> Reject
-                                                        </button>
-                                                    <?php endif; ?>
                                                     
                                                     <?php if ($staking['status'] == 'active'): ?>
                                                         <button class="dropdown-item text-danger cancel-staking" data-toggle="modal" data-target="#cancelModal" data-id="<?= $staking['id'] ?>" data-user="<?= htmlspecialchars($staking['username']) ?>" data-amount="<?= number_format($staking['amount'], 2) ?>">
                                                             <i class="fas fa-ban fa-sm fa-fw mr-2 text-danger"></i> Cancel
+                                                        </button>
+                                                        <button class="dropdown-item toggle-compounding" data-toggle="modal" data-target="#compoundingModal" data-id="<?= $staking['id'] ?>" data-compounding="<?= $staking['is_compounding'] ?>">
+                                                            <i class="fas fa-sync fa-sm fa-fw mr-2 text-info"></i> Toggle Compounding
                                                         </button>
                                                         <a class="dropdown-item" href="staking_rewards.php?process=<?= $staking['id'] ?>">
                                                             <i class="fas fa-coins fa-sm fa-fw mr-2 text-warning"></i> Process Reward
@@ -751,19 +573,49 @@ include_once __DIR__ . '/layout/header.php';
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="cancelModalLabel">Cancel Staking Position</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
                 </button>
             </div>
             <form method="post">
                 <div class="modal-body">
-                    <input type="hidden" name="staking_id" id="cancel_staking_id">
-                    <p>Are you sure you want to cancel the staking position for <strong id="cancel_user"></strong> with an amount of <strong id="cancel_amount"></strong>?</p>
-                    <p class="text-danger">This will cancel the active position and return the staked amount to the user. Any accumulated rewards will remain with the user.</p>
+                    <p>Are you sure you want to cancel the staking position for <span id="cancelUserName"></span>?</p>
+                    <p>This will return <span id="cancelAmount"></span> to the user's balance.</p>
+                    <input type="hidden" name="staking_id" id="cancelStakingId" value="">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" name="cancel_staking" class="btn btn-danger">Cancel Staking</button>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button type="submit" name="cancel_staking" class="btn btn-danger">Yes, Cancel Staking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Compounding Modal -->
+<div class="modal fade" id="compoundingModal" tabindex="-1" role="dialog" aria-labelledby="compoundingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="compoundingModalLabel">Change Compounding Setting</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form method="post">
+                <div class="modal-body">
+                    <p>Update compounding setting for staking position #<span id="compoundingStakingIdDisplay"></span>:</p>
+                    <div class="form-group">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="compoundingSwitch" name="is_compounding">
+                            <label class="custom-control-label" for="compoundingSwitch">Enable Compounding</label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="staking_id" id="compoundingStakingId" value="">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button type="submit" name="toggle_compounding" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -780,35 +632,25 @@ $(document).ready(function() {
         "searching": false
     });
     
-    // Set up modal data
-    $('.approve-staking').on('click', function() {
+    // Cancel staking modal
+    $('.cancel-staking').click(function() {
         var id = $(this).data('id');
         var user = $(this).data('user');
         var amount = $(this).data('amount');
         
-        $('#approve_staking_id').val(id);
-        $('#approve_user').text(user);
-        $('#approve_amount').text('$' + amount);
+        $('#cancelStakingId').val(id);
+        $('#cancelUserName').text(user);
+        $('#cancelAmount').text('$' + amount);
     });
     
-    $('.reject-staking').on('click', function() {
+    // Toggle compounding modal
+    $('.toggle-compounding').click(function() {
         var id = $(this).data('id');
-        var user = $(this).data('user');
-        var amount = $(this).data('amount');
+        var is_compounding = $(this).data('compounding');
         
-        $('#reject_staking_id').val(id);
-        $('#reject_user').text(user);
-        $('#reject_amount').text('$' + amount);
-    });
-    
-    $('.cancel-staking').on('click', function() {
-        var id = $(this).data('id');
-        var user = $(this).data('user');
-        var amount = $(this).data('amount');
-        
-        $('#cancel_staking_id').val(id);
-        $('#cancel_user').text(user);
-        $('#cancel_amount').text('$' + amount);
+        $('#compoundingStakingId').val(id);
+        $('#compoundingStakingIdDisplay').text(id);
+        $('#compoundingSwitch').prop('checked', is_compounding == 1);
     });
 });
 </script>
