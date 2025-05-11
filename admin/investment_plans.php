@@ -22,31 +22,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
         $roi_percent = floatval($_POST['roi_percent']);
-        $duration = intval($_POST['duration']);
-        $duration_unit = $_POST['duration_unit'];
+        $duration_days = intval($_POST['duration_days']);
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
-            // Calculate duration in days
-            $days = $duration;
-            if ($duration_unit === 'week') {
-                $days = $duration * 7;
-            } elseif ($duration_unit === 'month') {
-                $days = $duration * 30;
-            } elseif ($duration_unit === 'year') {
-                $days = $duration * 365;
-            }
-            
             // Insert new plan
             $stmt = $conn_back->prepare("
-                INSERT INTO investment_plans (name, description, min_amount, max_amount, roi_percent, duration, duration_unit, duration_days, status, featured, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                INSERT INTO investment_plans (name, description, min_amount, max_amount, roi_percent, duration_days, status, featured, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
-            $stmt->bind_param("ssdddiisii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration, $duration_unit, $days, $status, $featured);
+            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $status, $featured);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Add Investment Plan', "Added new plan: $name");
@@ -67,34 +56,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
         $roi_percent = floatval($_POST['roi_percent']);
-        $duration = intval($_POST['duration']);
-        $duration_unit = $_POST['duration_unit'];
+        $duration_days = intval($_POST['duration_days']);
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_percent <= 0 || $duration_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
-            // Calculate duration in days
-            $days = $duration;
-            if ($duration_unit === 'week') {
-                $days = $duration * 7;
-            } elseif ($duration_unit === 'month') {
-                $days = $duration * 30;
-            } elseif ($duration_unit === 'year') {
-                $days = $duration * 365;
-            }
-            
             // Update plan
             $stmt = $conn_back->prepare("
                 UPDATE investment_plans 
                 SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
-                    roi_percent = ?, duration = ?, duration_unit = ?, duration_days = ?,
+                    roi_percent = ?, duration_days = ?,
                     status = ?, featured = ?, updated_at = NOW() 
                 WHERE id = ?
             ");
-            $stmt->bind_param("ssdddiisiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration, $duration_unit, $days, $status, $featured, $plan_id);
+            $stmt->bind_param("ssdddiii", $name, $description, $min_amount, $max_amount, $roi_percent, $duration_days, $status, $featured, $plan_id);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Update Investment Plan', "Updated plan #$plan_id: $name");
@@ -210,7 +188,7 @@ include_once __DIR__ . '/layout/header.php';
                         
                         <div class="mb-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
-                            <div><?= $plan['duration'] ?> <?= ucfirst($plan['duration_unit']) ?>(s)</div>
+                            <div><?= $plan['duration_days'] ?? 0 ?> Days</div>
                         </div>
                         
                         <div class="row">
@@ -247,8 +225,7 @@ include_once __DIR__ . '/layout/header.php';
                                     data-min="<?= $plan['min_amount'] ?>"
                                     data-max="<?= $plan['max_amount'] ?>"
                                     data-rate="<?= $plan['roi_percent'] ?>"
-                                    data-duration="<?= $plan['duration'] ?>"
-                                    data-unit="<?= $plan['duration_unit'] ?>"
+                                    data-duration="<?= $plan['duration_days'] ?>"
                                     data-status="<?= $plan['status'] ?>"
                                     data-featured="<?= $plan['featured'] ?>">
                                 <i class="fas fa-edit mr-1"></i> Edit
@@ -316,21 +293,11 @@ include_once __DIR__ . '/layout/header.php';
                                 <input type="number" class="form-control" id="roi_percent" name="roi_percent" step="0.01" min="0" required>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="duration">Duration *</label>
-                                <input type="number" class="form-control" id="duration" name="duration" min="1" required>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="duration_unit">Unit *</label>
-                                <select class="form-control" id="duration_unit" name="duration_unit" required>
-                                    <option value="day">Day</option>
-                                    <option value="week">Week</option>
-                                    <option value="month">Month</option>
-                                    <option value="year">Year</option>
-                                </select>
+                                <label for="duration_days">Duration (Days) *</label>
+                                <input type="number" class="form-control" id="duration_days" name="duration_days" min="1" required>
+                                <small class="form-text text-muted">Number of days for the investment period</small>
                             </div>
                         </div>
                     </div>
@@ -405,21 +372,11 @@ include_once __DIR__ . '/layout/header.php';
                                 <input type="number" class="form-control" id="edit_roi_percent" name="roi_percent" step="0.01" min="0" required>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="edit_duration">Duration *</label>
-                                <input type="number" class="form-control" id="edit_duration" name="duration" min="1" required>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="edit_duration_unit">Unit *</label>
-                                <select class="form-control" id="edit_duration_unit" name="duration_unit" required>
-                                    <option value="day">Day</option>
-                                    <option value="week">Week</option>
-                                    <option value="month">Month</option>
-                                    <option value="year">Year</option>
-                                </select>
+                                <label for="edit_duration_days">Duration (Days) *</label>
+                                <input type="number" class="form-control" id="edit_duration_days" name="duration_days" min="1" required>
+                                <small class="form-text text-muted">Number of days for the investment period</small>
                             </div>
                         </div>
                     </div>
@@ -487,7 +444,6 @@ $(document).ready(function() {
         var max = $(this).data('max');
         var rate = $(this).data('rate');
         var duration = $(this).data('duration');
-        var unit = $(this).data('unit');
         var status = $(this).data('status');
         var featured = $(this).data('featured');
         
@@ -497,8 +453,7 @@ $(document).ready(function() {
         $('#edit_min_amount').val(min);
         $('#edit_max_amount').val(max);
         $('#edit_roi_percent').val(rate);
-        $('#edit_duration').val(duration);
-        $('#edit_duration_unit').val(unit);
+        $('#edit_duration_days').val(duration);
         $('#edit_status').prop('checked', status == 1);
         $('#edit_featured').prop('checked', featured == 1);
     });
