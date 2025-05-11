@@ -172,38 +172,44 @@ include_once __DIR__ . '/layout/header.php';
     .card-deck .card, .row .card {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        min-height: 350px; /* Set minimum height */
+        height: auto;
     }
     .card-body {
         flex: 1 1 auto;
-        overflow: hidden;
+        overflow: visible; /* Change from hidden to visible */
+        padding: 1.25rem;
     }
     .card-deck {
         margin-bottom: 15px;
     }
     
-    /* Prevent text overflow */
+    /* Prevent text overflow but ensure visibility */
     .card-body p, .card-body div, .card-header h6 {
         word-break: break-word;
         max-width: 100%;
         white-space: normal;
+        color: #ffffff !important; /* Make all text white for visibility */
     }
     
     /* Limit description height with scrolling */
     .card-body .description-container {
         max-height: 80px;
         overflow-y: auto;
+        background-color: rgba(0,0,0,0.1); /* Subtle background for scrollable area */
+        padding: 5px;
+        border-radius: 4px;
     }
     
     /* Lighten text colors */
     .text-gray-800 {
-        color: #f8f9fc !important;
+        color: #ffffff !important;
+        font-size: 1.25rem;
     }
     .text-xs {
         color: #d1d3e2 !important;
-    }
-    .card-body div:not(.text-xs) {
-        color: #f8f9fc !important;
+        font-weight: bold;
+        font-size: 0.8rem;
     }
     
     /* Improve card header text contrast */
@@ -214,11 +220,19 @@ include_once __DIR__ . '/layout/header.php';
     /* Add spacing for better readability */
     .card {
         margin-bottom: 1rem;
+        background-color: #2c3e50 !important; /* Darker background */
+        border: 1px solid rgba(255,255,255,0.125) !important;
     }
     
     /* Make numbers more readable */
     .h5.mb-0 {
         font-size: 1.5rem;
+    }
+    
+    /* Improve visibility of badges */
+    .badge {
+        font-size: 90%;
+        padding: 0.35em 0.65em;
     }
 </style>
 
@@ -268,13 +282,13 @@ include_once __DIR__ . '/layout/header.php';
             </div>
         </div>
     <?php else: ?>
-        <div class="row">
+        <div class="row mb-4">
             <?php 
             $count = 0;
             foreach ($plans as $plan): 
                 // Start a new row for every 3 cards (on large screens)
                 if($count % 3 == 0 && $count > 0): ?>
-                </div><div class="row">
+                </div><div class="row mb-4">
                 <?php endif; 
                 $count++;
             ?>
@@ -297,10 +311,10 @@ include_once __DIR__ . '/layout/header.php';
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-uppercase mb-1">Daily Return Rate</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><?= $plan['roi_daily'] ?>%</div>
+                                    <div class="h5 mb-0 font-weight-bold text-white"><?= $plan['roi_daily'] ?>%</div>
                                 </div>
                                 <div class="col-auto">
-                                    <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                                    <i class="fas fa-chart-line fa-2x text-white"></i>
                                 </div>
                             </div>
                             
@@ -308,17 +322,17 @@ include_once __DIR__ . '/layout/header.php';
                             
                             <div class="mb-2">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Lock-up Period</div>
-                                <div><?= $plan['lockup_period'] ?> days</div>
+                                <div class="text-white"><?= $plan['lockup_period'] ?> days</div>
                             </div>
                             
                             <div class="row">
                                 <div class="col-6">
                                     <div class="text-xs font-weight-bold text-uppercase mb-1">Min Stake</div>
-                                    <div class="text-nowrap">$<?= number_format($plan['min_amount'], 2) ?></div>
+                                    <div class="text-nowrap text-white">$<?= number_format($plan['min_amount'], 2) ?></div>
                                 </div>
                                 <div class="col-6">
                                     <div class="text-xs font-weight-bold text-uppercase mb-1">Max Stake</div>
-                                    <div class="text-nowrap">
+                                    <div class="text-nowrap text-white">
                                         <?php if ($plan['max_amount'] > 0): ?>
                                             $<?= number_format($plan['max_amount'], 2) ?>
                                         <?php else: ?>
@@ -332,8 +346,8 @@ include_once __DIR__ . '/layout/header.php';
                                 <hr>
                                 <div class="mb-0">
                                     <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
-                                    <div class="description-container">
-                                        <p class="mb-0"><?= nl2br(htmlspecialchars($plan['description'])) ?></p>
+                                    <div class="description-container mt-2 mb-2">
+                                        <p class="mb-0" style="color: #ffffff;"><?= nl2br(htmlspecialchars($plan['description'])) ?></p>
                                     </div>
                                 </div>
                             <?php endif; ?>
