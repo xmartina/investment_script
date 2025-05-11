@@ -167,6 +167,20 @@ if ($result && $result->num_rows > 0) {
 include_once __DIR__ . '/layout/header.php';
 ?>
 
+<style>
+    /* Ensure equal height cards in each row */
+    .card-deck .card, .row .card {
+        display: flex;
+        flex-direction: column;
+    }
+    .card-body {
+        flex: 1 1 auto;
+    }
+    .card-deck {
+        margin-bottom: 15px;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Staking Plans Management</h1>
@@ -214,7 +228,15 @@ include_once __DIR__ . '/layout/header.php';
         </div>
     <?php else: ?>
         <div class="row">
-            <?php foreach ($plans as $plan): ?>
+            <?php 
+            $count = 0;
+            foreach ($plans as $plan): 
+                // Start a new row for every 3 cards (on large screens)
+                if($count % 3 == 0 && $count > 0): ?>
+                </div><div class="row">
+                <?php endif; 
+                $count++;
+            ?>
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
                         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -283,7 +305,7 @@ include_once __DIR__ . '/layout/header.php';
                                         data-max="<?= $plan['max_amount'] ?>"
                                         data-roi="<?= $plan['roi_daily'] ?>"
                                         data-lockup="<?= $plan['lockup_period'] ?>"
-                                        data-status="<?= $plan['status'] ?>"
+                                        data-status="<?= isset($plan['status']) ? $plan['status'] : '0' ?>"
                                         data-featured="<?= $plan['featured'] ?>">
                                     <i class="fas fa-edit mr-1"></i> Edit
                                 </button>
