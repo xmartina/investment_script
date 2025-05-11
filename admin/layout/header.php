@@ -50,15 +50,15 @@
     <div id="loader"></div>
 
     <header class="main-header">
-        <div class="d-flex align-items-center logo-box justify-content-start">
+        <div class="d-flex align-items-center logo-box justify-content-center">
             <!-- Logo -->
-            <a href="<?=$siteLink?>/admin" class="logo">
+            <a href="<?=$siteLink?>/admin" class="logo w-100">
                 <!-- logo-->
                 <!-- <div class="logo-mini w-30">
                     <span class="light-logo"><img src="<?=$siteLink?>/front_assets/images/favicon.png" alt="logo"></span>
                     <span class="dark-logo"><img src="<?=$siteLink?>/front_assets/images/favicon.png" alt="logo"></span>
                 </div> -->
-                <div class="logo-lg bg-light rounded">
+                <div class="logo-lg bg-white rounded w-100">
                     <span class="light-logo"><img src="<?=$siteLink?>/front_assets/images/logo.png" alt="logo"></span>
                     <span class="dark-logo"><img src="<?=$siteLink?>/front_assets/images/logo.png" alt="logo"></span>
                 </div>
