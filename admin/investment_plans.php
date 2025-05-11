@@ -173,7 +173,7 @@ include_once __DIR__ . '/layout/header.php';
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card <?= $plan['featured'] ? 'border-left-primary' : '' ?> shadow h-100">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background-color: #f8f9fc;">
-                        <h6 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($plan['name']) ?></h6>
+                        <h6 class="m-0 font-weight-bold text-primary text-truncate" style="max-width: 70%;" title="<?= htmlspecialchars($plan['name']) ?>"><?= htmlspecialchars($plan['name']) ?></h6>
                         <div>
                             <?php if ($plan['featured']): ?>
                                 <span class="badge badge-primary">Featured</span>
@@ -185,7 +185,7 @@ include_once __DIR__ . '/layout/header.php';
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="min-height: 350px; overflow: hidden;">
                         <!-- Plan Type and Category Info -->
                         <div class="d-flex justify-content-between mb-3">
                             <span class="badge badge-info"><?= htmlspecialchars($plan['plan_type']) ?></span>
@@ -213,7 +213,7 @@ include_once __DIR__ . '/layout/header.php';
                             </div>
                             <div class="col-6">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Risk Level</div>
-                                <div class="font-weight-bold"><?= htmlspecialchars($plan['risk_level']) ?></div>
+                                <div class="font-weight-bold text-truncate" title="<?= htmlspecialchars($plan['risk_level']) ?>"><?= htmlspecialchars($plan['risk_level']) ?></div>
                             </div>
                         </div>
                         
@@ -245,7 +245,7 @@ include_once __DIR__ . '/layout/header.php';
                             <hr class="my-2">
                             <div class="mb-0">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Description</div>
-                                <p class="mb-0 text-muted"><?= nl2br(htmlspecialchars($plan['description'] ?? '')) ?></p>
+                                <p class="mb-0 text-muted" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;"><?= nl2br(htmlspecialchars($plan['description'] ?? '')) ?></p>
                             </div>
                         <?php endif; ?>
                     </div>
