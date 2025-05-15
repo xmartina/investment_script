@@ -142,6 +142,8 @@
 
 <!-- main-js -->
 <script src="<?=$site_link?>/front_assets/js/script.js"></script>
+<script src="//code.jivosite.com/widget/mLTwDlXdg6" async></script>
+
 
 </body><!-- End of .page_wrapper -->
 
