@@ -102,225 +102,237 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
-
 ?>
 
-    <?php
-    if(isset($_GET['msg'])) { // Removed check for form_submitted
-        $msg = str_replace('_', ' ', $_GET['msg']);
-        $alert_class = "alert-success";
-        
-        if(strpos($msg, 'Error') !== false) {
-            $alert_class = "alert-danger";
-        }
+<?php
+if(isset($_GET['msg'])) { // Removed check for form_submitted
+    $msg = str_replace('_', ' ', $_GET['msg']);
+    $alert_class = "alert-success";
+
+    if(strpos($msg, 'Error') !== false) {
+        $alert_class = "alert-danger";
+    }
     ?>
     <div id="alert-message" class="alert <?php echo $alert_class; ?>" role="alert"><?php echo $msg; ?></div>
     <script>
-        // Remove hash from URL without affecting navigation
-        if(window.location.hash) {
-            history.replaceState('', document.title, window.location.pathname + window.location.search);
+    // Remove hash from URL without affecting navigation
+    if(window.location.hash) {
+        history.replaceState('', document.title, window.location.pathname + window.location.search);
+    }
+
+    setTimeout(function() {
+        var alert = document.getElementById('alert-message');
+        if(alert) {
+            alert.style.transition = 'opacity 0.5s';
+            alert.style.opacity = '0';
+            setTimeout(function() {
+                alert.remove();
+            }, 500);
         }
-        
-        setTimeout(function() {
-            var alert = document.getElementById('alert-message');
-            if(alert) {
-                alert.style.transition = 'opacity 0.5s';
-                alert.style.opacity = '0';
-                setTimeout(function() {
-                    alert.remove();
-                }, 500);
-            }
-        }, 3000);
-    </script>
-    <?php } ?>
+    }, 3000);
+</script>
+<?php } ?>
     <form id="depositForm" action="" method="post" enctype="multipart/form-data">
-    <div class="container mt-4" id="main-content">
-        <div class="card adminuiux-card overflow-hidden mb-4" id="smartwizard">
-            <ul class="nav">
-                <li class="nav-item"><a class="nav-link" href="#step-1">
-                        <div class="num">1</div>
-                        <div><p class="h5 mb-0">Deposit Setup</p>
-                            <p class="small">Deposit Information</p></div>
-                    </a></li>
-                <li class="nav-item"><a class="nav-link" href="#step-2">
-                        <div class="num">2</div>
-                        <div><p class="h5 mb-0">Payment Instructions</p>
-                            <p class="small">Make Payment</p></div>
-                    </a></li>
-                <li class="nav-item"><a class="nav-link" href="#step-3">
-                        <div class="num">3</div>
-                        <div><p class="h5 mb-0">Confirmation</p>
-                            <p class="small">Confirm Deposit</p></div>
-                    </a></li>
-            </ul>
-            <div class="card-body pb-0">
-                <div class="tab-content">
-                    <div id="step-1" class="tab-pane px-0" role="tabpanel" aria-labelledby="step-1">
-                        <div class="row my-2">
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label for="exampleFormControlInput1" class="form-label">Select Payment Method</label>
-                                            <select name="payment_method" class="form-select" aria-label="Select Payment Method">
-                                                <option selected>Select</option>
-                                                <option value="USDT">USDT</option>
-                                                <option value="BTC">BTC</option>
-                                                <option value="ETH">ETH</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
-                                    <div class="card-body">
-                                        <label for="exampleFormControlInput1" class="form-label">Enter Deposit Amount</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><?=$user_currency?></span>
-                                            <input id="deposit_amount_input" name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
-                                            <span class="input-group-text">.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="step-2" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-2">
-                        <div class="row my-2">
-                            <div class="col-12 col-md-12 col-lg-12 col-xl-12 mb-4">
-                                <div class="card h-100 bg-theme-1-subtle theme-green selectable anyone">
-                                    <div class="card-body">
-                                        <div class="list-group">
-                                            <div class="alert alert-warning" role="alert">Use the wallet address below to make payment</div>
-                                            <div class="row">
-                                                <div class="col-12 col-md-3">
-                                                    <span class="list-group-item list-group-item-action list-group-item-light">Wallet Address</span>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <input type="text" id="wallet_address" class="form-control" readonly>
-                                                </div>
-                                                <div class="col-12 col-md-3">
-                                                    <span id="walletType" class="list-group-item list-group-item-action list-group-item-light">Wallet Type</span>
-                                                </div>
+        <div class="container mt-4" id="main-content">
+            <div class="card adminuiux-card overflow-hidden mb-4" id="smartwizard">
+                <ul class="nav">
+                    <li class="nav-item"><a class="nav-link" href="#step-1">
+                            <div class="num">1</div>
+                            <div><p class="h5 mb-0">Deposit Setup</p>
+                                <p class="small">Deposit Information</p></div>
+                        </a></li>
+                    <li class="nav-item"><a class="nav-link" href="#step-2">
+                            <div class="num">2</div>
+                            <div><p class="h5 mb-0">Payment Instructions</p>
+                                <p class="small">Make Payment</p></div>
+                        </a></li>
+                    <li class="nav-item"><a class="nav-link" href="#step-3">
+                            <div class="num">3</div>
+                            <div><p class="h5 mb-0">Confirmation</p>
+                                <p class="small">Confirm Deposit</p></div>
+                        </a></li>
+                </ul>
+                <div class="card-body pb-0">
+                    <div class="tab-content">
+                        <div id="step-1" class="tab-pane px-0" role="tabpanel" aria-labelledby="step-1">
+                            <div class="row my-2">
+                                <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
+                                    <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="exampleFormControlInput1" class="form-label">Select Payment Method</label>
+                                                <select name="payment_method" class="form-select" aria-label="Select Payment Method">
+                                                    <option selected>Select</option>
+                                                    <option value="USDT">USDT</option>
+                                                    <option value="BTC">BTC</option>
+                                                    <option value="ETH">ETH</option>
+                                                    <option value="XRP">XRP</option>
+                                                    <option value="XLM">XLM</option>
+                                                    <option value="DOGE">DOGE</option>
+                                                    <option value="SOL">SOL</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card h-100 selectable anyone">
-                                    <div class="card-body">
-                                        <div class="list-group">
-                                            <div class="row">
-                                                <div class="col-12 col-md-5">
-                                                    <span class="list-group-item list-group-item-action list-group-item-light">Deposit Amount</span>
-                                                </div>
-                                                <div class="col-12 col-md-7">
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><?=$user_currency?></span>
-                                                        <input id="deposit_amount"  type="number" class="form-control" aria-label="Amount (to the nearest dollar)" readonly>
-                                                        <span class="input-group-text">.00</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="alert alert-warning" role="alert">make exactly the amount above to the address provided</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
-                                <div class="card h-100 selectable anyone">
-                                    <div class="card-body">
-                                        <div class="list-group">
-                                            <div class="row">
-                                                <div class="col-12 col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="exampleFormControlInput1" class="form-label">Enter Transaction ID/Reference</label>
-                                                        <input type="text" class="form-control" name="transactionId" id="exampleFormControlInput1" placeholder="ID/REF1235">
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="formFile" class="form-label">Upload Proof of Payment</label>
-                                                        <input class="form-control" type="file" name="paymentProof" id="formFile">
-                                                    </div>
-                                                </div>
+                                <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
+                                    <div class="card text-center bg-theme-1-subtle theme-green h-100 selectable">
+                                        <div class="card-body">
+                                            <label for="exampleFormControlInput1" class="form-label">Enter Deposit Amount</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><?=$user_currency?></span>
+                                                <input id="deposit_amount_input" name="deposit_amount" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                                <span class="input-group-text">.00</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="step-3" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-3">
-                        <div class="row my-2">
-
-                            <!-- summary -->
-                            <div class="col-12 col-md-6 mb-4">
-                                <div class="card bg-theme-1-subtle theme-green h-100 selectable">
-                                    <div class="card-body">
-                                        <h5 class="mb-4">Confirm Deposit Details</h5>
-                                        <ul class="list-group">
-                                            <li class="list-group-item d-flex justify-content-between">
-                                                <span>Payment&nbsp;Method</span><span id="c_pm"></span>
-                                            </li>
-                                            <li class="list-group-item d-flex justify-content-between">
-                                                <span>Amount</span><span id="c_amt"></span>
-                                            </li>
-                                            <li class="list-group-item d-flex justify-content-between">
-                                                <span>Wallet&nbsp;Address</span><span id="c_addr" class="text-break"></span>
-                                            </li>
-                                            <li class="list-group-item d-flex justify-content-between">
-                                                <span>Tx&nbsp;ID/Ref</span><span id="c_tx"></span>
-                                            </li>
-                                        </ul>
-
-                                        <!-- hidden fields posted to PHP -->
-                                        <input type="hidden" name="payment_method"  id="h_pm">
-                                        <input type="hidden" name="deposit_amount"  id="h_amt">
-                                        <input type="hidden" name="wallet_address"  id="h_addr">
-<!--                                        <input type="hidden" name="tx_id"           id="h_tx">-->
+                        <div id="step-2" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-2">
+                            <div class="row my-2">
+                                <div class="col-12 col-md-12 col-lg-12 col-xl-12 mb-4">
+                                    <div class="card h-100 bg-theme-1-subtle theme-green selectable anyone">
+                                        <div class="card-body">
+                                            <div class="list-group">
+                                                <div class="alert alert-warning" role="alert">Use the wallet address below to make payment</div>
+                                                <div class="row">
+                                                    <div class="col-12 col-md-3">
+                                                        <span class="list-group-item list-group-item-action list-group-item-light">Wallet Address</span>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <input type="text" id="wallet_address" class="form-control" readonly>
+                                                    </div>
+                                                    <div class="col-12 col-md-3">
+                                                        <span id="walletType" class="list-group-item list-group-item-action list-group-item-light">Wallet Type</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
+                                    <div class="card h-100 selectable anyone">
+                                        <div class="card-body">
+                                            <div class="list-group">
+                                                <div class="row">
+                                                    <div class="col-12 col-md-5">
+                                                        <span class="list-group-item list-group-item-action list-group-item-light">Deposit Amount</span>
+                                                    </div>
+                                                    <div class="col-12 col-md-7">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><?=$user_currency?></span>
+                                                            <input id="deposit_amount"  type="number" class="form-control" aria-label="Amount (to the nearest dollar)" readonly>
+                                                            <span class="input-group-text">.00</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="alert alert-warning" role="alert">make exactly the amount above to the address provided</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-6 col-xl-6 mb-4">
+                                    <div class="card h-100 selectable anyone">
+                                        <div class="card-body">
+                                            <div class="list-group">
+                                                <div class="row">
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="mb-3">
+                                                            <label for="exampleFormControlInput1" class="form-label">Enter Transaction ID/Reference</label>
+                                                            <input type="text" class="form-control" name="transactionId" id="exampleFormControlInput1" placeholder="ID/REF1235">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="mb-3">
+                                                            <label for="formFile" class="form-label">Upload Proof of Payment</label>
+                                                            <input class="form-control" type="file" name="paymentProof" id="formFile">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- proof + submit -->
-                            <div class="col-12 col-md-6 mb-4">
-                                <div class="card h-100 selectable">
-                                    <div class="card-body text-center">
-                                        <h5 class="mb-4">Proof of Payment</h5>
-                                        <img id="proof_preview" class="img-fluid border mb-3" style="max-height:240px" alt="">
-                                        <button id="submitDepositBtn" type="submit" class="btn btn-theme-1 w-100 finish-btn" style="background-color: #0049e8;color: #fff;">Submit Deposit</button>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
+                        <div id="step-3" class="tab-pane px-0 pb-0" role="tabpanel" aria-labelledby="step-3">
+                            <div class="row my-2">
+
+                                <!-- summary -->
+                                <div class="col-12 col-md-6 mb-4">
+                                    <div class="card bg-theme-1-subtle theme-green h-100 selectable">
+                                        <div class="card-body">
+                                            <h5 class="mb-4">Confirm Deposit Details</h5>
+                                            <ul class="list-group">
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Payment&nbsp;Method</span><span id="c_pm"></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Amount</span><span id="c_amt"></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Wallet&nbsp;Address</span><span id="c_addr" class="text-break"></span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between">
+                                                    <span>Tx&nbsp;ID/Ref</span><span id="c_tx"></span>
+                                                </li>
+                                            </ul>
+
+                                            <!-- hidden fields posted to PHP -->
+                                            <input type="hidden" name="payment_method"  id="h_pm">
+                                            <input type="hidden" name="deposit_amount"  id="h_amt">
+                                            <input type="hidden" name="wallet_address"  id="h_addr">
+                                            <!--                                        <input type="hidden" name="tx_id"           id="h_tx">-->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- proof + submit -->
+                                <div class="col-12 col-md-6 mb-4">
+                                    <div class="card h-100 selectable">
+                                        <div class="card-body text-center">
+                                            <h5 class="mb-4">Proof of Payment</h5>
+                                            <img id="proof_preview" class="img-fluid border mb-3" style="max-height:240px" alt="">
+                                            <button id="submitDepositBtn" type="submit" class="btn btn-theme-1 w-100 finish-btn" style="background-color: #0049e8;color: #fff;">Submit Deposit</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /STEP-3 -->
                     </div>
-                    <!-- /STEP-3 -->
+                </div>
+                <div class="progress bg-theme-1-subtle rounded-0">
+                    <div class="progress-bar bg-theme-1 h-100 rounded-0" role="progressbar" style="width: 0%"
+                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
-            <div class="progress bg-theme-1-subtle rounded-0">
-                <div class="progress-bar bg-theme-1 h-100 rounded-0" role="progressbar" style="width: 0%"
-                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
         </div>
-    </div>
     </form>
 
     <!-- ───────────────  SCRIPT  ─────────────── -->
     <script>
 /* ====== CONSTANT MAPS (step-1 / step-2) ====== */
 const walletAddresses = {
-  USDT: "TXX123USDTWalletExample",
-  BTC : "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-  ETH : "0x1234567890abcdef1234567890abcdef12345678"
+  USDT: "0x81Dc8cEe8fda0Ee57D2c9E0808218e781dC9Da8A",
+  BTC : "bc1qkyqlvaed0zxdjync4udlyk290sy333jhv8qlxc",
+  ETH : "0x1234567890abcdef1234567890abcdef12345678",
+  XRP : "rNET5KoxdU4YRGoLjmxAijYXNmMth8mXgT",
+  XLM : "GCS76CYBB6IQUEROYHVTBAVDCKZY65LMENX3ZR23I6F5TI7DAD43NUA2",
+  DOGE : "DGFq4VZUzMiN2R9sCr74CMiiLiGfaDJjLf",
+  SOL : "995UT8C4AaTZvQcZ8vZ6tA1tbLVXnn9wA7Do7Y7X6nfc"
 };
+
 const walletTypes = {
   USDT: "USDT TRC-20",
   BTC : "Bitcoin",
-  ETH : "Ethereum"
+  ETH : "Ethereum",
+  XRP : "XRP",
+  XLM : "Stellar",
+  DOGE : "Dogecoin",
+  SOL : "Solana"
 };
 
 /* ====== SYNC FIELDS BETWEEN STEP-1 & STEP-2 ====== */
@@ -365,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* 1) SmartWizard users — 'showStep' fires AFTER pane is visible */
   if (window.$ && $('#smartwizard').length) {
-    $('#smartwizard').on('showStep', (e, anchorObj, stepNumber) => {
+    $('#smartwizard').on('showStep', (e, anchorObj, stepNumber) {
       if (stepNumber === 2) fillConfirm();      // 0-based index → step-3
     });
   }
@@ -375,7 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (link) link.addEventListener('click', () => setTimeout(fillConfirm, 10));
 });
 </script>
-
 
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php';
