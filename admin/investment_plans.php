@@ -37,12 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert new plan
             $stmt = $conn_back->prepare("
                 INSERT INTO investment_plans (
-                    name, description, plan_type, category, min_amount, max_amount, 
+                    name, plan_type, category, min_amount, max_amount, 
                     roi_percent, duration_days, risk_level, return_interval, 
                     is_active, featured, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
-            $stmt->bind_param("ssssdddssii", $name, $description, $plan_type, $category, $min_amount, $max_amount, $roi_percent, $duration_days, $risk_level, $return_interval, $is_active, $featured);
+            $stmt->bind_param("sssdddiisii", $name, $plan_type, $category, $min_amount, $max_amount, $roi_percent, $duration_days, $risk_level, $return_interval, $is_active, $featured);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Add Investment Plan', "Added new plan: $name");
@@ -78,13 +78,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update plan
             $stmt = $conn_back->prepare("
                 UPDATE investment_plans 
-                SET name = ?, description = ?, plan_type = ?, category = ?,
+                SET name = ?, plan_type = ?, category = ?,
                     min_amount = ?, max_amount = ?, roi_percent = ?, duration_days = ?,
-                    risk_level = ?, return_interval = ?, is_active = ?, featured = ?,
-                    updated_at = NOW() 
+                    risk_level = ?, return_interval = ?, is_active = ?, featured = ?
                 WHERE id = ?
             ");
-            $stmt->bind_param("ssssdddssiii", $name, $description, $plan_type, $category, $min_amount, $max_amount, $roi_percent, $duration_days, $risk_level, $return_interval, $is_active, $featured, $plan_id);
+            $stmt->bind_param("sssdddiisiii", $name, $plan_type, $category, $min_amount, $max_amount, $roi_percent, $duration_days, $risk_level, $return_interval, $is_active, $featured, $plan_id);
             
             if ($stmt->execute()) {
                 logAdminActivity($_SESSION['admin_id'], 'Update Investment Plan', "Updated plan #$plan_id: $name");

@@ -345,7 +345,7 @@ include_once __DIR__ . '/layout/header.php';
                                     </td>
                                     <td>
                                         <?php if (!empty($deposit['payment_proof'])): ?>
-                                            <a href="<?= $deposit['payment_proof'] ?>" target="_blank" class="btn btn-sm btn-info">
+                                            <a href="<?= preg_replace('|^.*?/payment_proof/|', '/payment_proof/', $deposit['payment_proof']) ?>" target="_blank" class="btn btn-sm btn-info">
                                                 <i class="fas fa-image"></i> View
                                             </a>
                                         <?php else: ?>

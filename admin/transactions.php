@@ -36,10 +36,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_status = $conn_back->real_escape_string($_POST['status']);
         
         if (in_array($new_status, ['pending', 'completed', 'cancelled', 'rejected'])) {
-            $stmt = $conn_back->prepare("UPDATE transactions SET status = ? WHERE transaction_id = ?");
-            $stmt->bind_param("si", $new_status, $transaction_id);
+            // Begin transaction
+            $conn_back->begin_transaction();
             
-            if ($stmt->execute()) {
+            try {
+                // Get transaction details first
+                $stmt = $conn_back->prepare("SELECT * FROM transactions WHERE transaction_id = ?");
+                $stmt->bind_param("i", $transaction_id);
+                $stmt->execute();
+                $transaction = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
+                
+                // Update transaction status
+                $stmt = $conn_back->prepare("UPDATE transactions SET status = ? WHERE transaction_id = ?");
+                $stmt->bind_param("si", $new_status, $transaction_id);
+                $stmt->execute();
+                $stmt->close();
+                
+                // If this is a deposit transaction being approved, update user balance and deposit request
+                if ($transaction['transaction_type'] === 'deposit' && $new_status === 'completed') {
+                    // Update user's balance
+                    $stmt = $conn_back->prepare("UPDATE users SET main_balance = main_balance + ? WHERE id = ?");
+                    $stmt->bind_param("di", $transaction['amount'], $transaction['user_id']);
+                    $stmt->execute();
+                    $stmt->close();
+                    
+                    // If this deposit has a deposit_request_id, update it too
+                    if (!empty($transaction['deposit_request_id'])) {
+                        $stmt = $conn_back->prepare("UPDATE deposit_requests SET status = 'approved' WHERE id = ?");
+                        $stmt->bind_param("i", $transaction['deposit_request_id']);
+                        $stmt->execute();
+                        $stmt->close();
+                    }
+                    
+                    // Check for referral bonus
+                    $stmt = $conn_back->prepare("SELECT referred_by FROM users WHERE id = ? AND referred_by IS NOT NULL");
+                    $stmt->bind_param("i", $transaction['user_id']);
+                    $stmt->execute();
+                    $referral_result = $stmt->get_result();
+                    $stmt->close();
+                    
+                    if ($referral_result->num_rows > 0) {
+                        $referrer = $referral_result->fetch_assoc();
+                        $referrer_id = $referrer['referred_by'];
+                        
+                        // Calculate referral bonus (5% of deposit)
+                        $bonus_percentage = 0.05; // 5%
+                        $bonus_amount = $transaction['amount'] * $bonus_percentage;
+                        
+                        // Add referral bonus to referrer's balance
+                        $stmt = $conn_back->prepare("UPDATE users SET main_balance = main_balance + ?, referral_bonus_earned = referral_bonus_earned + ? WHERE id = ?");
+                        $stmt->bind_param("ddi", $bonus_amount, $bonus_amount, $referrer_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        
+                        // Create referral commission record
+                        $stmt = $conn_back->prepare("
+                            INSERT INTO referral_commissions (
+                                referrer_id, referred_id, amount, source_type, 
+                                source_id, status, created_at, paid_at
+                            ) VALUES (?, ?, ?, 'deposit', ?, 'paid', NOW(), NOW())
+                        ");
+                        $stmt->bind_param("iidi", $referrer_id, $transaction['user_id'], $bonus_amount, $transaction_id);
+                        $stmt->execute();
+                        $stmt->close();
+                        
+                        // Create transaction for referral bonus
+                        $ref_transaction_reference = 'REF' . time() . rand(1000, 9999);
+                        $ref_transaction_proof = 'REFPROOF' . time();
+                        $ref_description = 'Referral bonus for deposit #' . $transaction_id;
+                        
+                        $stmt = $conn_back->prepare("
+                            INSERT INTO transactions (
+                                user_id, amount, transaction_type, reference_id, 
+                                transaction_proof_id, currency, status, 
+                                date_time, description
+                            ) VALUES (?, ?, 'referral_bonus', ?, ?, ?, 'completed', NOW(), ?)
+                        ");
+                        $stmt->bind_param("idssss", 
+                            $referrer_id, 
+                            $bonus_amount, 
+                            $ref_transaction_reference, 
+                            $ref_transaction_proof, 
+                            $transaction['currency'], 
+                            $ref_description
+                        );
+                        $stmt->execute();
+                        $stmt->close();
+                    }
+                }
+                
                 // Log admin activity
                 $admin_id = $_SESSION['admin_id'];
                 $action = "Updated transaction #$transaction_id status to $new_status";
@@ -49,9 +135,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $log_stmt->bind_param("iss", $admin_id, $action, $ip);
                 $log_stmt->execute();
                 
+                // Commit transaction
+                $conn_back->commit();
+                
                 $success_message = "Transaction status updated successfully";
-            } else {
-                $error_message = "Failed to update transaction status: " . $conn_back->error;
+            } catch (Exception $e) {
+                // Rollback transaction on error
+                $conn_back->rollback();
+                $error_message = "Error updating transaction: " . $e->getMessage();
             }
         } else {
             $error_message = "Invalid status value";

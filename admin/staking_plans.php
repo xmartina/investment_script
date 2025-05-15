@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert new plan
             $stmt = $conn_back->prepare("
                 INSERT INTO staking_plans (name, description, min_amount, max_amount, 
-                    roi_daily, lockup_period, status, featured, created_at) 
+                    roi_daily, lockup_period, is_active, featured, created_at) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
             $stmt->bind_param("ssdddiis", $name, $description, $min_amount, $max_amount, 
@@ -79,8 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn_back->prepare("
                 UPDATE staking_plans 
                 SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
-                    roi_daily = ?, lockup_period = ?, status = ?, featured = ?, 
-                    updated_at = NOW() 
+                    roi_daily = ?, lockup_period = ?, is_active = ?, featured = ? 
                 WHERE id = ?
             ");
             $stmt->bind_param("ssdddiisi", $name, $description, $min_amount, $max_amount, 
@@ -301,7 +300,7 @@ include_once __DIR__ . '/layout/header.php';
                                 <?php if ($plan['featured']): ?>
                                     <span class="badge badge-primary">Featured</span>
                                 <?php endif; ?>
-                                <?php if (isset($plan['status']) && $plan['status']): ?>
+                                <?php if (isset($plan['is_active']) && $plan['is_active']): ?>
                                     <span class="badge badge-success">Active</span>
                                 <?php else: ?>
                                     <span class="badge badge-secondary">Inactive</span>
@@ -363,7 +362,7 @@ include_once __DIR__ . '/layout/header.php';
                                         data-max="<?= $plan['max_amount'] ?>"
                                         data-roi="<?= $plan['roi_daily'] ?>"
                                         data-lockup="<?= $plan['lockup_period'] ?>"
-                                        data-status="<?= isset($plan['status']) ? $plan['status'] : '0' ?>"
+                                        data-status="<?= isset($plan['is_active']) ? $plan['is_active'] : '0' ?>"
                                         data-featured="<?= $plan['featured'] ?>">
                                     <i class="fas fa-edit mr-1"></i> Edit
                                 </button>
@@ -442,7 +441,7 @@ include_once __DIR__ . '/layout/header.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="status" name="status" checked>
+                                    <input type="checkbox" class="custom-control-input" id="status" name="is_active" checked>
                                     <label class="custom-control-label" for="status">Active</label>
                                 </div>
                             </div>
@@ -520,7 +519,7 @@ include_once __DIR__ . '/layout/header.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="edit_status" name="status">
+                                    <input type="checkbox" class="custom-control-input" id="edit_status" name="is_active">
                                     <label class="custom-control-label" for="edit_status">Active</label>
                                 </div>
                             </div>
