@@ -33,6 +33,17 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php';
         </div>
         <div class="row clearfix">
             <?php
+            // Get site currency from admin_settings if not already defined
+            if (!isset($site_currency)) {
+                $currency_query = "SELECT setting_value FROM admin_settings WHERE setting_key = 'site_currency'";
+                $currency_result = $conn_back->query($currency_query);
+                if ($currency_result && $currency_result->num_rows > 0) {
+                    $site_currency = $currency_result->fetch_assoc()['setting_value'];
+                } else {
+                    $site_currency = 'USD'; // Default fallback
+                }
+            }
+            
             // Fetch all investment plans from the database
             $query = "SELECT * FROM investment_plans WHERE is_active = 1 ORDER BY min_amount ASC";
             $result = $conn_back->query($query);
