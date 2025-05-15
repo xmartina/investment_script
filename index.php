@@ -17,6 +17,9 @@ get('/faq', function() {
 get('/contact', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/pages/contactpage.php';
 });
+get('/plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/pages/plans.php';
+});
 
 //User Dashboard
 get('/user/login', function() {
@@ -531,6 +534,9 @@ post('/admin/site_settings.php', function() {
 });
 post('/admin/upload_image.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/upload_image.php';
+});
+post('/plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/pages/plans.php';
 });
 
 // Dispatch the routes

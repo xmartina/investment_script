@@ -38,7 +38,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
                 <div class="content-box">
                     <h6>Security You Can Trust</h6>
                     <h2>End-to-end encryption with military-grade security</h2>
-                    <p>Lost in the market’s noise, many wander without purpose. <br />Exodus AI filters the chaos, guiding you to clarity and gains.</p>
+                    <p>Lost in the market's noise, many wander without purpose. <br />Exodus AI filters the chaos, guiding you to clarity and gains.</p>
                     <div class="btn-box">
                         <a href="<?=$register['link']?>" class="theme-btn btn-two">Get Started</a>
                     </div>
@@ -510,70 +510,45 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
             <h2>Effective & Flexible Pricing</h2>
         </div>
         <div class="row clearfix">
+            <?php
+            // Fetch 3 investment plans from the database
+            $stmt = $conn->prepare("SELECT * FROM investment_plans WHERE is_active = 1 ORDER BY min_amount ASC LIMIT 3");
+            $stmt->execute();
+            $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            foreach($plans as $plan) {
+                $isActive = ($plan['featured'] == 1) ? 'active-block' : '';
+            ?>
             <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                <div class="pricing-block-one">
+                <div class="pricing-block-one <?=$isActive?>">
                     <div class="pricing-table">
+                        <?php if($plan['featured'] == 1) { ?>
+                        <span class="discount-text">Featured Plan</span>
+                        <?php } ?>
                         <div class="table-header">
-                            <div class="icon-box"><i class="flaticon-idea"></i></div>
-                            <h3>Basic <br />Package</h3>
-                            <p>Pricing plan for small business</p>
+                            <div class="icon-box">
+                                <i class="flaticon-<?= ($plan['risk_level'] == 'Low') ? 'idea' : (($plan['risk_level'] == 'Moderate') ? 'star' : 'diamond') ?>"></i>
+                            </div>
+                            <h3><?=htmlspecialchars($plan['name'])?></h3>
+                            <p><?=htmlspecialchars($plan['plan_type'])?> - <?=htmlspecialchars($plan['category'])?></p>
                         </div>
                         <div class="table-content">
                             <ul class="feature-list clearfix">
-                                <li>Traditional Consulting</li>
-                                <li>Investment Management</li>
-                                <li>Data Aggregation</li>
-                                <li class="light">Tax Planning & Preparation</li>
+                                <li>Risk Level: <?=htmlspecialchars($plan['risk_level'])?></li>
+                                <li>Duration: <?=htmlspecialchars($plan['duration_days'])?> days</li>
+                                <li>Return Interval: <?=htmlspecialchars($plan['return_interval'])?></li>
+                                <li>Min Investment: <?=$plan['min_amount']?> <?=$site_currency?></li>
                             </ul>
-                            <h2>49 <span class="symble">$</span><span class="fraction">.99</span><span class="text">Billed Monthly</span></h2>
-                            <a href="index-2.html" class="theme-btn btn-two">Get Started Now</a>
+                            <h2><?=$plan['roi_percent']?><span class="symble">%</span><span class="text">Return</span></h2>
+                            <a href="<?=$login['link']?>" class="theme-btn btn-two">Start Investing</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                <div class="pricing-block-one active-block">
-                    <div class="pricing-table">
-                        <span class="discount-text">10% Discount, Start Today</span>
-                        <div class="table-header">
-                            <div class="icon-box"><i class="flaticon-star"></i></div>
-                            <h3>Basic <br />Package</h3>
-                            <p>Pricing plan for small business</p>
-                        </div>
-                        <div class="table-content">
-                            <ul class="feature-list clearfix">
-                                <li>Traditional Consulting</li>
-                                <li>Investment Management</li>
-                                <li>Data Aggregation</li>
-                                <li>Tax Planning & Preparation</li>
-                            </ul>
-                            <h2>129 <span class="symble">$</span><span class="fraction">.99</span><span class="text">Billed Monthly</span></h2>
-                            <a href="index-2.html" class="theme-btn btn-two">Get Started Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
-                <div class="pricing-block-one">
-                    <div class="pricing-table">
-                        <div class="table-header">
-                            <div class="icon-box"><i class="flaticon-diamond"></i></div>
-                            <h3>Pro <br />Package</h3>
-                            <p>Pricing plan for small business</p>
-                        </div>
-                        <div class="table-content">
-                            <ul class="feature-list clearfix">
-                                <li>Traditional Consulting</li>
-                                <li>Investment Management</li>
-                                <li>Data Aggregation</li>
-                                <li>Tax Planning & Preparation</li>
-                            </ul>
-                            <h2>189 <span class="symble">$</span><span class="fraction">.99</span><span class="text">Billed Monthly</span></h2>
-                            <a href="index-2.html" class="theme-btn btn-two">Get Started Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php } ?>
+        </div>
+        <div class="text-center mt-5">
+            <a href="<?=$site_link?>/plans" class="theme-btn btn-one">View All Investment & Staking Plans</a>
         </div>
     </div>
 </section>
@@ -619,7 +594,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
                         <h5>Managing Director - <br /> WealthMax Advisors</h5>
                     </div>
                     <div class="quote-box"><i class="flaticon-quote"></i></div>
-                    <p>Exodus Ai Pro’s team has demonstrated deep knowledge in investment strategies. Their insights have helped us make smarter financial decisions, and I couldn’t be more satisfied with the results.</p>
+                    <p>Exodus Ai Pro's team has demonstrated deep knowledge in investment strategies. Their insights have helped us make smarter financial decisions, and I couldn't be more satisfied with the results.</p>
                 </div>
                 <div class="testimonial-content">
                     <div class="author-box">
@@ -643,7 +618,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
                         <h5>Lead Investment Strategist <br /> - Quantum Wealth Group</h5>
                     </div>
                     <div class="quote-box"><i class="flaticon-quote"></i></div>
-                    <p>I have been extremely impressed with Exodus Ai Pro’s ability to understand and cater to our specific investment goals. Their strategies have helped us grow our capital effectively and consistently.</p>
+                    <p>I have been extremely impressed with Exodus Ai Pro's ability to understand and cater to our specific investment goals. Their strategies have helped us grow our capital effectively and consistently.</p>
                 </div>
             </div>
         </div>
@@ -822,5 +797,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
 <!-- clients-style-two end -->
 
 
+
+<?php include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php'; ?>
 
 <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/footer.php'; ?>
