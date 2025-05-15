@@ -38,16 +38,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/breadcrumb.php';
                                         <div class="lower-content">
                                             <div class="single-item">
                                                 <div class="icon-box">
-                                                    <i class="flaticon-chat-2"></i>
-                                                </div>
-                                                <h6>Phone</h6>
-                                                <p>
-                                                    General: <a href="tel:<?=$site_phone?>"><?=$site_phone?></a><br />
-                                                    WhatsApp: <a href="https://wa.me/<?=$site_phone?>" target="_blank"><?=$site_phone?></a>
-                                                </p>
-                                            </div>
-                                            <div class="single-item">
-                                                <div class="icon-box">
                                                     <i class="flaticon-mail"></i>
                                                 </div>
                                                 <h6>Email</h6>

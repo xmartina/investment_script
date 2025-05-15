@@ -36,6 +36,9 @@
         .logo-box{
             max-width: 120px ;
         }
+        .pricing-block-one {
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px !important;
+        }
     </style>
 
 </head>
