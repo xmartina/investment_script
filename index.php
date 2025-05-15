@@ -261,6 +261,47 @@ get('/admin/create_wallet_addresses_table.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_wallet_addresses_table.php';
 });
 
+// Front Pages Management
+get('/admin/front_pages', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/front_pages.php';
+});
+get('/admin/front_pages.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/front_pages.php';
+});
+get('/admin/edit_page.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/edit_page.php';
+});
+get('/admin/header_footer', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/header_footer.php';
+});
+get('/admin/header_footer.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/header_footer.php';
+});
+get('/admin/navigation', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/navigation.php';
+});
+get('/admin/navigation.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/navigation.php';
+});
+get('/admin/site_settings', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/site_settings.php';
+});
+get('/admin/site_settings.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/site_settings.php';
+});
+get('/admin/create_front_page_tables', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_front_page_tables.php';
+});
+get('/admin/create_front_page_tables.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_front_page_tables.php';
+});
+get('/admin/install_front_pages', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/install_front_pages.php';
+});
+get('/admin/install_front_pages.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/install_front_pages.php';
+});
+
 // Wallet addresses installation helper
 get('/install_wallet_addresses', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/install_wallet_addresses.php';
@@ -458,6 +499,38 @@ post('/admin/wallet_addresses', function() {
 });
 post('/admin/wallet_addresses.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/wallet_addresses.php';
+});
+
+// Front Pages Management POST Routes
+post('/admin/front_pages', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/front_pages.php';
+});
+post('/admin/front_pages.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/front_pages.php';
+});
+post('/admin/edit_page.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/edit_page.php';
+});
+post('/admin/header_footer', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/header_footer.php';
+});
+post('/admin/header_footer.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/header_footer.php';
+});
+post('/admin/navigation', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/navigation.php';
+});
+post('/admin/navigation.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/navigation.php';
+});
+post('/admin/site_settings', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/site_settings.php';
+});
+post('/admin/site_settings.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/site_settings.php';
+});
+post('/admin/upload_image.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/upload_image.php';
 });
 
 // Dispatch the routes

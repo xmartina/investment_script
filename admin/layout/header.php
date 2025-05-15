@@ -242,6 +242,31 @@
                                 <span>Referrals</span>
                             </a>
                         </li>
+
+                        <li class="treeview <?php echo in_array($current_page, ['front_pages.php', 'edit_page.php', 'header_footer.php', 'navigation.php', 'slider.php', 'site_settings.php']) ? 'active' : ''; ?>">
+                            <a href="#">
+                                <i data-feather="layout"></i>
+                                <span>Website Content</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-right pull-right"></i>
+                                </span>
+                            </a>
+                            <ul class="treeview-menu">
+                                <li class="<?php echo $current_page == 'front_pages.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/front_pages"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Front Pages</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'header_footer.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/header_footer"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Header & Footer</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'navigation.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/navigation"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Navigation Menu</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'site_settings.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/site_settings"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Site Settings</a>
+                                </li>
+                            </ul>
+                        </li>
+                        
                         <li class="<?php echo $current_page == 'settings.php' ? 'active' : ''; ?>">
                             <a href="<?=$siteLink?>/admin/settings">
                                 <i data-feather="settings"></i>
