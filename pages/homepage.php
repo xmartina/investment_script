@@ -548,7 +548,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
                                 <li>Risk Level: <?=htmlspecialchars($plan['risk_level'])?></li>
                                 <li>Duration: <?=htmlspecialchars($plan['duration_days'])?> days</li>
                                 <li>Return Interval: <?=htmlspecialchars($plan['return_interval'])?></li>
-                                <li>Min Investment: <?=$plan['min_amount']?> <?=$site_currency?></li>
+                                <li>
+                                    <div class="row">
+                                        <div class="col-6">Min Investment <br /> <?=number_format($plan['min_amount'], 2)?> <?=$site_currency?></div>
+                                        <div class="col-6">Max Investment <br /> <?=number_format($plan['max_amount'], 2)?> <?=$site_currency?></div>
+                                    </div>
+                                </li>
                             </ul>
                             <h2><?=$plan['roi_percent']?><span class="symble">%</span><span class="text">Return</span></h2>
                             <a href="<?=$login['link']?>" class="theme-btn btn-two">Start Investing</a>
