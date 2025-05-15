@@ -453,5 +453,12 @@ post('/admin/withdrawal_methods.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
 });
 
+post('/admin/wallet_addresses', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/wallet_addresses.php';
+});
+post('/admin/wallet_addresses.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/wallet_addresses.php';
+});
+
 // Dispatch the routes
 dispatch();
