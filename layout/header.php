@@ -147,10 +147,7 @@
         <div class="header-top-two">
             <div class="outer-container">
                 <ul class="info-list clearfix">
-                    <li>
-                        <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-9.png" alt=""></div>
-                        Talk to Us: <a href="tel:<?=$site_phone?>"><span><?=$site_phone?></span></a> / <a href="mailto:<?=$site_email?>"><span><?=$site_email?></span></a>
-                    </li>
+                    
                     <li>
                         <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-10.png" alt=""></div>
                         Reach Us: <span><?=$site_address?></span>

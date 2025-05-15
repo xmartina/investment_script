@@ -34,12 +34,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php';
         <div class="row clearfix">
             <?php
             // Fetch all investment plans from the database
-            $stmt = $conn->prepare("SELECT * FROM investment_plans WHERE is_active = 1 ORDER BY min_amount ASC");
-            $stmt->execute();
-            $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $query = "SELECT * FROM investment_plans WHERE is_active = 1 ORDER BY min_amount ASC";
+            $result = $conn_back->query($query);
             
-            foreach($plans as $plan) {
-                $isActive = ($plan['featured'] == 1) ? 'active-block' : '';
+            if ($result && $result->num_rows > 0) {
+                while($plan = $result->fetch_assoc()) {
+                    $isActive = ($plan['featured'] == 1) ? 'active-block' : '';
             ?>
             <div class="col-lg-4 col-md-6 col-sm-12 pricing-block mb-4">
                 <div class="pricing-block-one <?=$isActive?>">
@@ -72,7 +72,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php';
                     </div>
                 </div>
             </div>
-            <?php } ?>
+            <?php 
+                }
+            }
+            ?>
         </div>
     </div>
 </section>
@@ -89,12 +92,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php';
         <div class="row clearfix">
             <?php
             // Fetch all staking plans from the database
-            $stmt = $conn->prepare("SELECT * FROM staking_plans WHERE is_active = 1 ORDER BY min_amount ASC");
-            $stmt->execute();
-            $staking_plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $query = "SELECT * FROM staking_plans WHERE is_active = 1 ORDER BY min_amount ASC";
+            $result = $conn_back->query($query);
             
-            foreach($staking_plans as $plan) {
-                $isActive = ($plan['featured'] == 1) ? 'active-block' : '';
+            if ($result && $result->num_rows > 0) {
+                while($plan = $result->fetch_assoc()) {
+                    $isActive = ($plan['featured'] == 1) ? 'active-block' : '';
             ?>
             <div class="col-lg-4 col-md-6 col-sm-12 pricing-block mb-4">
                 <div class="pricing-block-one <?=$isActive?>">
@@ -130,7 +133,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php';
                     </div>
                 </div>
             </div>
-            <?php } ?>
+            <?php
+                }
+            }
+            ?>
         </div>
     </div>
 </section>

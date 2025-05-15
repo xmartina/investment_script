@@ -512,12 +512,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
         <div class="row clearfix">
             <?php
             // Fetch 3 investment plans from the database
-            $stmt = $conn->prepare("SELECT * FROM investment_plans WHERE is_active = 1 ORDER BY min_amount ASC LIMIT 3");
-            $stmt->execute();
-            $plans = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $query = "SELECT * FROM investment_plans WHERE is_active = 1 ORDER BY min_amount ASC LIMIT 3";
+            $result = $conn_back->query($query);
             
-            foreach($plans as $plan) {
-                $isActive = ($plan['featured'] == 1) ? 'active-block' : '';
+            if ($result && $result->num_rows > 0) {
+                while($plan = $result->fetch_assoc()) {
+                    $isActive = ($plan['featured'] == 1) ? 'active-block' : '';
             ?>
             <div class="col-lg-4 col-md-6 col-sm-12 pricing-block">
                 <div class="pricing-block-one <?=$isActive?>">
@@ -545,7 +545,10 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php'; ?>
                     </div>
                 </div>
             </div>
-            <?php } ?>
+            <?php 
+                }
+            } 
+            ?>
         </div>
         <div class="text-center mt-5">
             <a href="<?=$site_link?>/plans" class="theme-btn btn-one">View All Investment & Staking Plans</a>
