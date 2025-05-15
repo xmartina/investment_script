@@ -72,13 +72,12 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php';
                                 <li>Return Interval: <?=htmlspecialchars($plan['return_interval'])?></li>
                                 <li>
                                     <div class="row">
-                                        <div class="col-6">Min Investment: <?=$plan['min_amount']?> <?=$site_currency?></div>
+                                        <div class="col-6">Min Investment: <?=number_format($plan['min_amount'], 2)?> <?=$site_currency?></div>
                                         <?php if($plan['max_amount'] > 0) { ?>
-                                            <div class="col-6"> Max Investment: <?=$plan['max_amount']?> <?=$site_currency?></div>
+                                            <div class="col-6"> Max Investment: <?=number_format($plan['max_amount'], 2)?> <?=$site_currency?></div>
                                         <?php } else { ?>
                                             <div class="col-6"> No Maximum Limit </div>
                                         <?php } ?>
-                                    </div>
                                     </div>
                                 </li>
                             </ul>
@@ -133,12 +132,16 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/header.php';
                                 <li>Duration: <?=htmlspecialchars($plan['duration_days'])?> days</li>
                                 <li>Lock Period: <?=htmlspecialchars($plan['lock_period_days'])?> days</li>
                                 <li>Daily ROI: <?=$plan['roi_daily']?>%</li>
-                                <li>Min Staking: <?=$plan['min_amount']?> <?=$site_currency?></li>
-                                <?php if($plan['max_amount'] > 0) { ?>
-                                <li>Max Staking: <?=$plan['max_amount']?> <?=$site_currency?></li>
-                                <?php } else { ?>
-                                <li>No Maximum Limit</li>
-                                <?php } ?>
+                                <li>
+                                    <div class="row">
+                                        <div class="col-6">Min Investment: <?=number_format($plan['min_amount'], 2)?> <?=$site_currency?></div>
+                                        <?php if($plan['max_amount'] > 0) { ?>
+                                            <div class="col-6"> Max Investment: <?=number_format($plan['max_amount'], 2)?> <?=$site_currency?></div>
+                                        <?php } else { ?>
+                                            <div class="col-6"> No Maximum Limit </div>
+                                        <?php } ?>
+                                    </div>
+                                </li>
                                 <?php if($plan['early_unstake_penalty'] > 0) { ?>
                                 <li>Early Unstake Penalty: <?=$plan['early_unstake_penalty']?>%</li>
                                 <?php } ?>
