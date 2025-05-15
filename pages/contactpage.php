@@ -15,7 +15,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/layout/breadcrumb.php';
                     <div class="sec-title">
                         <span class="sub-title">Contact</span>
                         <h2>Reach Out to <br />Exodus Ai Pro Today</h2>
-                        <a href="<?=$site_link?>/locations" class="theme-btn btn-two">Our Locations</a>
+                        <a href="javascript:void(0)" class="theme-btn btn-two">Our Locations</a>
                     </div>
                 </div>
 
