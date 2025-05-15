@@ -102,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
+
 ?>
 
 <?php
@@ -115,22 +116,22 @@ if(isset($_GET['msg'])) { // Removed check for form_submitted
     ?>
     <div id="alert-message" class="alert <?php echo $alert_class; ?>" role="alert"><?php echo $msg; ?></div>
     <script>
-    // Remove hash from URL without affecting navigation
-    if(window.location.hash) {
-        history.replaceState('', document.title, window.location.pathname + window.location.search);
-    }
-
-    setTimeout(function() {
-        var alert = document.getElementById('alert-message');
-        if(alert) {
-            alert.style.transition = 'opacity 0.5s';
-            alert.style.opacity = '0';
-            setTimeout(function() {
-                alert.remove();
-            }, 500);
+        // Remove hash from URL without affecting navigation
+        if(window.location.hash) {
+            history.replaceState('', document.title, window.location.pathname + window.location.search);
         }
-    }, 3000);
-</script>
+
+        setTimeout(function() {
+            var alert = document.getElementById('alert-message');
+            if(alert) {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }
+        }, 3000);
+    </script>
 <?php } ?>
     <form id="depositForm" action="" method="post" enctype="multipart/form-data">
         <div class="container mt-4" id="main-content">
@@ -163,8 +164,8 @@ if(isset($_GET['msg'])) { // Removed check for form_submitted
                                                 <label for="exampleFormControlInput1" class="form-label">Select Payment Method</label>
                                                 <select name="payment_method" class="form-select" aria-label="Select Payment Method">
                                                     <option selected>Select</option>
-                                                    <option value="USDT">USDT</option>
                                                     <option value="BTC">BTC</option>
+                                                    <option value="USDT">USDT</option>
                                                     <option value="ETH">ETH</option>
                                                     <option value="XRP">XRP</option>
                                                     <option value="XLM">XLM</option>
@@ -316,23 +317,23 @@ if(isset($_GET['msg'])) { // Removed check for form_submitted
     <script>
 /* ====== CONSTANT MAPS (step-1 / step-2) ====== */
 const walletAddresses = {
+  BTC: "bc1qkyqlvaed0zxdjync4udlyk290sy333jhv8qlxc",
   USDT: "0x81Dc8cEe8fda0Ee57D2c9E0808218e781dC9Da8A",
-  BTC : "bc1qkyqlvaed0zxdjync4udlyk290sy333jhv8qlxc",
-  ETH : "0x1234567890abcdef1234567890abcdef12345678",
-  XRP : "rNET5KoxdU4YRGoLjmxAijYXNmMth8mXgT",
-  XLM : "GCS76CYBB6IQUEROYHVTBAVDCKZY65LMENX3ZR23I6F5TI7DAD43NUA2",
-  DOGE : "DGFq4VZUzMiN2R9sCr74CMiiLiGfaDJjLf",
-  SOL : "995UT8C4AaTZvQcZ8vZ6tA1tbLVXnn9wA7Do7Y7X6nfc"
+  ETH: "0x81Dc8cEe8fda0Ee57D2c9E0808218e781dC9Da8A",
+  XRP: "rNET5KoxdU4YRGoLjmxAijYXNmMth8mXgT",
+  XLM: "GCS76CYBB6IQUEROYHVTBAVDCKZY65LMENX3ZR23I6F5TI7DAD43NUA2",
+  DOGE: "DGFq4VZUzMiN2R9sCr74CMiiLiGfaDJjLf",
+  SOL: "995UT8C4AaTZvQcZ8vZ6tA1tbLVXnn9wA7Do7Y7X6nfc"
 };
 
 const walletTypes = {
-  USDT: "USDT TRC-20",
-  BTC : "Bitcoin",
-  ETH : "Ethereum",
-  XRP : "XRP",
-  XLM : "Stellar",
-  DOGE : "Dogecoin",
-  SOL : "Solana"
+  BTC: "Bitcoin",
+  USDT: "USDT BEP-20",
+  ETH: "Ethereum",
+  XRP: "XRP",
+  XLM: "XLM",
+  DOGE: "Dogecoin",
+  SOL: "Solana"
 };
 
 /* ====== SYNC FIELDS BETWEEN STEP-1 & STEP-2 ====== */
@@ -377,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* 1) SmartWizard users — 'showStep' fires AFTER pane is visible */
   if (window.$ && $('#smartwizard').length) {
-    $('#smartwizard').on('showStep', (e, anchorObj, stepNumber) {
+    $('#smartwizard').on('showStep', (e, anchorObj, stepNumber) => {
       if (stepNumber === 2) fillConfirm();      // 0-based index → step-3
     });
   }
@@ -387,6 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (link) link.addEventListener('click', () => setTimeout(fillConfirm, 10));
 });
 </script>
+
 
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/footer.php';
