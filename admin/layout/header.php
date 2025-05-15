@@ -164,7 +164,7 @@
                             </a>
                         </li>
                         
-                        <li class="treeview <?php echo in_array($current_page, ['deposits.php', 'withdrawals.php', 'withdrawal_methods.php', 'transactions.php']) ? 'active' : ''; ?>">
+                        <li class="treeview <?php echo in_array($current_page, ['deposits.php', 'withdrawals.php', 'withdrawal_methods.php', 'transactions.php', 'wallet_addresses.php']) ? 'active' : ''; ?>">
                             <a href="#">
                                 <i data-feather="dollar-sign"></i>
                                 <span>Finance</span>
@@ -181,6 +181,9 @@
                                 </li>
                                 <li class="<?php echo $current_page == 'withdrawal_methods.php' ? 'active' : ''; ?>">
                                     <a href="<?=$siteLink?>/admin/withdrawal_methods"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Payment Methods</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'wallet_addresses.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/wallet_addresses"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Wallet Addresses</a>
                                 </li>
                                 <li class="<?php echo $current_page == 'transactions.php' ? 'active' : ''; ?>">
                                     <a href="<?=$siteLink?>/admin/transactions"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Transactions</a>

@@ -247,6 +247,25 @@ get('/admin/withdrawal_methods.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
 });
 
+// Wallet Addresses Management
+get('/admin/wallet_addresses', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/wallet_addresses.php';
+});
+get('/admin/wallet_addresses.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/wallet_addresses.php';
+});
+get('/admin/create_wallet_addresses_table', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_wallet_addresses_table.php';
+});
+get('/admin/create_wallet_addresses_table.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_wallet_addresses_table.php';
+});
+
+// Wallet addresses installation helper
+get('/install_wallet_addresses', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/install_wallet_addresses.php';
+});
+
 // Add these to your index.php
 post('/user/login', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/user/auth/login.php';

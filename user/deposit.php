@@ -164,13 +164,19 @@ if(isset($_GET['msg'])) { // Removed check for form_submitted
                                                 <label for="exampleFormControlInput1" class="form-label">Select Payment Method</label>
                                                 <select name="payment_method" class="form-select" aria-label="Select Payment Method">
                                                     <option selected>Select</option>
-                                                    <option value="BTC">BTC</option>
-                                                    <option value="USDT">USDT</option>
-                                                    <option value="ETH">ETH</option>
-                                                    <option value="XRP">XRP</option>
-                                                    <option value="XLM">XLM</option>
-                                                    <option value="DOGE">DOGE</option>
-                                                    <option value="SOL">SOL</option>
+                                                    <?php
+                                                    // Fetch wallet addresses from database for dropdown
+                                                    $sql = "SELECT currency, wallet_type FROM wallet_addresses ORDER BY currency ASC";
+                                                    $result = $conn_back->query($sql);
+                                                    
+                                                    if ($result && $result->num_rows > 0) {
+                                                        while ($row = $result->fetch_assoc()) {
+                                                            echo '<option value="' . htmlspecialchars($row['currency']) . '">' . 
+                                                                 htmlspecialchars($row['currency']) . ' - ' . htmlspecialchars($row['wallet_type']) . 
+                                                                 '</option>';
+                                                        }
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -315,25 +321,37 @@ if(isset($_GET['msg'])) { // Removed check for form_submitted
 
     <!-- ───────────────  SCRIPT  ─────────────── -->
     <script>
-/* ====== CONSTANT MAPS (step-1 / step-2) ====== */
+/* ====== FETCH WALLET ADDRESSES FROM DATABASE ====== */
+<?php
+// Fetch wallet addresses from database
+$sql = "SELECT currency, address, wallet_type FROM wallet_addresses ORDER BY currency ASC";
+$result = $conn_back->query($sql);
+$wallet_addresses = [];
+$wallet_types = [];
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        echo "console.log('Loading wallet address: " . $row['currency'] . "');";
+        $wallet_addresses[$row['currency']] = $row['address'];
+        $wallet_types[$row['currency']] = $row['wallet_type'];
+    }
+}
+?>
+
 const walletAddresses = {
-  BTC: "bc1qkyqlvaed0zxdjync4udlyk290sy333jhv8qlxc",
-  USDT: "0x81Dc8cEe8fda0Ee57D2c9E0808218e781dC9Da8A",
-  ETH: "0x81Dc8cEe8fda0Ee57D2c9E0808218e781dC9Da8A",
-  XRP: "rNET5KoxdU4YRGoLjmxAijYXNmMth8mXgT",
-  XLM: "GCS76CYBB6IQUEROYHVTBAVDCKZY65LMENX3ZR23I6F5TI7DAD43NUA2",
-  DOGE: "DGFq4VZUzMiN2R9sCr74CMiiLiGfaDJjLf",
-  SOL: "995UT8C4AaTZvQcZ8vZ6tA1tbLVXnn9wA7Do7Y7X6nfc"
+<?php
+foreach ($wallet_addresses as $currency => $address) {
+    echo "  $currency: \"$address\",\n";
+}
+?>
 };
 
 const walletTypes = {
-  BTC: "Bitcoin",
-  USDT: "USDT BEP-20",
-  ETH: "Ethereum",
-  XRP: "XRP",
-  XLM: "XLM",
-  DOGE: "Dogecoin",
-  SOL: "Solana"
+<?php
+foreach ($wallet_types as $currency => $type) {
+    echo "  $currency: \"$type\",\n";
+}
+?>
 };
 
 /* ====== SYNC FIELDS BETWEEN STEP-1 & STEP-2 ====== */
