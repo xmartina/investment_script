@@ -129,7 +129,6 @@
                                 <h4>Contact Info</h4>
                                 <ul>
                                     <li><?=$site_address?></li>
-                                    <li><a href="<?=$site_phone?>"><?=$site_phone?></a></li>
                                     <li><a href="mailto:<?=$site_email?>"><?=$site_email?></a></li>
                                 </ul>
                             </div>
@@ -258,7 +257,6 @@
                 <h4>Contact Info</h4>
                 <ul>
                     <li><?=$site_address?></li>
-                    <li><a href="tel:<?=$site_phone?>"><?=$site_phone?></a></li>
                     <li><a href="mailto:<?=$site_email?>"><?=$site_email?></a></li>
                 </ul>
             </div>
