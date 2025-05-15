@@ -7,6 +7,41 @@ if (!isset($_SESSION['user_id'])) {
 $page_name = 'Dashboard';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/include/config.php';
 include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
+
+// Calculate active investments
+$sql_active_investments = "SELECT COALESCE(SUM(amount), 0) as total FROM investments 
+                           WHERE user_id = ? AND status = 'active'";
+$stmt = $conn_back->prepare($sql_active_investments);
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$total_active_investments = floatval($row['total']);
+
+// Calculate active stakes
+$sql_active_stakes = "SELECT COALESCE(SUM(amount), 0) as total FROM staking 
+                       WHERE user_id = ? AND status = 'active'";
+$stmt = $conn_back->prepare($sql_active_stakes);
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$total_active_stakes = floatval($row['total']);
+
+// Calculate pending stakes (if applicable in your system)
+$sql_pending_stakes = "SELECT COALESCE(SUM(amount), 0) as total FROM staking 
+                        WHERE user_id = ? AND status = 'pending'";
+$stmt = $conn_back->prepare($sql_pending_stakes);
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$total_pending_stakes = floatval($row['total']);
+
+// Format values for display
+$formatted_active_investments = number_format($total_active_investments, 2);
+$formatted_active_stakes = number_format($total_active_stakes, 2);
+$formatted_pending_stakes = number_format($total_pending_stakes, 2);
 ?>
 
 <div class="container mt-4" id="main-content">
@@ -79,7 +114,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
                     <div class="row align-items-center justify-content-center h-100 py-4">
                         <div class="col-11">
                             <h2 class="fw-normal">Your portfolio value has been grown by</h2>
-                            <h1 class="mb-3"><?= $user_currency . $total_returns ?></h1>
+                            <h1 class="mb-3"><?= $user_currency . number_format($total_returns + $total_returns_stakes, 2) ?></h1>
                             <p>In last 7 days</p>
                         </div>
                     </div>
@@ -95,25 +130,28 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/header.php';
                         <div class="card-body pb-0">
                             <div class="card adminuiux-card bg-theme-1 mb-3">
                                 <div class="card-body">
-                                    <p class="text-white mb-2">Total Investments</p>
-                                    <h4 class="fw-medium"><?= $user_currency . $total_invested ?></h4>
+                                    <p class="text-white mb-2">Total Active Investments</p>
+                                    <h4 class="fw-medium"><?= $user_currency . $formatted_active_investments ?></h4>
                                 </div>
                             </div>
                             <div class="card adminuiux-card bg-theme-1-subtle mb-3">
                                 <div class="card-body">
-                                    <p class="text-secondary mb-2">Total Stock Purchased</p>
+                                    <p class="text-secondary mb-2">Total Active Stakes</p>
                                     <h4 class="fw-medium">
-                                        <?= $user_currency . $total_stakes_invested ?>
-                                        <span class="text-success fs-14">
-                                            <i class="bi bi-arrow-up-short me-1"></i>11.5%
-                                        </span>
+                                        <?= $user_currency . $formatted_active_stakes ?>
                                     </h4>
                                 </div>
                             </div>
                             <div class="card adminuiux-card bg-theme-1-subtle mb-3">
                                 <div class="card-body">
-                                    <p class="text-secondary mb-2">Total Investments</p>
-                                    <h4 class="fw-medium"><?= $user_currency . $total_investments ?></h4>
+                                    <p class="text-secondary mb-2">Pending Stakes</p>
+                                    <h4 class="fw-medium"><?= $user_currency . $formatted_pending_stakes ?></h4>
+                                </div>
+                            </div>
+                            <div class="card adminuiux-card bg-theme-1-subtle mb-3">
+                                <div class="card-body">
+                                    <p class="text-secondary mb-2">Total Portfolio Value</p>
+                                    <h4 class="fw-medium"><?= $user_currency . number_format(($total_active_investments + $total_active_stakes + $total_pending_stakes + $get_user['main_balance']), 2) ?></h4>
                                 </div>
                             </div>
                         </div>
