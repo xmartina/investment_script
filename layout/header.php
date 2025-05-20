@@ -156,9 +156,9 @@
                         Reach Us: <span><?=$site_email?></span>
                     </li>
                 </ul>
-                <div class="language-box">
+                <div class="language-box" id="selectLang">
                     <h5><img src="<?=$site_link?>/front_assets/images/icons/icon-11.png" alt="">Global:</h5>
-                    <div class="select-box">
+                    <div class="select-box text-white">
                        Lang
                     </div>
                 </div>

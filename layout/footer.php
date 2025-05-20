@@ -149,6 +149,20 @@
 <script>window.gtranslateSettings = {"default_language":"en","native_language_names":true,"detect_browser_language":true,"languages":["en","fr","it","es","de","nl","da"],"wrapper_selector":".gtranslate_wrapper"}</script>
 <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const selectLang = document.getElementById('selectLang');
+    const gtFloatWrapper = document.getElementById('gt_float_wrapper');
+
+    if (selectLang && gtFloatWrapper) {
+      selectLang.addEventListener('click', function () {
+        gtFloatWrapper.click();
+      });
+    }
+  });
+</script>
+
+
 
 </body><!-- End of .page_wrapper -->
 
