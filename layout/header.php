@@ -152,7 +152,7 @@
                 <ul class="info-list clearfix">
                     
                     <li>
-                        <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-23.png" alt=""></div>
+                        <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-26.png" alt=""></div>
                         Reach Us: <span><?=$site_email?></span>
                     </li>
                 </ul>
