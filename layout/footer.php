@@ -152,15 +152,22 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const selectLang = document.getElementById('selectLang');
-    const gtFloatWrapper = document.getElementById('gt_float_wrapper');
 
-    if (selectLang && gtFloatWrapper) {
+    if (selectLang) {
       selectLang.addEventListener('click', function () {
-        gtFloatWrapper.click();
+        const gtFloatWrapper = document.getElementById('gt_float_wrapper');
+        if (gtFloatWrapper) {
+          gtFloatWrapper.click();
+        } else {
+          console.warn('Element with ID "gt_float_wrapper" not found.');
+        }
       });
+    } else {
+      console.warn('Element with ID "selectLang" not found.');
     }
   });
 </script>
+
 
 
 
