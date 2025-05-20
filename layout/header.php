@@ -159,12 +159,7 @@
                 <div class="language-box">
                     <h5><img src="<?=$site_link?>/front_assets/images/icons/icon-11.png" alt="">Global:</h5>
                     <div class="select-box">
-                        <select class="selectmenu">
-                            <option>Eng</option>
-                            <option>Chines</option>
-                            <option>Hindi</option>
-                            <option>Turky</option>
-                        </select>
+                       Lang
                     </div>
                 </div>
             </div>
