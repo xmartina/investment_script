@@ -153,7 +153,7 @@
                     
                     <li>
                         <div class="icon-box"><img src="<?=$site_link?>/front_assets/images/icons/icon-10.png" alt=""></div>
-                        Reach Us: <span><?=$site_address?></span>
+                        Reach Us: <span><?=$site_email?></span>
                     </li>
                 </ul>
                 <div class="language-box">
