@@ -54,7 +54,8 @@ $penalty_amount = 0;
 $return_amount = $staking['amount'];
 
 if (!$can_unstake) {
-    $penalty_percentage = $staking['early_unstake_penalty'];
+    // Make sure we get the penalty percentage from the plan
+    $penalty_percentage = floatval($staking['early_unstake_penalty']);
     $penalty_amount = ($staking['amount'] * $penalty_percentage) / 100;
     $return_amount = $staking['amount'] - $penalty_amount;
 }
@@ -115,7 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
                     WHERE id = ?
                 ");
                 $stmt->bind_param("di", $return_amount, $user_id);
-                $stmt->execute();
+                
+                if (!$stmt->execute()) {
+                    throw new Exception("Failed to update user balance: " . $stmt->error);
+                }
                 $stmt->close();
                 
                 // Get readable balance name
@@ -159,8 +163,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_unstake'])) {
                         ) VALUES (?, 'penalty', ?, ?, ?, 'USD', 'successful', ?, ?)
                     ");
                     $stmt->bind_param("issdss", $user_id, $penalty_reference, $penalty_proof_id, $penalty_amount, $now, $penalty_description);
-                    $stmt->execute();
+                    
+                    if (!$stmt->execute()) {
+                        throw new Exception("Failed to record penalty transaction: " . $stmt->error);
+                    }
                     $stmt->close();
+                    
+                    // Log penalty to system log
+                    error_log("Penalty applied: User ID: $user_id, Staking ID: $staking_id, Amount: $penalty_amount, Percentage: {$staking['early_unstake_penalty']}%");
                 }
                 
                 // Commit transaction
@@ -244,6 +254,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                 You are unstaking before the lock period ends (<?= date('M d, Y', strtotime($staking['unstake_available_at'])) ?>).
                                 An early unstaking penalty of <?= number_format($staking['early_unstake_penalty'], 2) ?>% will be applied.
                             </p>
+                            <hr>
+                            <p class="mb-0"><strong>Penalty calculation:</strong> $<?= number_format($staking['amount'], 2) ?> × <?= number_format($staking['early_unstake_penalty'], 2) ?>% = $<?= number_format($penalty_amount, 2) ?></p>
                         </div>
                         
                         <div class="row mb-4">

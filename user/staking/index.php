@@ -283,10 +283,16 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 <?php
-                                $total_staked = 0;
-                                foreach ($active_stakings as $staking) {
-                                    $total_staked += $staking['amount'];
-                                }
+                                // Get total active amount from database instead of just adding up active_stakings
+                                $total_staked_query = $conn_back->prepare("
+                                    SELECT SUM(amount) as total_active_amount
+                                    FROM staking
+                                    WHERE user_id = ? AND status = 'active'
+                                ");
+                                $total_staked_query->bind_param("i", $user_id);
+                                $total_staked_query->execute();
+                                $total_staked_result = $total_staked_query->get_result()->fetch_assoc();
+                                $total_staked = $total_staked_result['total_active_amount'] ?? 0;
                                 echo '$' . number_format($total_staked, 2);
                                 ?>
                             </div>
