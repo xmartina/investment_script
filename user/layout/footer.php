@@ -1,8 +1,6 @@
 </main>
 </div>
 <footer class="adminuiux-footer has-adminuiux-sidebar mt-auto">
-    <!-- Gtranslate -->
-<div class="gtranslate_wrapper"></div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-md col-lg py-2"><span class="small"><?=$footer_sub_content?> <a

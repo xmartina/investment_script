@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_inve
                 
                 // Update user balance - Add the total return amount to the user's balance
                 $update_balance_stmt = $conn_back->prepare("
-                    UPDATE users SET balance = balance + ? WHERE id = ?
+                    UPDATE users SET main_balance = main_balance + CAST(? AS SIGNED) WHERE id = ?
                 ");
                 $update_balance_stmt->bind_param("di", $total_return, $user_id);
                 $update_balance_stmt->execute();
@@ -218,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_stak
                 
                 // Update user balance - Add the total return amount to the user's balance
                 $update_balance_stmt = $conn_back->prepare("
-                    UPDATE users SET balance = balance + ? WHERE id = ?
+                    UPDATE users SET main_balance = main_balance + CAST(? AS SIGNED) WHERE id = ?
                 ");
                 $update_balance_stmt->bind_param("di", $total_return, $user_id);
                 $update_balance_stmt->execute();
