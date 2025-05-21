@@ -241,6 +241,10 @@ include_once __DIR__ . '/layout/header.php';
         font-size: 90%;
         padding: 0.35em 0.65em;
     }
+    .card-deck .card, .row .card {
+    min-height: 480px;
+}
+    
 </style>
 
 <div class="container-fluid">
