@@ -104,9 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_inve
                 $stmt->execute();
                 $stmt->close();
                 
-                // Update user balance - Add the total return amount to the user's balance
+                // Update user balance - Add the total return amount to the investment balance
                 $update_balance_stmt = $conn_back->prepare("
-                    UPDATE users SET main_balance = main_balance + CAST(? AS SIGNED) WHERE id = ?
+                    UPDATE users SET investment_balance = investment_balance + CAST(? AS SIGNED) WHERE id = ?
                 ");
                 $update_balance_stmt->bind_param("di", $total_return, $user_id);
                 $update_balance_stmt->execute();
@@ -216,9 +216,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_stak
                 $stmt->execute();
                 $stmt->close();
                 
-                // Update user balance - Add the total return amount to the user's balance
+                // Update user balance - Add the total return amount to the staking balance
                 $update_balance_stmt = $conn_back->prepare("
-                    UPDATE users SET main_balance = main_balance + CAST(? AS SIGNED) WHERE id = ?
+                    UPDATE users SET staking_balance = staking_balance + CAST(? AS SIGNED) WHERE id = ?
                 ");
                 $update_balance_stmt->bind_param("di", $total_return, $user_id);
                 $update_balance_stmt->execute();
