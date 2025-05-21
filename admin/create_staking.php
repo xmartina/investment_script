@@ -22,6 +22,24 @@ $users_result = $conn_back->query($users_query);
 $plans_query = "SELECT id, name, min_amount, max_amount, reward_percent, duration_days, lock_period_days FROM staking_plans WHERE is_active = 1 ORDER BY name";
 $plans_result = $conn_back->query($plans_query);
 
+// Debugging - Check for query errors
+if (!$plans_result) {
+    $error = "Error fetching staking plans: " . $conn_back->error;
+}
+
+// If no plans found, show all plans regardless of active status
+if ($plans_result && $plans_result->num_rows == 0) {
+    $plans_query = "SELECT id, name, min_amount, max_amount, reward_percent, duration_days, lock_period_days FROM staking_plans ORDER BY name";
+    $plans_result = $conn_back->query($plans_query);
+    
+    if (!$plans_result) {
+        $error = "Error fetching all staking plans: " . $conn_back->error;
+    }
+}
+
+// Debugging - Check if any staking plans were found
+$num_plans = ($plans_result) ? $plans_result->num_rows : 0;
+
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
     $user_id = (int)$_POST['user_id'];
@@ -179,6 +197,11 @@ include_once __DIR__ . '/layout/header.php';
             </button>
         </div>
     <?php endif; ?>
+
+    <?php // Debugging message ?>
+    <div class="alert alert-info">
+        <?= $num_plans ?> staking plans found in database.
+    </div>
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">

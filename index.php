@@ -579,5 +579,21 @@ post('/admin/create_completed_position.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_completed_position.php';
 });
 
+// Staking Plans Setup
+get('/admin/insert_staking_plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/insert_staking_plans.php';
+});
+get('/admin/insert_staking_plans.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/insert_staking_plans.php';
+});
+
+// POST routes for staking plans setup
+post('/admin/insert_staking_plans', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/insert_staking_plans.php';
+});
+post('/admin/insert_staking_plans.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/insert_staking_plans.php';
+});
+
 // Dispatch the routes
 dispatch();

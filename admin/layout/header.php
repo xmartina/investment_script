@@ -242,6 +242,9 @@
                                 <li class="<?php echo $current_page == 'staking_plans.php' ? 'active' : ''; ?>">
                                     <a href="<?=$siteLink?>/admin/staking_plans"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Staking Plans</a>
                                 </li>
+                                <li class="<?php echo $current_page == 'insert_staking_plans.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/insert_staking_plans"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Setup Staking Plans</a>
+                                </li>
                                 <li class="<?php echo $current_page == 'staking_rewards.php' ? 'active' : ''; ?>">
                                     <a href="<?=$siteLink?>/admin/staking_rewards"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Staking Rewards</a>
                                 </li>

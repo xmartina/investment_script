@@ -104,6 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_inve
                 $stmt->execute();
                 $stmt->close();
                 
+                // Update user balance - Add the total return amount to the user's balance
+                $update_balance_stmt = $conn_back->prepare("
+                    UPDATE users SET balance = balance + ? WHERE id = ?
+                ");
+                $update_balance_stmt->bind_param("di", $total_return, $user_id);
+                $update_balance_stmt->execute();
+                $update_balance_stmt->close();
+                
                 // Log admin action
                 $admin_action = "Created completed investment #{$investment_id} for user #{$user_id} in plan #{$plan_id}";
                 $ip = $_SERVER['REMOTE_ADDR'];
@@ -207,6 +215,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_stak
                 $stmt->bind_param("idss", $user_id, $total_return, $transaction_reference, $description);
                 $stmt->execute();
                 $stmt->close();
+                
+                // Update user balance - Add the total return amount to the user's balance
+                $update_balance_stmt = $conn_back->prepare("
+                    UPDATE users SET balance = balance + ? WHERE id = ?
+                ");
+                $update_balance_stmt->bind_param("di", $total_return, $user_id);
+                $update_balance_stmt->execute();
+                $update_balance_stmt->close();
                 
                 // Log admin action
                 $admin_action = "Created completed staking #{$staking_id} for user #{$user_id} in plan #{$plan_id}";
@@ -352,7 +368,7 @@ include_once __DIR__ . '/layout/header.php';
                         <hr>
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle"></i> 
-                            <strong>Note:</strong> The completed investment will be recorded in the system but no funds will be added to the user's balance.
+                            <strong>Note:</strong> The completed investment will be recorded in the system and the total amount (principal + ROI) will be added to the user's balance.
                         </div>
                         
                         <button type="submit" name="create_completed_investment" class="btn btn-primary">Add Completed Investment</button>
@@ -444,7 +460,7 @@ include_once __DIR__ . '/layout/header.php';
                         <hr>
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle"></i> 
-                            <strong>Note:</strong> The completed staking position will be recorded in the system but no funds will be added to the user's balance.
+                            <strong>Note:</strong> The completed staking position will be recorded in the system and the total amount (principal + rewards) will be added to the user's balance.
                         </div>
                         
                         <button type="submit" name="create_completed_staking" class="btn btn-primary">Add Completed Staking</button>
