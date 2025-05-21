@@ -20,8 +20,24 @@ $user = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 // Get staking plans
-$query = "SELECT * FROM staking_plans WHERE is_active = 1 ORDER BY min_amount ASC";
-$staking_plans = $conn_back->query($query)->fetch_all(MYSQLI_ASSOC);
+$query = "SELECT * FROM staking_plans WHERE is_active = 1 OR is_active = 'true' OR is_active = 'active' ORDER BY min_amount ASC";
+$staking_plans_result = $conn_back->query($query);
+$staking_plans = [];
+if ($staking_plans_result && $staking_plans_result->num_rows > 0) {
+    while ($row = $staking_plans_result->fetch_assoc()) {
+        $staking_plans[] = $row;
+    }
+}
+
+// Debug query - check all staking plans regardless of status
+$all_plans_query = "SELECT id, name, is_active FROM staking_plans ORDER BY id ASC";
+$all_plans_result = $conn_back->query($all_plans_query);
+$all_plans = [];
+if ($all_plans_result && $all_plans_result->num_rows > 0) {
+    while ($row = $all_plans_result->fetch_assoc()) {
+        $all_plans[] = $row;
+    }
+}
 
 // Get user's active staking positions
 $stmt = $conn_back->prepare("
@@ -148,11 +164,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             // Create staking record
             $now = date('Y-m-d H:i:s');
             $start_date = $now;
-            $end_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $plan['duration_days'] . ' days'));
-            $unstake_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $plan['lock_period_days'] . ' days'));
+            $duration_days = $plan['duration_days'] ?? 0;
+            $end_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $duration_days . ' days'));
+            $lockup_period = $plan['lock_period_days'] ?? 0;
+            $unstake_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $lockup_period . ' days'));
             
             // Calculate APY directly
-            $calculated_apy = ($plan['reward_percent'] * 365) / $plan['duration_days'];
+            $reward_percent = isset($plan['reward_percent']) ? $plan['reward_percent'] : $plan['roi_daily'];
+            $calculated_apy = ($reward_percent * 365) / max(1, $duration_days);
             
             $stmt = $conn_back->prepare("
                 INSERT INTO staking (
@@ -162,15 +181,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             ");
             $stmt->bind_param(
                 "iidiidsssss", 
-                $user_id, $plan_id, $amount, $plan['duration_days'], 
-                $plan['reward_percent'], $calculated_apy, $is_compounding, $start_date, $end_date, $unstake_date, $now
+                $user_id, $plan_id, $amount, $duration_days, 
+                $reward_percent, $calculated_apy, $is_compounding, $start_date, $end_date, $unstake_date, $now
             );
             $stmt->execute();
             $staking_id = $conn_back->insert_id;
             $stmt->close();
             
             // Insert rewards record directly rather than relying on trigger
-            $expected_reward = ($amount * $plan['reward_percent']) / 100;
+            $expected_reward = ($amount * $reward_percent) / 100;
             $rewardStmt = $conn_back->prepare("
                 INSERT INTO staking_rewards 
                 (staking_id, user_id, reward_amount, expected_date, status, created_at)
@@ -329,6 +348,41 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                     <h6 class="m-0 font-weight-bold text-primary">Available Staking Plans</h6>
                 </div>
                 <div class="card-body">
+                    <!-- Debug output -->
+                    <?php if(empty($staking_plans)): ?>
+                    <div class="alert alert-warning">
+                        No active staking plans found. Please contact administrator.
+                    </div>
+                    
+                    <!-- Debug info about all plans -->
+                    <div class="alert alert-info">
+                        <h5>Debug Information</h5>
+                        <p>All staking plans in database (including inactive):</p>
+                        <?php if(!empty($all_plans)): ?>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>is_active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach($all_plans as $debug_plan): ?>
+                                    <tr>
+                                        <td><?= $debug_plan['id'] ?></td>
+                                        <td><?= htmlspecialchars($debug_plan['name']) ?></td>
+                                        <td><?= $debug_plan['is_active'] ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p>No plans found in database.</p>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
+                    
                     <div class="row">
                         <?php foreach ($staking_plans as $plan): ?>
                             <div class="col-lg-4 col-md-6 mb-4">
@@ -337,31 +391,31 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                         <div class="text-center">
                                             <h5 class="fw-bolder"><?= htmlspecialchars($plan['name']) ?></h5>
                                             <span class="badge bg-primary mb-2">
-                                                <?= number_format($plan['reward_percent'], 2) ?>% return
+                                                <?= number_format($plan['reward_percent'] ?? $plan['roi_daily'], 2) ?>% return
                                             </span>
                                             <div class="d-flex justify-content-center small text-warning mb-2">
-                                                <?php for ($i = 0; $i < ceil($plan['reward_percent'] / 5); $i++): ?>
+                                                <?php for ($i = 0; $i < ceil(($plan['reward_percent'] ?? $plan['roi_daily']) / 5); $i++): ?>
                                                     <div class="bi-star-fill"></div>
                                                 <?php endfor; ?>
                                             </div>
                                             <p class="card-text">
-                                                <?= htmlspecialchars($plan['description']) ?>
+                                                <?= htmlspecialchars($plan['description'] ?? '') ?>
                                             </p>
                                         </div>
                                         <ul class="list-group list-group-flush mb-3">
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Lock Period:</span>
-                                                <strong><?= $plan['lock_period_days'] ?> days</strong>
+                                                <strong><?= $plan['lock_period_days'] ?? 0 ?> days</strong>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Duration:</span>
-                                                <strong><?= $plan['duration_days'] ?> days</strong>
+                                                <strong><?= $plan['duration_days'] ?? 0 ?> days</strong>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Min Amount:</span>
                                                 <strong>$<?= number_format($plan['min_amount'], 2) ?></strong>
                                             </li>
-                                            <?php if ($plan['max_amount'] > 0): ?>
+                                            <?php if (isset($plan['max_amount']) && $plan['max_amount'] > 0): ?>
                                                 <li class="list-group-item d-flex justify-content-between">
                                                     <span>Max Amount:</span>
                                                     <strong>$<?= number_format($plan['max_amount'], 2) ?></strong>
@@ -369,7 +423,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                             <?php endif; ?>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Early Unstake Fee:</span>
-                                                <strong><?= number_format($plan['early_unstake_penalty'], 2) ?>%</strong>
+                                                <strong><?= number_format($plan['early_unstake_penalty'] ?? 0, 2) ?>%</strong>
                                             </li>
                                         </ul>
                                         <div class="text-center">
@@ -458,8 +512,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                 
                                                 <div class="alert alert-info">
                                                     <ul class="mb-0">
-                                                        <li>Lock period: <?= $plan['lock_period_days'] ?> days</li>
-                                                        <li>Early unstaking penalty: <?= number_format($plan['early_unstake_penalty'], 2) ?>%</li>
+                                                        <li>Lock period: <?= $plan['lockup_period'] ?? 0 ?> days</li>
+                                                        <li>Early unstaking penalty: <?= number_format($plan['early_unstake_penalty'] ?? 0, 2) ?>%</li>
                                                         <li>Your current balances:
                                                             <ul>
                                                                 <li>Main: <?= $user_currency . number_format($main_balance, 2) ?></li>
@@ -482,7 +536,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                             <script>
                                 document.getElementById('amount<?= $plan['id'] ?>').addEventListener('input', function() {
                                     const amount = parseFloat(this.value) || 0;
-                                    const reward = amount * <?= $plan['reward_percent'] / 100 ?>;
+                                    const rewardPercent = <?= isset($plan['reward_percent']) ? $plan['reward_percent'] : $plan['roi_daily'] ?>;
+                                    const reward = amount * (rewardPercent / 100);
                                     document.getElementById('calculatedReward<?= $plan['id'] ?>').value = reward.toFixed(2);
                                 });
                             </script>

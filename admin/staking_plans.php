@@ -34,11 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert new plan
             $stmt = $conn_back->prepare("
                 INSERT INTO staking_plans (name, description, min_amount, max_amount, 
-                    roi_daily, lockup_period, is_active, featured, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    roi_daily, lock_period_days, is_active, featured, created_at,
+                    reward_percent, duration_days) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, 30)
             ");
-            $stmt->bind_param("ssdddiis", $name, $description, $min_amount, $max_amount, 
-                $roi_daily, $lockup_period, $status, $featured);
+            
+            // Added reward_percent (same as roi_daily for now) and default duration_days of 30
+            $stmt->bind_param("ssdddiisd", $name, $description, $min_amount, $max_amount, 
+                $roi_daily, $lockup_period, $status, $featured, $roi_daily);
             
             if ($stmt->execute()) {
                 // Log admin activity
@@ -79,11 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn_back->prepare("
                 UPDATE staking_plans 
                 SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
-                    roi_daily = ?, lockup_period = ?, is_active = ?, featured = ? 
+                    roi_daily = ?, lock_period_days = ?, is_active = ?, featured = ?,
+                    reward_percent = ?
                 WHERE id = ?
             ");
-            $stmt->bind_param("ssdddiisi", $name, $description, $min_amount, $max_amount, 
-                $roi_daily, $lockup_period, $status, $featured, $plan_id);
+            $stmt->bind_param("ssdddiiidi", $name, $description, $min_amount, $max_amount, 
+                $roi_daily, $lockup_period, $status, $featured, $roi_daily, $plan_id);
             
             if ($stmt->execute()) {
                 // Log admin activity
@@ -441,7 +445,7 @@ include_once __DIR__ . '/layout/header.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="status" name="is_active" checked>
+                                    <input type="checkbox" class="custom-control-input" id="status" name="status" checked>
                                     <label class="custom-control-label" for="status">Active</label>
                                 </div>
                             </div>
@@ -519,7 +523,7 @@ include_once __DIR__ . '/layout/header.php';
                         <div class="col-md-6">
                             <div class="form-group">
                                 <div class="custom-control custom-switch">
-                                    <input type="checkbox" class="custom-control-input" id="edit_status" name="is_active">
+                                    <input type="checkbox" class="custom-control-input" id="edit_status" name="status">
                                     <label class="custom-control-label" for="edit_status">Active</label>
                                 </div>
                             </div>
