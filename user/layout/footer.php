@@ -1,6 +1,8 @@
 </main>
 </div>
 <footer class="adminuiux-footer has-adminuiux-sidebar mt-auto">
+    <!-- Gtranslate -->
+<div class="gtranslate_wrapper"></div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-md col-lg py-2"><span class="small"><?=$footer_sub_content?> <a
@@ -182,8 +184,7 @@
         <div class="text-center mb-4"><a href="javascript:void(0);" class="btn btn-sm btn-outline-theme">More
                 options <i class="bi bi-arrow-right-short"></i></a></div>
     </div>
-    <!-- Gtranslate -->
-<div class="gtranslate_wrapper"></div>
+    
 </div>
 <script src="<?= $site_link ?>/back_assets/js/investment/investment-dashboard.js"></script>
 <?php
