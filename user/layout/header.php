@@ -44,6 +44,8 @@
     </div>
 </div>
 <header class="adminuiux-header">
+       <!-- Gtranslate -->
+<div class="gtranslate_wrapper"></div>
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid">
             <button class="btn btn-link btn-square sidebar-toggler" type="button" onclick="initSidebar()"><i
