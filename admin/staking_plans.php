@@ -23,12 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
         $roi_daily = floatval($_POST['roi_daily']);
-        $lockup_period = intval($_POST['lockup_period']);
+        $lock_period_days = intval($_POST['lock_period_days']);
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lockup_period <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lock_period_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Insert new plan
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Added reward_percent (same as roi_daily for now) and default duration_days of 30
             $stmt->bind_param("ssdddiisd", $name, $description, $min_amount, $max_amount, 
-                $roi_daily, $lockup_period, $status, $featured, $roi_daily);
+                $roi_daily, $lock_period_days, $status, $featured, $roi_daily);
             
             if ($stmt->execute()) {
                 // Log admin activity
@@ -70,12 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $min_amount = floatval($_POST['min_amount']);
         $max_amount = floatval($_POST['max_amount']);
         $roi_daily = floatval($_POST['roi_daily']);
-        $lockup_period = intval($_POST['lockup_period']);
+        $lock_period_days = intval($_POST['lock_period_days']);
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lockup_period <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lock_period_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Update plan
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 WHERE id = ?
             ");
             $stmt->bind_param("ssdddiiidi", $name, $description, $min_amount, $max_amount, 
-                $roi_daily, $lockup_period, $status, $featured, $roi_daily, $plan_id);
+                $roi_daily, $lock_period_days, $status, $featured, $roi_daily, $plan_id);
             
             if ($stmt->execute()) {
                 // Log admin activity
@@ -326,7 +326,7 @@ include_once __DIR__ . '/layout/header.php';
                             
                             <div class="mb-2">
                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Lock-up Period</div>
-                                <div class="text-white"><?= $plan['lockup_period'] ?> days</div>
+                                <div class="text-white"><?= $plan['lock_period_days'] ?> days</div>
                             </div>
                             
                             <div class="row">
@@ -365,7 +365,7 @@ include_once __DIR__ . '/layout/header.php';
                                         data-min="<?= $plan['min_amount'] ?>"
                                         data-max="<?= $plan['max_amount'] ?>"
                                         data-roi="<?= $plan['roi_daily'] ?>"
-                                        data-lockup="<?= $plan['lockup_period'] ?>"
+                                        data-lockup="<?= $plan['lock_period_days'] ?>"
                                         data-status="<?= isset($plan['is_active']) ? $plan['is_active'] : '0' ?>"
                                         data-featured="<?= $plan['featured'] ?>">
                                     <i class="fas fa-edit mr-1"></i> Edit
@@ -436,8 +436,8 @@ include_once __DIR__ . '/layout/header.php';
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="lockup_period">Lock-up Period (days) *</label>
-                                <input type="number" class="form-control" id="lockup_period" name="lockup_period" min="1" required>
+                                <label for="lock_period_days">Lock-up Period (days) *</label>
+                                <input type="number" class="form-control" id="lock_period_days" name="lock_period_days" min="1" required>
                             </div>
                         </div>
                     </div>
@@ -514,8 +514,8 @@ include_once __DIR__ . '/layout/header.php';
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="edit_lockup_period">Lock-up Period (days) *</label>
-                                <input type="number" class="form-control" id="edit_lockup_period" name="lockup_period" min="1" required>
+                                <label for="edit_lock_period_days">Lock-up Period (days) *</label>
+                                <input type="number" class="form-control" id="edit_lock_period_days" name="lock_period_days" min="1" required>
                             </div>
                         </div>
                     </div>
@@ -592,7 +592,7 @@ $(document).ready(function() {
         $('#edit_min_amount').val(min);
         $('#edit_max_amount').val(max);
         $('#edit_roi_daily').val(roi);
-        $('#edit_lockup_period').val(lockup);
+        $('#edit_lock_period_days').val(lockup);
         $('#edit_status').prop('checked', status == 1);
         $('#edit_featured').prop('checked', featured == 1);
     });
