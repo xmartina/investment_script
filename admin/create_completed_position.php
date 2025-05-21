@@ -191,8 +191,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_stak
                 ");
                 
                 $reward_percent = $plan['reward_percent'];
-                $apy = ($reward_percent * 365) / ($plan['duration_days'] ?? 30);
                 $duration_days = $plan['duration_days'] ?? 30;
+                if ($duration_days <= 0) {
+                    $duration_days = 30; // Ensure we have a positive value to avoid division by zero
+                }
+                $apy = ($reward_percent * 365) / $duration_days;
                 
                 $stmt->bind_param("iidididsss", 
                     $user_id, 
