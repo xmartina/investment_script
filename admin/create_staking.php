@@ -150,6 +150,9 @@ include_once __DIR__ . '/layout/header.php';
     #createStakingForm{
         color: rgba(255, 255, 255, 0.85);
     }
+    #createStakingForm .card-body p {
+        color: rgba(255, 255, 255, 0.85);
+    }
 </style>
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
