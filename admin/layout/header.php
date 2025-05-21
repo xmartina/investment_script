@@ -157,11 +157,23 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
-                        <li class="<?php echo $current_page == 'users.php' ? 'active' : ''; ?>">
-                            <a href="<?=$siteLink?>/admin/users">
+                        
+                        <li class="treeview <?php echo in_array($current_page, ['users.php', 'user_detail.php', 'edit_user.php', 'adjust_balance.php']) ? 'active' : ''; ?>">
+                            <a href="#">
                                 <i data-feather="users"></i>
                                 <span>Users</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-right pull-right"></i>
+                                </span>
                             </a>
+                            <ul class="treeview-menu">
+                                <li class="<?php echo $current_page == 'users.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/users"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>All Users</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'adjust_balance.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/adjust_balance"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Adjust User Balance</a>
+                                </li>
+                            </ul>
                         </li>
                         
                         <li class="treeview <?php echo in_array($current_page, ['deposits.php', 'withdrawals.php', 'withdrawal_methods.php', 'transactions.php', 'wallet_addresses.php']) ? 'active' : ''; ?>">
@@ -191,7 +203,7 @@
                             </ul>
                         </li>
                         
-                        <li class="treeview <?php echo in_array($current_page, ['investments.php', 'investment_plans.php', 'create_investment.php']) ? 'active' : ''; ?>">
+                        <li class="treeview <?php echo in_array($current_page, ['investments.php', 'investment_plans.php', 'create_investment.php', 'create_completed_position.php']) ? 'active' : ''; ?>">
                             <a href="#">
                                 <i data-feather="trending-up"></i>
                                 <span>Investments</span>
@@ -209,10 +221,13 @@
                                 <li class="<?php echo $current_page == 'create_investment.php' ? 'active' : ''; ?>">
                                     <a href="<?=$siteLink?>/admin/create_investment"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Create Investment</a>
                                 </li>
+                                <li class="<?php echo $current_page == 'create_completed_position.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/create_completed_position"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Add Completed Position</a>
+                                </li>
                             </ul>
                         </li>
                         
-                        <li class="treeview <?php echo in_array($current_page, ['staking.php', 'staking_plans.php', 'staking_rewards.php', 'create_staking.php']) ? 'active' : ''; ?>">
+                        <li class="treeview <?php echo in_array($current_page, ['staking.php', 'staking_plans.php', 'staking_rewards.php', 'create_staking.php', 'complete_positions.php']) ? 'active' : ''; ?>">
                             <a href="#">
                                 <i data-feather="bar-chart-2"></i>
                                 <span>Staking</span>
@@ -232,6 +247,9 @@
                                 </li>
                                 <li class="<?php echo $current_page == 'create_staking.php' ? 'active' : ''; ?>">
                                     <a href="<?=$siteLink?>/admin/create_staking"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Create Staking</a>
+                                </li>
+                                <li class="<?php echo $current_page == 'complete_positions.php' ? 'active' : ''; ?>">
+                                    <a href="<?=$siteLink?>/admin/complete_positions"><i class="icon-Commit"><span class="path1"></span><span class="path2"></span></i>Complete Positions</a>
                                 </li>
                             </ul>
                         </li>

@@ -250,6 +250,26 @@ get('/admin/withdrawal_methods.php', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/withdrawal_methods.php';
 });
 
+// New admin pages for managing positions and balances
+get('/admin/complete_positions', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/complete_positions.php';
+});
+get('/admin/complete_positions.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/complete_positions.php';
+});
+get('/admin/adjust_balance', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/adjust_balance.php';
+});
+get('/admin/adjust_balance.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/adjust_balance.php';
+});
+get('/admin/create_completed_position', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_completed_position.php';
+});
+get('/admin/create_completed_position.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_completed_position.php';
+});
+
 // Wallet Addresses Management
 get('/admin/wallet_addresses', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/admin/wallet_addresses.php';
@@ -537,6 +557,26 @@ post('/admin/upload_image.php', function() {
 });
 post('/plans', function() {
     include $_SERVER['DOCUMENT_ROOT'] . '/pages/plans.php';
+});
+
+// POST routes for new admin pages
+post('/admin/complete_positions', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/complete_positions.php';
+});
+post('/admin/complete_positions.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/complete_positions.php';
+});
+post('/admin/adjust_balance', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/adjust_balance.php';
+});
+post('/admin/adjust_balance.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/adjust_balance.php';
+});
+post('/admin/create_completed_position', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_completed_position.php';
+});
+post('/admin/create_completed_position.php', function() {
+    include $_SERVER['DOCUMENT_ROOT'] . '/admin/create_completed_position.php';
 });
 
 // Dispatch the routes
