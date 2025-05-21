@@ -24,24 +24,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $max_amount = floatval($_POST['max_amount']);
         $roi_daily = floatval($_POST['roi_daily']);
         $lock_period_days = intval($_POST['lock_period_days']);
+        $duration_days = intval($_POST['duration_days']);
+        $early_unstake_penalty = floatval($_POST['early_unstake_penalty']);
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lock_period_days <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lock_period_days <= 0 || $duration_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Insert new plan
             $stmt = $conn_back->prepare("
                 INSERT INTO staking_plans (name, description, min_amount, max_amount, 
                     roi_daily, lock_period_days, is_active, featured, created_at,
-                    reward_percent, duration_days) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, 30)
+                    reward_percent, duration_days, early_unstake_penalty) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)
             ");
             
-            // Added reward_percent (same as roi_daily for now) and default duration_days of 30
-            $stmt->bind_param("ssdddiisd", $name, $description, $min_amount, $max_amount, 
-                $roi_daily, $lock_period_days, $status, $featured, $roi_daily);
+            // Added reward_percent (same as roi_daily for now) and duration_days and early_unstake_penalty
+            $stmt->bind_param("ssdddiisdid", $name, $description, $min_amount, $max_amount, 
+                $roi_daily, $lock_period_days, $status, $featured, $roi_daily, $duration_days, $early_unstake_penalty);
             
             if ($stmt->execute()) {
                 // Log admin activity
@@ -71,11 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $max_amount = floatval($_POST['max_amount']);
         $roi_daily = floatval($_POST['roi_daily']);
         $lock_period_days = intval($_POST['lock_period_days']);
+        $duration_days = intval($_POST['duration_days']);
+        $early_unstake_penalty = floatval($_POST['early_unstake_penalty']);
         $status = isset($_POST['status']) ? 1 : 0;
         $featured = isset($_POST['featured']) ? 1 : 0;
         
         // Validate inputs
-        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lock_period_days <= 0) {
+        if (empty($name) || $min_amount <= 0 || $roi_daily <= 0 || $lock_period_days <= 0 || $duration_days <= 0) {
             $error = "Please fill all required fields with valid values.";
         } else {
             // Update plan
@@ -83,11 +87,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 UPDATE staking_plans 
                 SET name = ?, description = ?, min_amount = ?, max_amount = ?, 
                     roi_daily = ?, lock_period_days = ?, is_active = ?, featured = ?,
-                    reward_percent = ?
+                    reward_percent = ?, duration_days = ?, early_unstake_penalty = ?
                 WHERE id = ?
             ");
-            $stmt->bind_param("ssdddiiidi", $name, $description, $min_amount, $max_amount, 
-                $roi_daily, $lock_period_days, $status, $featured, $roi_daily, $plan_id);
+            $stmt->bind_param("ssdddiisdidi", $name, $description, $min_amount, $max_amount, 
+                $roi_daily, $lock_period_days, $status, $featured, $roi_daily, $duration_days, $early_unstake_penalty, $plan_id);
             
             if ($stmt->execute()) {
                 // Log admin activity
@@ -346,6 +350,17 @@ include_once __DIR__ . '/layout/header.php';
                                 </div>
                             </div>
                             
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Duration</div>
+                                    <div class="text-nowrap text-white"><?= $plan['duration_days'] ?> days</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-xs font-weight-bold text-uppercase mb-1">Early Unstake Fee</div>
+                                    <div class="text-nowrap text-white"><?= number_format($plan['early_unstake_penalty'], 2) ?>%</div>
+                                </div>
+                            </div>
+                            
                             <?php if (!empty($plan['description'])): ?>
                                 <hr>
                                 <div class="mb-0">
@@ -366,6 +381,8 @@ include_once __DIR__ . '/layout/header.php';
                                         data-max="<?= $plan['max_amount'] ?>"
                                         data-roi="<?= $plan['roi_daily'] ?>"
                                         data-lockup="<?= $plan['lock_period_days'] ?>"
+                                        data-duration="<?= $plan['duration_days'] ?>"
+                                        data-penalty="<?= $plan['early_unstake_penalty'] ?>"
                                         data-status="<?= isset($plan['is_active']) ? $plan['is_active'] : '0' ?>"
                                         data-featured="<?= $plan['featured'] ?>">
                                     <i class="fas fa-edit mr-1"></i> Edit
@@ -444,6 +461,20 @@ include_once __DIR__ . '/layout/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label for="duration_days">Duration (days)</label>
+                                <input type="number" class="form-control" id="duration_days" name="duration_days" min="1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="early_unstake_penalty">Early Unstake Penalty (%)</label>
+                                <input type="number" class="form-control" id="early_unstake_penalty" name="early_unstake_penalty" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <div class="custom-control custom-switch">
                                     <input type="checkbox" class="custom-control-input" id="status" name="status" checked>
                                     <label class="custom-control-label" for="status">Active</label>
@@ -508,14 +539,28 @@ include_once __DIR__ . '/layout/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="edit_roi_daily">Daily Interest Rate (%) *</label>
-                                <input type="number" class="form-control" id="edit_roi_daily" name="roi_daily" step="0.01" min="0" required>
+                                <label for="edit_lock_period_days">Lock-up Period (days) *</label>
+                                <input type="number" class="form-control" id="edit_lock_period_days" name="lock_period_days" min="1" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="edit_lock_period_days">Lock-up Period (days) *</label>
-                                <input type="number" class="form-control" id="edit_lock_period_days" name="lock_period_days" min="1" required>
+                                <label for="edit_roi_daily">Daily Interest Rate (%) *</label>
+                                <input type="number" class="form-control" id="edit_roi_daily" name="roi_daily" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_duration_days">Duration (days)</label>
+                                <input type="number" class="form-control" id="edit_duration_days" name="duration_days" min="1" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_early_unstake_penalty">Early Unstake Penalty (%)</label>
+                                <input type="number" class="form-control" id="edit_early_unstake_penalty" name="early_unstake_penalty" step="0.01" min="0" required>
                             </div>
                         </div>
                     </div>
@@ -583,6 +628,8 @@ $(document).ready(function() {
         var max = $(this).data('max');
         var roi = $(this).data('roi');
         var lockup = $(this).data('lockup');
+        var duration = $(this).data('duration');
+        var penalty = $(this).data('penalty');
         var status = $(this).data('status');
         var featured = $(this).data('featured');
         
@@ -593,6 +640,8 @@ $(document).ready(function() {
         $('#edit_max_amount').val(max);
         $('#edit_roi_daily').val(roi);
         $('#edit_lock_period_days').val(lockup);
+        $('#edit_duration_days').val(duration);
+        $('#edit_early_unstake_penalty').val(penalty);
         $('#edit_status').prop('checked', status == 1);
         $('#edit_featured').prop('checked', featured == 1);
     });

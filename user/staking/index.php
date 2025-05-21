@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_staking'])) {
             // Create staking record
             $now = date('Y-m-d H:i:s');
             $start_date = $now;
-            $duration_days = $plan['duration_days'] ?? 0;
+            $duration_days = $plan['duration_days'] ?? 30;
             $end_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $duration_days . ' days'));
             $lockup_period = $plan['lock_period_days'] ?? 0;
             $unstake_date = date('Y-m-d H:i:s', strtotime($now . ' + ' . $lockup_period . ' days'));
@@ -409,7 +409,7 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Duration:</span>
-                                                <strong><?= $plan['duration_days'] ?? 0 ?> days</strong>
+                                                <strong><?= $plan['duration_days'] ?? 30 ?> days</strong>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Min Amount:</span>
@@ -512,7 +512,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] . '/user/layout/breadcumb.php';
                                                 
                                                 <div class="alert alert-info">
                                                     <ul class="mb-0">
-                                                        <li>Lock period: <?= $plan['lockup_period'] ?? 0 ?> days</li>
+                                                        <li>Lock period: <?= $plan['lock_period_days'] ?? 0 ?> days</li>
+                                                        <li>Duration: <?= $plan['duration_days'] ?? 30 ?> days</li>
                                                         <li>Early unstaking penalty: <?= number_format($plan['early_unstake_penalty'] ?? 0, 2) ?>%</li>
                                                         <li>Your current balances:
                                                             <ul>
