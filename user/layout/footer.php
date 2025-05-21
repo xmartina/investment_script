@@ -182,6 +182,8 @@
         <div class="text-center mb-4"><a href="javascript:void(0);" class="btn btn-sm btn-outline-theme">More
                 options <i class="bi bi-arrow-right-short"></i></a></div>
     </div>
+    <!-- Gtranslate -->
+<div class="gtranslate_wrapper"></div>
 </div>
 <script src="<?= $site_link ?>/back_assets/js/investment/investment-dashboard.js"></script>
 <?php
@@ -203,4 +205,8 @@ if ($page_name = 'Deposit'){
 </script>
 <script src="//code.jivosite.com/widget/mLTwDlXdg6" async></script>
 
+
+
+<script>window.gtranslateSettings = {"default_language":"en","native_language_names":true,"detect_browser_language":true,"languages":["en","fr","it","es","de","nl","da","hi"],"wrapper_selector":".gtranslate_wrapper"}</script>
+<script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
 
