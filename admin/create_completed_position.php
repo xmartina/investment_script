@@ -26,6 +26,15 @@ $investment_plans_result = $conn_back->query($investment_plans_query);
 $staking_plans_query = "SELECT id, name, min_amount, max_amount, reward_percent, duration_days FROM staking_plans WHERE is_active = 1 ORDER BY name";
 $staking_plans_result = $conn_back->query($staking_plans_query);
 
+// If no active staking plans found, show all staking plans regardless of status
+if ($staking_plans_result && $staking_plans_result->num_rows == 0) {
+    $staking_plans_query = "SELECT id, name, min_amount, max_amount, reward_percent, duration_days FROM staking_plans ORDER BY name";
+    $staking_plans_result = $conn_back->query($staking_plans_query);
+}
+
+// Add a debugging variable
+$num_staking_plans = ($staking_plans_result) ? $staking_plans_result->num_rows : 0;
+
 // Process form submission for completed investment
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_completed_investment'])) {
     $user_id = (int)$_POST['user_id'];
@@ -384,6 +393,12 @@ include_once __DIR__ . '/layout/header.php';
                     <h6 class="m-0 font-weight-bold text-primary">Add Completed Staking</h6>
                 </div>
                 <div class="card-body">
+                    <?php if ($num_staking_plans == 0): ?>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Warning:</strong> No staking plans found. Please <a href="<?=$siteLink?>/admin/staking_plans">create staking plans</a> first.
+                        </div>
+                    <?php else: ?>
                     <form method="post" id="completedStakingForm">
                         <div class="form-group">
                             <label for="staking_user_id">Select User:</label>
@@ -465,6 +480,7 @@ include_once __DIR__ . '/layout/header.php';
                         
                         <button type="submit" name="create_completed_staking" class="btn btn-primary">Add Completed Staking</button>
                     </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
