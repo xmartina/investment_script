@@ -128,7 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['adjust_balance'])) {
 
 include_once __DIR__ . '/layout/header.php';
 ?>
-
+<style>
+    #adjustBalanceForm{
+       color: rgba(255, 255, 255, 0.85);
+    }
+</style>
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Adjust User Balance</h1>
